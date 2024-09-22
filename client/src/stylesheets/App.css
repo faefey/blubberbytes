@@ -1,0 +1,7 @@
+/* Main app container */
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;    /* align items to the left */
+    height: 100vh;              /* full viewport height */
+}

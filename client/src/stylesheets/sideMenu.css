@@ -1,0 +1,43 @@
+/* Wrapper to hold logo and sidebar */
+.sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 250px;
+}
+
+/* Adjust the logo styling */
+.logo {
+    width: 400px;
+    height: auto;               /* maintain aspect ratio */
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Sidebar styling */
+.side-menu {
+    width: 100%;
+    flex-grow: 1;               /* fill the remaining space */
+    background-color: #CCEBFF;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Navigation item styling */
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background-color: #99D7FF;
+    border-radius: 25px;
+    font-weight: bold;
+}
+
+/* Icon styling */
+.nav-icon {
+    margin-right: 10px;
+}
