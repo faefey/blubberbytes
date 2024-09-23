@@ -1,7 +1,7 @@
 import {useState} from 'react'
 
 // I plan on stylizing this later when everything is combined into one page
-export default function SelectedFileMenu({}) {
+export default function SelectedFileMenu() {
     const [selectedFiles, setSelectedFiles] = useState([])
 
     return (
@@ -9,7 +9,7 @@ export default function SelectedFileMenu({}) {
     )
 }
 
-function FileFilters({}) {
+function FileFilters() {
     function clearFilters() {
         document.getElementById("typefilter").value = "Type"
         document.getElementById("datefilter").value = "Date"
@@ -43,7 +43,7 @@ function FileActions({selectedFiles}) {
             <p style={{display: "inline"}}>{selectedFiles.length} selected</p>
             <span className="material-symbols-outlined">download</span>
             <span className="material-symbols-outlined">delete</span>
-            <span class="material-symbols-outlined">info</span>
+            <span className="material-symbols-outlined">info</span>
         </div>
     )
 }
