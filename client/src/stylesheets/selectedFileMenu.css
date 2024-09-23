@@ -1,4 +1,5 @@
-#selectedfilemenu {
+/* I plan on stylizing this later when everything is combined into one page */
+#fileactions {
   display: flex;
   justify-content: center;
   align-items: center;
