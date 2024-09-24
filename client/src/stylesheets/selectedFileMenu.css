@@ -1,18 +1,48 @@
-/* I plan on stylizing this later when everything is combined into one page */
-#fileactions, #filefilters {
+#filefilters, #fileactions {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 20px;
-  background-color: lightgrey;
+  gap: 1%;
+  background-color: lightblue;
   border-radius: 20px;
-  width: 70%;
+  width: 80%;
+  height: 45px;
+  padding-left: 2%;
 }
 
-.material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24
+.filter {
+  display: inline-block;
+  text-align: center;
+  height: 65%;
+  background-color: white;
+  border-radius: 15px;
+  border-width: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.filter:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}
+
+#clearfilters {
+  position: relative;
+  left: 2%;
+  border-radius: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#fileactions p {
+  user-select: none;
+}
+
+.icon {
+  border-radius: 8px;
+}
+
+.icon:hover {
+  cursor: pointer;
+  background-color: lightcyan;
 }
