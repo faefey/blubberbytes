@@ -6,12 +6,10 @@ import { useSortableTable } from "./sortTable";
 const Table = ({ caption, data, columns }) => {
   const [tableData, handleSorting] = useSortableTable(data, columns);
   const [selectedRows, setSelectedRows] = useState([]);
-
-  // Toggle individual row selection
   const onSelectRow = (id) => {
     setSelectedRows((prevSelectedRows) =>
       prevSelectedRows.includes(id)
-        ? prevSelectedRows.filter((rowId) => rowId !== id) // Deselect if already selected
+        ? prevSelectedRows.filter((rowId) => rowId !== id) 
         : [...prevSelectedRows, id] // Select if not selected
     );
   };
