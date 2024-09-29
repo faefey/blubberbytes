@@ -1,5 +1,7 @@
 import {useState} from 'react'
 
+import '../stylesheets/selectedFileMenu.css'
+
 import {ReactComponent as Download} from '../icons/download.svg'
 import {ReactComponent as Delete} from '../icons/delete.svg'
 import {ReactComponent as Info} from '../icons/info.svg'
