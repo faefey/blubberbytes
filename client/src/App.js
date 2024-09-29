@@ -19,9 +19,11 @@ function App() {
   return (
     <div className="App">
 	    <Banner />
-      <SideMenu fileItems={fileItems} tagItems={tagItems} />
-      <SelectedFileMenu />
-      <Table data={tableData1} columns={columns} />
+      <div className="content">
+        <SideMenu fileItems={fileItems} tagItems={tagItems} />
+        <SelectedFileMenu />
+        <Table data={tableData1} columns={columns} />
+      </div>
     </div>
   );
 }
