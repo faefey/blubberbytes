@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import HostPopup from './HostPopup';
 import { fileItems, tagItems } from './menuItems';
 
-import '../stylesheets/SideMenu.css';
+import '../stylesheets/sideMenu.css';
 
 // side menu navigation item component
 const NavItem = ({ label, icon, onClick, isActive }) => (
