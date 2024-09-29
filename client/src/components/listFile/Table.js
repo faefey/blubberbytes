@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TableBody from "./TableBody";
 import TableHead from "./TableHead";
 import { useSortableTable } from "./sortTable";
+import "../../stylesheets/table.css";
 
 const Table = ({ caption, data, columns }) => {
   const [tableData, handleSorting] = useSortableTable(data, columns);
