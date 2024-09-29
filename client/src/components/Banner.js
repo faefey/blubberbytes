@@ -15,7 +15,7 @@ const imageStyle = { width: '500px', height: 'auto' };
 
 //setCurrentPage and currPage
 //{setCurrPage, currPage}
-export default function Banner() {
+export default function Banner({currPage, setCurrPage}) {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Dropdown state
 
     const toggleDropdown = () => {
@@ -38,7 +38,8 @@ export default function Banner() {
           {isDropdownVisible && (
             <div className="dropdown">
               <button className="dropdown-item">Log Out</button>
-              <button className="dropdown-item">Settings</button>
+              {currPage === 0 && <button className="dropdown-item"
+                                  onClick={() => setCurrPage(1)}>Settings</button>}
             </div>
           )}
         </div>

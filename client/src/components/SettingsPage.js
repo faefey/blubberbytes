@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './SettingsPage.css';
 
-const SettingsPage = () => {
+const SettingsPage = ({setCurrPage}) => {
   const [activeSection, setActiveSection] = useState('account'); // Default section is 'account'
   const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Dropdown state
 
@@ -37,7 +37,7 @@ const SettingsPage = () => {
           <nav className="menu">
             <ul>
               <li>
-                <button className="back-button">
+                <button className="back-button" onClick = {() => setCurrPage(0)}>
                   <span>&larr;</span> Settings
                 </button>
               </li>
