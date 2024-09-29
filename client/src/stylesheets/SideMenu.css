@@ -1,0 +1,35 @@
+/* Sidebar styling */
+.side-menu {
+    width: 15%;
+    flex-grow: 1;
+    background-color: #CCEBFF;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Navigation item styling */
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background-color: #99D7FF;
+    border-radius: 25px;
+    font-weight: bold;
+}
+
+/* Active item styling */
+.active-item {
+    background-color: #99D7FF;
+    border-radius: 25px;
+    font-weight: bold;
+}
+
+
+/* Icon styling */
+.nav-icon {
+    margin-right: 10px;
+}
