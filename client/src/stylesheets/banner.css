@@ -25,3 +25,36 @@
 .profile-button-container {
     position: relative; /* Ensures the dropdown is positioned relative to the button */
   }
+
+  
+  /* Dropdown for logout */
+  .dropdown {
+    position: absolute;
+    top: 50px; /* Position below the profile button */
+    right: 0;
+    background-color: #ccebff; /* Light blue background */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 100;
+    width: 120px; /* Adjust width if needed */
+    padding: 10px; /* Add padding for inner space */
+  }
+  
+  /* Styling for dropdown item (logout button) */
+  .dropdown-item {
+    padding: 10px 15px;
+    text-align: left;
+    border: none;
+    background-color: transparent; /* No need for background inside */
+    cursor: pointer;
+    font-size: 16px;
+    color: #333; /* Text color */
+    width: 100%;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #b3e0ff; /* Slightly darker blue on hover */
+    border-radius: 5px;
+  }
+  
+  
