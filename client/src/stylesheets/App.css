@@ -1,7 +1,27 @@
-/* Main app container */
-.app {
+.maincontent {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;    /* align items to the left */
-    height: 100vh;              /* full viewport height */
+    align-items: left;
+    justify-content: left;
+    width: 100%;
+}
+
+.side-menu {
+    flex-basis: 17%;
+    margin-right: 15px;
+}
+
+.content {
+    flex-basis: 83%;
+}
+
+#settingscontent {
+    background-color: #ccebff;
+    padding: 35px 50px 50px 50px;
+    border-radius: 10px;
+    min-height: 80vh;
+}
+
+#settingscontent h1 {
+    margin: 0px;
 }
