@@ -40,7 +40,7 @@ export default function Banner({currPage, setCurrPage}) {
             <div className="dropdown">
               <button className="dropdown-item">Log Out</button>
               {currPage === 0 && <button className="dropdown-item"
-                                  onClick={() => setCurrPage(1)}>Settings</button>}
+                                  onClick={() => {setCurrPage(1); setIsDropdownVisible(false);}}>Settings</button>}
             </div>
           )}
         </div>
