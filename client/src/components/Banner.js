@@ -1,6 +1,6 @@
 import SearchBar from ".//SearchBar.js";
 import logo from '../bb-logo.png';
-import './SettingsPage.css';
+import '../stylesheets/banner.css';
 import { useState } from 'react';
 
 import {ReactComponent as AccountCircle} from '../icons/account_circle.svg';

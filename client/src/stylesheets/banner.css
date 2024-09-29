@@ -1,0 +1,27 @@
+/* Profile button container */
+.profile-button {
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    width: 200px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    margin-right: 100px; /* Move button to the left by reducing this value */
+}
+
+.profile-button img {
+    width: 60px;
+    height: 60px;
+}
+
+.profile-button span {
+    display: none;
+}
+
+.profile-button-container {
+    position: relative; /* Ensures the dropdown is positioned relative to the button */
+  }
