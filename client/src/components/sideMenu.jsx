@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import HostPopup from './HostPopup';
+import { fileItems, tagItems } from './menuItems';
 
 // side menu navigation item component
 const NavItem = ({ label, icon, onClick }) => (
@@ -8,18 +10,45 @@ const NavItem = ({ label, icon, onClick }) => (
   </div>
 );
 
-// side menu list component
-const sideMenu = ({ items }) => (
-  <div className="side-menu">
-    {items.map((item, index) => (
-      <NavItem 
-        key={index} 
-        label={item.label} 
-        icon={item.icon} 
-        onClick={item.onClick} 
-      />
-    ))}
-  </div>
-);
+// side menu list components divided into Files and Tags
+const SideMenu = () => {
+  const [activeItem, setActiveItem] = useState('');
 
-export default sideMenu;
+  const handleItemClick = (label) => {
+    setActiveItem(label);
+    console.log(`Active item: ${label}`);
+  };
+
+  return (
+    <div className="side-menu">
+      {/* Files Section */}
+      <div className="menu-section">
+        <h3>Files</h3>
+        {activeItem === 'Hosted' && <HostPopup />}
+        {fileItems.map((item, index) => (
+          <NavItem
+            key={index}
+            label={item.label}
+            icon={item.icon}
+            onClick={() => handleItemClick(item.label)}
+          />
+        ))}
+      </div>
+
+      {/* Tags Section */}
+      <div className="menu-section">
+        <h3>Tags</h3>
+        {tagItems.map((item, index) => (
+          <NavItem
+            key={index}
+            label={item.label}
+            icon={item.icon}
+            onClick={() => handleItemClick(item.label)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default SideMenu;
