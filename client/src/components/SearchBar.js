@@ -7,6 +7,13 @@ and when pressed, the info in the bar is deleted.
 To use in app:
 import SearchBar from './/components/SearchBar.js';
 */
+const inputStyle = {
+  width: '900px',
+  height: '50px',
+  borderRadius: '0px',
+  background: '#ccebff'
+};
+
 export default function SearchBar() {
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = React.createRef();
@@ -29,6 +36,7 @@ export default function SearchBar() {
                placeholder="Search..."
                onChange={inputChangeHandler}
                onKeyDown={keyPressHandler}
+               style={inputStyle}
                ref={inputRef}/>
       );
 }
