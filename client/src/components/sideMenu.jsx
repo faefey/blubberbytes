@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import HostPopup from './HostPopup';
 import { fileItems, tagItems } from './menuItems';
 
+import '../stylesheets/SideMenu.css';
+
 // side menu navigation item component
-const NavItem = ({ label, icon, onClick }) => (
-  <div onClick={onClick} className="nav-item">
+const NavItem = ({ label, icon, onClick, isActive }) => (
+  <div onClick={onClick} className={`nav-item ${isActive ? 'active-item' : ''}`}>
     {icon && <span className="nav-icon">{icon}</span>}
     <span className="nav-label">{label}</span>
   </div>
@@ -31,6 +33,7 @@ const SideMenu = () => {
             label={item.label}
             icon={item.icon}
             onClick={() => handleItemClick(item.label)}
+            isActive={activeItem === item.label}
           />
         ))}
       </div>
@@ -44,6 +47,7 @@ const SideMenu = () => {
             label={item.label}
             icon={item.icon}
             onClick={() => handleItemClick(item.label)}
+            isActive={activeItem === item.label}
           />
         ))}
       </div>

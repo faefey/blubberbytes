@@ -1,23 +1,7 @@
-/* Wrapper to hold logo and sidebar */
-.sidebar-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 250px;
-}
-
-/* Adjust the logo styling */
-.logo {
-    width: 400px;
-    height: auto;               /* maintain aspect ratio */
-    display: block;
-    margin-bottom: 20px;
-}
-
 /* Sidebar styling */
 .side-menu {
-    width: 100%;
-    flex-grow: 1;               /* fill the remaining space */
+    width: 15%;
+    flex-grow: 1;
     background-color: #CCEBFF;
     padding: 10px;
     border-radius: 10px;
@@ -36,6 +20,14 @@
     border-radius: 25px;
     font-weight: bold;
 }
+
+/* Active item styling */
+.active-item {
+    background-color: #99D7FF;
+    border-radius: 25px;
+    font-weight: bold;
+}
+
 
 /* Icon styling */
 .nav-icon {
