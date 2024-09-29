@@ -9,7 +9,6 @@ const headerStyle = {
     alignItems: 'center',         
     justifyContent: 'space-between', 
     padding: '10px',               
-    backgroundColor: '#f8f9fa'
   };
 
 const imageStyle = { width: '500px', height: 'auto' };
