@@ -1,8 +1,9 @@
 import SearchBar from ".//SearchBar.js";
 import logo from '../bb-logo.png';
 import './SettingsPage.css';
-
 import { useState } from 'react';
+
+import {ReactComponent as AccountCircle} from '../icons/account_circle.svg';
 
 const headerStyle = {
     display: 'flex',            
@@ -32,7 +33,7 @@ export default function Banner({currPage, setCurrPage}) {
         <SearchBar/>
         <div className="profile-button-container">
           <button className="profile-button" onClick={toggleDropdown}>
-            <img src="/profile-icon.png" alt="Profile" />
+            <AccountCircle />
           </button>
           {/* Dropdown for Log Out */}
           {isDropdownVisible && (
