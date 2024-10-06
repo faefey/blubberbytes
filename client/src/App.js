@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
+import {useState} from 'react';
+
 import './stylesheets/App.css';
+
 import Banner from './components/Banner.js';
-import MainContent from './components/mainContent.js';
+import MainContent from './components/mainContent.js'
 import SettingsPage from './components/SettingsPage.js';
 
 function App() {
@@ -9,9 +12,9 @@ function App() {
 
   return (
     <div className="App">
-      <Banner currPage={currPage} setCurrPage={setCurrPage} />
+	    <Banner currPage={currPage} setCurrPage={setCurrPage}/>
       {currPage === 0 && <MainContent />}
-      {currPage === 1 && <SettingsPage setCurrPage={setCurrPage} />}
+      {currPage === 1 && <SettingsPage setCurrPage={setCurrPage}/>}
     </div>
   );
 }
