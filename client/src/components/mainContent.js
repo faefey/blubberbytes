@@ -1,6 +1,5 @@
 import SideMenu from './sideMenu.jsx';
 import {fileItems, tagItems} from './menuItems.jsx';
-import SelectedFileMenu from './selectedfilemenu.js';
 import Table from "./listFile/Table.js";
 
 import tableData1 from "../data/tableData1.json";
@@ -12,7 +11,6 @@ export default function MainContent() {
       <div className="maincontent">
         <SideMenu items={fileItems} tags={tagItems} />
         <div className="content">
-          <SelectedFileMenu />
           <Table data={tableData1} columns={columns} />
         </div>
       </div>
