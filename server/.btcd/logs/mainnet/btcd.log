@@ -1,0 +1,34 @@
+2024-10-05 10:11:02.847 [INF] BTCD: Version 0.24.2-beta
+2024-10-05 10:11:02.847 [INF] BTCD: Loading block database from '/home/firew/.btcd/data/mainnet/blocks_ffldb'
+2024-10-05 10:11:02.870 [INF] BTCD: Block database loaded
+2024-10-05 10:11:02.873 [INF] INDX: Committed filter index is enabled
+2024-10-05 10:11:02.873 [INF] CHAN: Pre-alloacting for 251 MiB
+2024-10-05 10:11:02.876 [INF] INDX: Catching up indexes from height -1 to 0
+2024-10-05 10:11:02.876 [INF] INDX: Indexes caught up to height 0
+2024-10-05 10:11:02.876 [INF] CHAN: Chain state (height 0, hash 8f53fdb18dedcf05516aa4bbcca0b13383e6fa02ab5bbe642d7f405c81998003, totaltx 1, work 4295032833)
+2024-10-05 10:11:02.877 [INF] RPCS: RPC server listening on 127.0.0.1:8334
+2024-10-05 10:11:02.877 [INF] AMGR: Loaded 0 addresses from file '/home/firew/.btcd/data/mainnet/peers.json'
+2024-10-05 10:11:02.877 [INF] CMGR: Server listening on [::]:8333
+2024-10-05 10:11:02.877 [INF] CMGR: Server listening on 0.0.0.0:8333
+2024-10-05 10:16:18.750 [INF] BTCD: Received signal (interrupt).  Shutting down...
+2024-10-05 10:16:18.750 [INF] BTCD: Gracefully shutting down the server...
+2024-10-05 10:16:18.750 [WRN] SRVR: Server shutting down
+2024-10-05 10:16:18.750 [WRN] RPCS: RPC server shutting down
+2024-10-05 10:16:18.750 [INF] RPCS: RPC server shutdown complete
+2024-10-05 10:16:18.770 [INF] SYNC: Sync manager shutting down
+2024-10-05 10:16:18.770 [INF] CHAN: Flushing UTXO cache of 97 MiB with 1 entries to disk. For large sizes, this can take up to several minutes...
+2024-10-05 10:16:18.774 [INF] AMGR: Address manager shutting down
+2024-10-05 10:16:18.777 [INF] SRVR: Server shutdown complete
+2024-10-05 10:16:18.777 [INF] BTCD: Gracefully shutting down the database...
+2024-10-05 10:16:18.782 [INF] BTCD: Shutdown complete
+2024-10-06 14:18:17.111 [INF] BTCD: Version 0.24.2-beta
+2024-10-06 14:18:17.112 [INF] BTCD: Loading block database from '/home/firew/.btcd/data/mainnet/blocks_ffldb'
+2024-10-06 14:18:17.139 [INF] BTCD: Block database loaded
+2024-10-06 14:18:17.144 [INF] INDX: Committed filter index is enabled
+2024-10-06 14:18:17.145 [INF] CHAN: Pre-alloacting for 251 MiB
+2024-10-06 14:18:17.149 [INF] CHAN: Loading block index...
+2024-10-06 14:18:17.152 [INF] CHAN: Chain state (height 0, hash 8f53fdb18dedcf05516aa4bbcca0b13383e6fa02ab5bbe642d7f405c81998003, totaltx 1, work 4295032833)
+2024-10-06 14:18:17.152 [INF] RPCS: RPC server listening on 127.0.0.1:8334
+2024-10-06 14:18:17.155 [INF] AMGR: Loaded 0 addresses from file '/home/firew/.btcd/data/mainnet/peers.json'
+2024-10-06 14:18:17.155 [INF] CMGR: Server listening on 0.0.0.0:8333
+2024-10-06 14:18:17.155 [INF] CMGR: Server listening on [::]:8333

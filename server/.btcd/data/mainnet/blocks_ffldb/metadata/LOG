@@ -1,0 +1,38 @@
+=============== Oct 5, 2024 (EDT) ===============
+10:11:02.848675 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+10:11:02.866528 db@open opening
+10:11:02.868069 version@stat F·[] S·0B[] Sc·[]
+10:11:02.870657 db@janitor F·2 G·0
+10:11:02.870765 db@open done T·4.17701ms
+10:16:18.753706 memdb@flush N·3 S·93B
+10:16:18.757126 memdb@flush created L0@3 N·3 S·260B "\x00\x00\x00..loc,v1":"bid..bid,v3"
+10:16:18.757220 version@stat F·[1] S·260B[260B] Sc·[0.25]
+10:16:18.759533 memdb@flush committed F·1 T·4.996603ms
+10:16:18.759654 journal@remove removed @1
+10:16:18.763250 transaction@flush created L0@4 N·24 S·1KiB "\x00\x00\x00..ate,v4":"bid..bid,v27"
+10:16:18.763305 version@stat F·[2] S·1KiB[1KiB] Sc·[0.50]
+10:16:18.768454 transaction@flush created L0@5 N·2 S·364B "\x00\x00\x00..fee,v28":"\x00\x00\x00..loc,v29"
+10:16:18.768523 version@stat F·[3] S·1KiB[1KiB] Sc·[0.75]
+10:16:18.780155 transaction@flush created L0@6 N·3 S·313B "\x00\x00\x00..loc,v30":"\x00\x00\x00..,\xf3\x00,d32"
+10:16:18.780213 version@stat F·[4] S·2KiB[2KiB] Sc·[1.00]
+10:16:18.782460 db@close closing
+10:16:18.782527 table@compaction L0·4 -> L1·0 S·2KiB Q·32
+10:16:18.782555 table@build exiting
+10:16:18.782639 db@close done T·178.292µs
+=============== Oct 6, 2024 (EDT) ===============
+14:18:17.113699 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:18:17.115456 version@stat F·[4] S·2KiB[2KiB] Sc·[1.00]
+14:18:17.115532 db@open opening
+14:18:17.115594 journal@recovery F·1
+14:18:17.116893 journal@recovery recovering @2
+14:18:17.118126 version@stat F·[4] S·2KiB[2KiB] Sc·[1.00]
+14:18:17.137013 db@janitor F·6 G·0
+14:18:17.137079 db@open done T·21.515593ms
+14:18:17.137204 table@compaction L0·4 -> L1·0 S·2KiB Q·32
+14:18:17.149605 table@build created L1@9 N·26 S·1KiB "\x00\x00\x00..ate,v4":"bid..bid,v27"
+14:18:17.149736 version@stat F·[0 1] S·1KiB[0B 1KiB] Sc·[0.00 0.00]
+14:18:17.159967 table@compaction committed F-3 S-747B Ke·0 D·6 T·22.703819ms
+14:20:17.180188 table@remove removed @6
+14:20:17.180254 table@remove removed @5
+14:20:17.180282 table@remove removed @4
+14:20:17.180337 table@remove removed @3
