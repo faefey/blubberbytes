@@ -1,6 +1,6 @@
 // SettingsPage.js
 import React, { useState } from 'react';
-import SideMenu from './sideMenu.jsx';
+import SideMenu from './sideMenu.js';
 
 import '../stylesheets/App.css';
 

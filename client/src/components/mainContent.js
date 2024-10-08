@@ -1,4 +1,4 @@
-import SideMenu from './sideMenu.jsx';
+import SideMenu from './sideMenu.js';
 import SelectedFileMenu from './selectedfilemenu.js';
 import Table from "./Table.js";
 
