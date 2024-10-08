@@ -2,7 +2,7 @@
 .side-menu {
     width: 15%;
     flex-grow: 1;
-    background-color: #CCEBFF;
+    background-color: var(--color-theme);
     padding: 10px;
     border-radius: 10px;
 }

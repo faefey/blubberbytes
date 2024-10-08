@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import HostPopup from './HostPopup';
 
 import '../stylesheets/sideMenu.css';
@@ -12,7 +12,7 @@ const NavItem = ({ label, icon, onClick, isActive }) => (
 );
 
 // side menu list components divided into Files and Tags
-const SideMenu = ({items, tags, files=true}) => {
+const SideMenu = ({items, tags, files=true, setCurrPage}) => {
   const [activeItem, setActiveItem] = useState('');
 
   const handleItemClick = (label, onClick) => {

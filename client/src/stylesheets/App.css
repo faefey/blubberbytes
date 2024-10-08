@@ -1,3 +1,7 @@
+:root {
+    --color-theme: #ccebff;
+}
+
 .maincontent {
     display: flex;
     flex-direction: row;
@@ -16,7 +20,7 @@
 }
 
 #settingscontent {
-    background-color: #ccebff;
+    background-color: var(--color-theme);
     padding: 35px 50px 50px 50px;
     border-radius: 10px;
     min-height: 80vh;
