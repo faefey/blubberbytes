@@ -1,44 +1,31 @@
 [
   {
     "id": 1,
-    "FileName": "FILE 1",
-    "FileSize": 0.50,
-    "DateListed": "2023-01-02",
-    "downloads": 10
+    "FileName": "Document1",
+    "FileSize": "2 GB",
+    "sizeInGB": 2,
+    "DateListed": "2023-10-01",
+    "type": "document",
+    "downloads": 150,
+    "price": 1.99
   },
   {
     "id": 2,
-    "FileName": "FILE 2",
-    "FileSize": 6.00,
-    "DateListed": "2024-05-03",
-    "downloads": 1
-  },
-  {
+    "FileName": "Media1",
+    "FileSize": "5.5 GB",
+    "sizeInGB": 5.5,
+    "DateListed": "2023-09-20",
+    "type": "media",
+    "downloads": 2500,
+    "price": 2.99
+  },  {
     "id": 3,
-    "FileName": "FILE 3",
-    "FileSize": 4.00,
-    "DateListed": "2023-06-02",
-    "downloads": 1
-  },
-  {
-    "id": 4,
-    "FileName": "FILE 4",
-    "FileSize": 34.00,
-    "DateListed": "2024-09-30",
-    "downloads": 200
-  },
-  {
-    "id": 5,
-    "FileName": "FILE 5",
-    "FileSize": 31.00,
-    "DateListed": "2023-06-02",
-    "downloads": 40
-  },
-  {
-    "id": 6,
-    "FileName": "FILE 6",
-    "FileSize": 350.00,
-    "DateListed": "2021-01-05",
-    "downloads": 3000
+    "FileName": "Document2",
+    "FileSize": "40 GB",
+    "sizeInGB": 40,
+    "DateListed": "2024-10-01",
+    "type": "document",
+    "downloads": 10,
+    "price": 100
   }
 ]
