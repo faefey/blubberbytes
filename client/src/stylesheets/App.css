@@ -2,12 +2,24 @@
     --color-theme: #ccebff;
 }
 
+body {
+    padding: 10px;
+    margin: 0px;
+}
+
+.App {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 20px);
+}
+
 .maincontent {
     display: flex;
     flex-direction: row;
     align-items: left;
     justify-content: left;
     width: 100%;
+    flex-grow: 1;
 }
 
 .side-menu {

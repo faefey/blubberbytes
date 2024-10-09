@@ -1,37 +1,42 @@
+import {useState} from 'react';
+
 import SideMenu from './sideMenu.js';
 import SelectedFileMenu from './selectedfilemenu.js';
 import Table from "./Table.js";
 
-import tableData1 from "../data/tableData1.json";
+import {ReactComponent as Hosting} from '../icons/server.svg'
+import {ReactComponent as Purchased} from '../icons/paid.svg'
+import {ReactComponent as Sharing} from '../icons/folder.svg'
+import {ReactComponent as Explore} from '../icons/globe1.svg'
 
-const columns = [ { label: "File Name", accessor: "FileName", sortable: true }, { label: "FileSize", accessor: "FileSize", sortable: true }, { label: "DateListed", accessor: "DateListed", sortable: true }, { label: "downloads", accessor: "downloads", sortable: true }, ];
+export default function MainContent({data, columns}) {
+  const [currSection, setCurrSection] = useState('Hosting')
 
-export default function MainContent({setCurrPage}) {
   const fileItems = [
     {
-      label: 'Hosted', icon: '🗄️',
-      onClick: () => console.log('Clicked Hosted')
+      label: 'Hosting', icon: <Hosting />,
+      onClick: () => setCurrSection('Hosting')
     },
     {
-      label: 'Purchased', icon: '🛒',
-      onClick: () => console.log('Clicked Purchased')
+      label: 'Purchased', icon: <Purchased />,
+      onClick: () => setCurrSection('Purchased')
     },
     {
-      label: 'Shared', icon: '🌐',
-      onClick: () => console.log('Clicked Shared')
+      label: 'Sharing', icon: <Sharing />,
+      onClick: () => setCurrSection('Sharing')
     },
     {
-      label: 'Explore', icon: '🌐',
-      onClick: () => console.log('Clicked Explore')
+      label: 'Explore', icon: <Explore />,
+      onClick: () => setCurrSection('Explore')
     }
   ];
 
   return (
       <div className="maincontent">
-        <SideMenu items={fileItems} tags={[]} setCurrPage={setCurrPage} />
+        <SideMenu items={fileItems} currSection={currSection} />
         <div className="content">
           <SelectedFileMenu />
-          <Table data={tableData1} columns={columns} />
+          <Table data={data[currSection]} columns={columns} />
         </div>
       </div>
   );

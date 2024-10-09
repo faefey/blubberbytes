@@ -1,39 +1,42 @@
-// SettingsPage.js
-import React, { useState } from 'react';
+import {useState} from 'react';
+
 import SideMenu from './sideMenu.js';
 
-import '../stylesheets/App.css';
+import {ReactComponent as Back} from '../icons/arrow_back.svg'
+import {ReactComponent as Account} from '../icons/person.svg'
+import {ReactComponent as Preferences} from '../icons/wrench.svg'
+import {ReactComponent as Wallet} from '../icons/payments.svg'
 
 const SettingsPage = ({setCurrPage}) => {
-  const [activeSection, setActiveSection] = useState('account'); // Default section is 'account'
+  const [currSection, setCurrSection] = useState('Account'); // Default section is 'account'
 
   const settingsItems = [
     {
-      label: 'Settings', icon: '<-',
+      label: 'Settings', icon: <Back />,
       onClick: () => setCurrPage(0)
     },
     {
-      label: 'Account', icon: '🗄️',
-      onClick: () => setActiveSection('account')
+      label: 'Account', icon: <Account />,
+      onClick: () => setCurrSection('Account')
     },
     {
-      label: 'Preferences', icon: '🛒',
-      onClick: () => setActiveSection('preferences')
+      label: 'Preferences', icon: <Preferences />,
+      onClick: () => setCurrSection('Preferences')
     },
     {
-      label: 'Wallet', icon: '🌐',
-      onClick: () => setActiveSection('wallet')
+      label: 'Wallet', icon: <Wallet />,
+      onClick: () => setCurrSection('Wallet')
     }
   ];
 
   return (
     <div className="maincontent">
-      <SideMenu items={settingsItems} tags={[]} files={false} />
+      <SideMenu items={settingsItems} files={false} currSection={currSection} />
 
       <div id="settingscontent" className="content">
-        {activeSection === 'account' && <h1>Account Section</h1>}
-        {activeSection === 'preferences' && <h1>Preferences Section</h1>}
-        {activeSection === 'wallet' && <h1>Wallet Section</h1>}
+        {currSection === 'Account' && <h1>Account Section</h1>}
+        {currSection === 'Preferences' && <h1>Preferences Section</h1>}
+        {currSection === 'Wallet' && <h1>Wallet Section</h1>}
       </div>
     </div>
   );

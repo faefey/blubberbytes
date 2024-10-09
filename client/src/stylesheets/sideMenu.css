@@ -7,6 +7,12 @@
     border-radius: 10px;
 }
 
+/* Center "Files" and host file button vertically on same line */
+.side-menu-header {
+    display: flex;
+    align-items: center;
+}
+
 /* Navigation item styling */
 .nav-item {
     display: flex;
@@ -28,8 +34,8 @@
     font-weight: bold;
 }
 
-
-/* Icon styling */
-.nav-icon {
-    margin-right: 10px;
+/* Move text to the right and prevent selecting the text */
+.nav-label {
+    margin-left: 10px;
+    user-select: none;
 }

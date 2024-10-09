@@ -1,15 +1,15 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
 
 import logo from '../bb-logo.png';
 import '../stylesheets/banner.css';
 
 import {ReactComponent as AccountCircle} from '../icons/account_circle.svg';
 
-export default function Banner({currPage, setCurrPage}) {
+export default function Banner({currPage, setCurrPage, data}) {
     return (
         <div id="banner">
             <img id="logo" src={logo} alt="Logo" />
-            <SearchBar />
+            {currPage === 0 && <SearchBar />}
             <AccountCircle id="profile-button" onClick={() => setCurrPage(1)} />
         </div>
     );
