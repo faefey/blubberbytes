@@ -1,6 +1,8 @@
 // Table.js
 import React, { useState, useEffect } from "react";
 import "../stylesheets/table.css";
+import TableContext from './TableContext';
+import SelectedFileMenu from './selectedfilemenu'; 
 
 // TableHead.js content
 const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
@@ -71,14 +73,18 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
 };
 
 // Main Table component
-const Table = ({
-  caption,
-  data,
-  columns,
-  filters,
-  selectedFiles,
-  setSelectedFiles,
-}) => {
+const Table = ({ caption, data, columns }) => {
+  // Move filters and selectedFiles state here
+  const [filters, setFilters] = useState({
+    type: '',
+    size: '',
+    date: '',
+    downloads: '',
+    price: '',
+  });
+
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
   const [tableData, handleSorting] = useSortableTable(data, columns, filters);
 
   const onSelectRow = (id) => {
@@ -91,7 +97,7 @@ const Table = ({
 
   const onSelectAll = () => {
     if (selectedFiles.length === tableData.length) {
-      setSelectedFiles([]); // Deselect all if all are selected
+      setSelectedFiles([]); // Deselect all
     } else {
       setSelectedFiles(tableData.map((row) => row.id)); // Select all
     }
@@ -99,8 +105,18 @@ const Table = ({
 
   const selectAll = selectedFiles.length === tableData.length && tableData.length > 0;
 
+  // Define context value
+  const contextValue = {
+    filters,
+    setFilters,
+    selectedFiles,
+    setSelectedFiles,
+  };
+
   return (
-    <>
+    <TableContext.Provider value={contextValue}>
+      {/* Move SelectedFileMenu inside Table */}
+      <SelectedFileMenu />
       <table className="table">
         <caption>{caption}</caption>
         <TableHead
@@ -116,7 +132,7 @@ const Table = ({
           selectedRows={selectedFiles}
         />
       </table>
-    </>
+    </TableContext.Provider>
   );
 };
 
