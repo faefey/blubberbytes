@@ -8,8 +8,9 @@
 }
 
 /* Center "Files" and host file button vertically on same line */
-.side-menu-header {
+#side-menu-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
