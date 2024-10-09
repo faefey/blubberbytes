@@ -42,7 +42,7 @@ export default function HostPopup() {
     }
     
     return (
-        <Popup  trigger={<button>Add file</button>}
+        <Popup  trigger={<button className="host-button">Add file</button>}
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
@@ -59,7 +59,7 @@ export default function HostPopup() {
                                    onChange={handleFileChange}
                                    ref={fileInputRef}
                                    style={{ display: 'none'}}/>
-                            <button id="file-input" 
+                            <button className ="host-button" id="file-input" 
                                     onClick={handleButtonClick}>Select A File</button>
                         </div>
                     </div>
@@ -72,7 +72,7 @@ export default function HostPopup() {
                     </div>
                     <br />
                     <br />
-                    <button type="submit">
+                    <button className="host-button" type="submit">
                         Add file
                     </button>
 

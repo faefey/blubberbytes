@@ -5,6 +5,7 @@
 }
 
 #popup-border {
+    position: relative;
     border: 2px solid black;
 }
 
@@ -23,7 +24,7 @@
     background: rgba(0, 0, 0, 0.5);
 }
 
-button {
+.host-button {
     padding: 5px 10px;
     border: 2px solid gray; 
     margin: 10px;
@@ -36,12 +37,12 @@ button {
     transition: all 0.3s ease;
 }
   
-button:hover {
+.host-button:hover {
     background-color: rgb(127, 190, 201);
     border-color: darkgray;
 }
   
-button:focus {
+.host-button:focus {
     outline: none;
     box-shadow: 0 0 5px rgba(128, 128, 128, 0.5); 
 }
@@ -55,8 +56,4 @@ button:focus {
     font-style: italic;
     font-size: 15px;
     text-align: center;
-}
-  
-
-
-  
+} 
