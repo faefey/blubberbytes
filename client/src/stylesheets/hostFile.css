@@ -1,0 +1,59 @@
+#label-div {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+}
+
+#popup-border {
+    position: relative;
+    border: 2px solid black;
+}
+
+#popup-text {
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.popup-content {
+    width: 400px;
+    height: 300px;
+    background-color: white;
+}
+  
+.popup-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.host-button {
+    padding: 5px 10px;
+    border: 2px solid gray; 
+    margin: 10px;
+    border-radius: 8px; 
+    background-color: rgb(32, 176, 201);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+  
+.host-button:hover {
+    background-color: rgb(127, 190, 201);
+    border-color: darkgray;
+}
+  
+.host-button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(128, 128, 128, 0.5); 
+}
+
+#file-input-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#file-name {
+    font-style: italic;
+    font-size: 15px;
+    text-align: center;
+} 
