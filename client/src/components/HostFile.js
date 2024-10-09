@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import Popup from 'reactjs-popup';
-
-const labelStyle = {display: 'flex',
-                    justifyContent: "space-between",
-                    margin: "10px"
-                   };
-
-const popupBorder = {border: "2px solid black"};
-
-const popupText = {fontWeight: 'bold', fontSize: '25px'};
-
-//const formBox = { display: "flex", flexDirection: "column", alignItems: "center" };
+import 'reactjs-popup/dist/index.css';
+import '../stylesheets/hostFile.css';
 
 /*
     Button that is displayed only when the hosted files are shown
     When clicked, a popup is prompted
 */
 export default function HostPopup() {
+    const [fileName, setFileName] = useState('No file chosen');
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (event) => {
+      const selectedFile = event.target.files[0];
+      setFileName(selectedFile ? selectedFile.name : 'No file chosen');
+    };  
+
+    const handleButtonClick = (event) => {
+        event.preventDefault();
+        if (fileInputRef.current) {
+          fileInputRef.current.click();
+        }
+    };
 
     /*
         Data is processed in this function for doing whatever
@@ -32,31 +37,42 @@ export default function HostPopup() {
 
         console.log(`File name:${filename}\n File price:${fileprice}`);
 
+        setFileName("No file chosen");
         close();
     }
     
     return (
         <Popup  trigger={<button>Add file</button>}
                 position={['left']}
-                contentStyle={{ width: '400px', height: '300px' }}
-                closeOnDocumentClick={false} modal>
+                className="popup-content"
+                overlayClassName="popup-overlay"
+                closeOnDocumentClick={true} modal>
 
             {(close) => (
-            <div style={popupBorder}>
+            <div id="popup-border">
                 <form onSubmit={(event) => inputData(event, close)}>
-                    <div style={labelStyle}>
-                        <label style={popupText}>File name: </label>
-                        <input type="text" name = "filename" placeholder="Search files..."/>
+                    <div id="label-div">
+                        <label id="popup-text">File name: </label>
+                        <div id="file-input-container">
+                            <input type="file" 
+                                   name = "filename" 
+                                   onChange={handleFileChange}
+                                   ref={fileInputRef}
+                                   style={{ display: 'none'}}/>
+                            <button id="file-input" 
+                                    onClick={handleButtonClick}>Select A File</button>
+                        </div>
                     </div>
+                    <div id="file-name">{fileName}</div>
                     <br />
                     <br />
-                    <div style={labelStyle}>
-                        <label style={popupText}>File price: </label>
+                    <div id="label-div">
+                        <label id="popup-text">File price: </label>
                         <input type="text" name = "fileprice" placeholder="Value"/>
                     </div>
                     <br />
                     <br />
-                    <button type="submit" style={{alignSelf: "flex-center"}}>
+                    <button type="submit">
                         Add file
                     </button>
 
