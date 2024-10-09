@@ -1,17 +1,17 @@
 [
   {
     "id": 1,
-    "FileName": "Document1",
+    "FileName": "COD",
     "FileSize": "2 GB",
     "sizeInGB": 2,
     "DateListed": "2023-10-01",
-    "type": "document",
+    "type": "media",
     "downloads": 150,
     "price": 1.99
   },
   {
     "id": 2,
-    "FileName": "Media1",
+    "FileName": "Fortnite",
     "FileSize": "5.5 GB",
     "sizeInGB": 5.5,
     "DateListed": "2023-09-20",
@@ -20,7 +20,7 @@
     "price": 2.99
   },  {
     "id": 3,
-    "FileName": "Document2",
+    "FileName": "Battlefield",
     "FileSize": "40 GB",
     "sizeInGB": 40,
     "DateListed": "2024-10-01",

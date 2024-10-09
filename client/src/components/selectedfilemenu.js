@@ -1,17 +1,22 @@
 // selectedfilemenu.js
 import '../stylesheets/selectedFileMenu.css';
+import TableContext from './TableContext';
+import React, { useContext } from 'react';
 
 import { ReactComponent as Download } from '../icons/download.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({ filters, setFilters, selectedFiles }) {
+export default function SelectedFileMenu() {
+  const { filters, setFilters, selectedFiles } = useContext(TableContext);
+
   return selectedFiles.length === 0 ? (
     <FileFilters filters={filters} setFilters={setFilters} />
   ) : (
     <FileActions selectedFiles={selectedFiles} />
   );
 }
+
 
 function FileFilters({ filters, setFilters }) {
   function clearFilters() {
