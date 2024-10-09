@@ -36,7 +36,7 @@ const SettingsPage = ({backToPrev}) => {
       <SideMenu items={settingsItems} files={false} currSection={currSection} />
 
       <div id="settingscontent" className="content">
-        {currSection === 'Account' && <h1>Account Section</h1>}
+        {currSection === 'Account' && <AccountSection />}
         
         {currSection === 'Preferences' && <PreferencesSection />}
         
@@ -46,11 +46,47 @@ const SettingsPage = ({backToPrev}) => {
   );
 };
 
+/* Account Section */
+const AccountSection = () => {
+  return (
+    <div>
+      <h1>Account Section</h1>
+      <div className="preferences-container">
+
+        {/* Hosted File List Export button */}
+        <div className="preferences-row">
+          <label>Hosted File List: </label>
+          <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
+            Export
+          </button>
+        </div>
+
+        {/* Purchased File List Export button */}
+        <div className="preferences-row">
+          <label>Purchased File List: </label>
+          <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
+            Export
+          </button>
+        </div>
+
+        {/* Transaction History Export button */}
+        <div className="preferences-row">
+          <label>Transaction History: </label>
+          <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 
+/* Preferences Section */
 const PreferencesSection = () => {
   const [theme, setTheme] = useState('Light'); 
   const [defaultNodes, setDefaultNodes] = useState(5); 
+  const [proxy, setProxy] = useState(''); // State for managing the proxy input
 
   // Toggle theme between Light and Dark
   const toggleTheme = () => {
@@ -82,39 +118,15 @@ const PreferencesSection = () => {
           />
         </div>
 
-        {/* Hosted File List Export button */}
-        <div className="preferences-row">
-          <label>Hosted File List: </label>
-          <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
-            Export
-          </button>
-        </div>
-
-        {/* Purchased File List Export button */}
-        <div className="preferences-row">
-          <label>Purchased File List: </label>
-          <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
-            Export
-          </button>
-        </div>
-
-        {/* Transaction History Export button */}
-        <div className="preferences-row">
-          <label>Transaction History: </label>
-          <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
-            Export
-          </button>
-        </div>
-
         {/* Proxy input */}
         <div className="preferences-row">
           <label>Proxy: </label>
           <input 
             type="text" 
-            value="" 
+            value={proxy} // Bind the input value to the state
+            onChange={(e) => setProxy(e.target.value)} // Update the state when the user types
             placeholder="specify a proxy server" 
-            readOnly 
-            className="preferences-input" 
+            className="preferences-input" // Keep the class name for styling
           />
         </div>
 
