@@ -26,14 +26,12 @@
     align-items: center;
     justify-content: space-between;
     width: 55%;
-    height: 50px;
+    height: 45px;
     padding-left: 10px;
     padding-right: 10px;
     gap: 5px;
     border-radius: 30px;
-    border-style: solid;
-    border-color: rgb(150, 212, 233);
-    outline-color: rgb(33, 142, 196);
+    border-style: none;
     background-color: var(--color-theme);
 }
 
