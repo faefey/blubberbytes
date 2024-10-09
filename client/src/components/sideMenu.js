@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import HostPopup from './HostPopup';
 
 import '../stylesheets/sideMenu.css';

@@ -7,13 +7,13 @@ import {ReactComponent as Account} from '../icons/person.svg'
 import {ReactComponent as Preferences} from '../icons/wrench.svg'
 import {ReactComponent as Wallet} from '../icons/payments.svg'
 
-const SettingsPage = ({setCurrPage}) => {
+const SettingsPage = ({backToPrev}) => {
   const [currSection, setCurrSection] = useState('Account'); // Default section is 'account'
 
   const settingsItems = [
     {
       label: 'Settings', icon: <Back />,
-      onClick: () => setCurrPage(0)
+      onClick: () => backToPrev()
     },
     {
       label: 'Account', icon: <Account />,

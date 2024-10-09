@@ -6,8 +6,8 @@
 }
 
 #logo {
-    width: 17%;
-    height: auto;
+    width: auto;
+    height: 50px;
 }
 
 #profile-button {
@@ -21,16 +21,24 @@
     border-radius: 15px;
 }
 
-#searchbar {
+.searchbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 55%;
     height: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 5px;
     border-radius: 30px;
     border-style: solid;
     border-color: rgb(150, 212, 233);
     outline-color: rgb(33, 142, 196);
     background-color: var(--color-theme);
-    background-image: url('../icons/search.svg');
-    background-position: 11px 11px;
-    background-repeat: no-repeat;
-    padding-left: 40px;
+}
+
+#searchbar {
+    all: unset;
+    height: 100%;
+    flex-grow: 1;
 }
