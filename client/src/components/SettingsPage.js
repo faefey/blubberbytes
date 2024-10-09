@@ -1,43 +1,45 @@
-// SettingsPage.js
-import React, { useState } from 'react';
-import SideMenu from './sideMenu.jsx';
+import { useState } from 'react';
 
-import '../stylesheets/App.css';
+import SideMenu from './sideMenu.js';
 
-const SettingsPage = ({setCurrPage}) => {
-  const [activeSection, setActiveSection] = useState('account'); // Default section is 'account'
+import { ReactComponent as Back } from '../icons/arrow_back.svg';
+import { ReactComponent as Account } from '../icons/person.svg';
+import { ReactComponent as Preferences } from '../icons/wrench.svg';
+import { ReactComponent as Wallet } from '../icons/payments.svg';
+
+const SettingsPage = ({ setCurrPage }) => {
+  const [currSection, setCurrSection] = useState('Account'); // Default section is 'Account'
 
   const settingsItems = [
     {
-      label: 'Settings', icon: '<-',
+      label: 'Settings', icon: <Back />,
       onClick: () => setCurrPage(0)
     },
     {
-      label: 'Account', icon: '🗄️',
-      onClick: () => setActiveSection('account')
+      label: 'Account', icon: <Account />,
+      onClick: () => setCurrSection('Account')
     },
     {
-      label: 'Preferences', icon: '🛒',
-      onClick: () => setActiveSection('preferences')
+      label: 'Preferences', icon: <Preferences />,
+      onClick: () => setCurrSection('Preferences')
     },
     {
-      label: 'Wallet', icon: '🌐',
-      onClick: () => setActiveSection('wallet')
+      label: 'Wallet', icon: <Wallet />,
+      onClick: () => setCurrSection('Wallet')
     }
   ];
 
   return (
     <div className="maincontent">
-      <SideMenu items={settingsItems} tags={[]} files={false} />
+      <SideMenu items={settingsItems} files={false} currSection={currSection} />
 
       <div id="settingscontent" className="content">
-        {activeSection === 'account' && <h1>Account Section</h1>}
-
-
-        {activeSection === 'preferences' && (
+        {currSection === 'Account' && <h1>Account Section</h1>}
+        
+        {currSection === 'Preferences' && (
           <div>
             <h1>Preferences Section</h1>
-            <div className="preferences-container" style={{ padding: '100px', fontSize: '18px', fontWeight: 'bold'}}>
+            <div className="preferences-container" style={{ padding: '100px', fontSize: '18px', fontWeight: 'bold' }}>
               
               {/* Display the download location, this field is currently read-only */}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
@@ -50,8 +52,7 @@ const SettingsPage = ({setCurrPage}) => {
                 />
               </div>
 
-
-              {/* Hosted File List Export button, backend function needs to handle export logic */}
+              {/* Hosted File List Export button */}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                 <label style={{ marginRight: '10px' }}>Hosted File List: </label>
                 <button style={{ padding: '5px 10px' }} onClick={() => alert('Hosted File List Export')}>
@@ -59,7 +60,7 @@ const SettingsPage = ({setCurrPage}) => {
                 </button>
               </div>
 
-              {/* Purchased File List Export button, backend function needs to handle export logic */}
+              {/* Purchased File List Export button */}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                 <label style={{ marginRight: '10px' }}>Purchased File List: </label>
                 <button style={{ padding: '5px 10px' }} onClick={() => alert('Purchased File List Export')}>
@@ -67,7 +68,7 @@ const SettingsPage = ({setCurrPage}) => {
                 </button>
               </div>
 
-              {/* Transaction History Export button, backend function needs to handle export logic */}
+              {/* Transaction History Export button */}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                 <label style={{ marginRight: '10px' }}>Transaction History: </label>
                 <button style={{ padding: '5px 10px' }} onClick={() => alert('Transaction History Export')}>
@@ -75,7 +76,7 @@ const SettingsPage = ({setCurrPage}) => {
                 </button>
               </div>
 
-              {/* Proxy input, to be connected to backend functionality to handle proxy settings */}
+              {/* Proxy input */}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                 <label style={{ marginRight: '10px' }}>Proxy: </label>
                 <input 
@@ -90,12 +91,8 @@ const SettingsPage = ({setCurrPage}) => {
             </div>
           </div>
         )}
-
-
-
-
-
-        {activeSection === 'wallet' && <h1>Wallet Section</h1>}
+        
+        {currSection === 'Wallet' && <h1>Wallet Section</h1>}
       </div>
     </div>
   );

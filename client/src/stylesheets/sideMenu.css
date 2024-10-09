@@ -2,9 +2,16 @@
 .side-menu {
     width: 15%;
     flex-grow: 1;
-    background-color: #CCEBFF;
+    background-color: var(--color-theme);
     padding: 10px;
     border-radius: 10px;
+}
+
+/* Center "Files" and host file button vertically on same line */
+#side-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Navigation item styling */
@@ -28,8 +35,8 @@
     font-weight: bold;
 }
 
-
-/* Icon styling */
-.nav-icon {
-    margin-right: 10px;
+/* Move text to the right and prevent selecting the text */
+.nav-label {
+    margin-left: 10px;
+    user-select: none;
 }

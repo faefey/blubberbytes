@@ -1,9 +1,25 @@
+:root {
+    --color-theme: #ccebff;
+}
+
+body {
+    padding: 10px;
+    margin: 0px;
+}
+
+.App {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 20px);
+}
+
 .maincontent {
     display: flex;
     flex-direction: row;
     align-items: left;
     justify-content: left;
     width: 100%;
+    flex-grow: 1;
 }
 
 .side-menu {
@@ -16,7 +32,7 @@
 }
 
 #settingscontent {
-    background-color: #ccebff;
+    background-color: var(--color-theme);
     padding: 35px 50px 50px 50px;
     border-radius: 10px;
     min-height: 80vh;
