@@ -84,14 +84,13 @@ const AccountSection = () => {
 
 /* Preferences Section */
 const PreferencesSection = () => {
-  const [theme, setTheme] = useState('Light'); 
+  const [theme, setTheme] = useState('Light'); // Default theme is Light
   const [defaultNodes, setDefaultNodes] = useState(5); 
   const [proxy, setProxy] = useState(''); // State for managing the proxy input
 
-  // Toggle theme between Light and Dark
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'Light' ? 'Dark' : 'Light'));
-    alert(`Switched to ${theme === 'Light' ? 'Dark' : 'Light'} Theme`);
+  // Handle theme change from the dropdown
+  const handleThemeChange = (event) => {
+    setTheme(event.target.value); // Update theme based on selection
   };
 
   return (
@@ -99,12 +98,13 @@ const PreferencesSection = () => {
       <h1>Preferences Section</h1>
       <div className="preferences-container">
 
-        {/* Light/Dark Theme Toggle */}
+        {/* Theme selection using a dropdown */}
         <div className="preferences-row">
           <label>Theme: </label>
-          <button className="preferences-button" onClick={toggleTheme}>
-            {theme === 'Light' ? 'Dark Mode' : 'Light Mode'}
-          </button>
+          <select value={theme} onChange={handleThemeChange} className="preferences-input">
+            <option value="Light">Light Mode</option>
+            <option value="Dark">Dark Mode</option>
+          </select>
         </div>
 
         {/* Display the download location, this field is currently read-only */}
@@ -125,7 +125,7 @@ const PreferencesSection = () => {
             type="text" 
             value={proxy} // Bind the input value to the state
             onChange={(e) => setProxy(e.target.value)} // Update the state when the user types
-            placeholder="specify a proxy server" 
+            placeholder="Specify a proxy server" 
             className="preferences-input" // Keep the class name for styling
           />
         </div>
