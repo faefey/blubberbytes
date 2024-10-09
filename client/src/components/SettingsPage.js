@@ -7,6 +7,8 @@ import { ReactComponent as Account } from '../icons/person.svg';
 import { ReactComponent as Preferences } from '../icons/wrench.svg';
 import { ReactComponent as Wallet } from '../icons/payments.svg';
 
+import '../stylesheets/settingsPage.css';
+
 const SettingsPage = ({backToPrev}) => {
   const [currSection, setCurrSection] = useState('Account'); // Default section is 'account'
 
@@ -36,66 +38,103 @@ const SettingsPage = ({backToPrev}) => {
       <div id="settingscontent" className="content">
         {currSection === 'Account' && <h1>Account Section</h1>}
         
-        {currSection === 'Preferences' && (
-          <div>
-            <h1>Preferences Section</h1>
-            <div className="preferences-container" style={{ padding: '100px', fontSize: '18px', fontWeight: 'bold' }}>
-              
-              {/* Display the download location, this field is currently read-only */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <label>Download Location: </label>
-                <input 
-                  type="text" 
-                  value="D:\\blubberbytes\\download\\files" 
-                  readOnly 
-                  style={{ width: '16%' }} 
-                />
-              </div>
-
-              {/* Hosted File List Export button */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <label style={{ marginRight: '10px' }}>Hosted File List: </label>
-                <button style={{ padding: '5px 10px' }} onClick={() => alert('Hosted File List Export')}>
-                  Export
-                </button>
-              </div>
-
-              {/* Purchased File List Export button */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <label style={{ marginRight: '10px' }}>Purchased File List: </label>
-                <button style={{ padding: '5px 10px' }} onClick={() => alert('Purchased File List Export')}>
-                  Export
-                </button>
-              </div>
-
-              {/* Transaction History Export button */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <label style={{ marginRight: '10px' }}>Transaction History: </label>
-                <button style={{ padding: '5px 10px' }} onClick={() => alert('Transaction History Export')}>
-                  Export
-                </button>
-              </div>
-
-              {/* Proxy input */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <label style={{ marginRight: '10px' }}>Proxy: </label>
-                <input 
-                  type="text" 
-                  value="" 
-                  placeholder="specify a proxy server" 
-                  readOnly 
-                  style={{ width: '16%' }}
-                />
-              </div>
-
-            </div>
-          </div>
-        )}
+        {currSection === 'Preferences' && <PreferencesSection />}
         
         {currSection === 'Wallet' && <h1>Wallet Section</h1>}
       </div>
     </div>
   );
 };
+
+
+
+const PreferencesSection = () => {
+  const [theme, setTheme] = useState('Light'); 
+  const [defaultNodes, setDefaultNodes] = useState(5); 
+
+  // Toggle theme between Light and Dark
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'Light' ? 'Dark' : 'Light'));
+    alert(`Switched to ${theme === 'Light' ? 'Dark' : 'Light'} Theme`);
+  };
+
+  return (
+    <div>
+      <h1>Preferences Section</h1>
+      <div className="preferences-container">
+
+        {/* Light/Dark Theme Toggle */}
+        <div className="preferences-row">
+          <label>Theme: </label>
+          <button className="preferences-button" onClick={toggleTheme}>
+            {theme === 'Light' ? 'Dark Mode' : 'Light Mode'}
+          </button>
+        </div>
+
+        {/* Display the download location, this field is currently read-only */}
+        <div className="preferences-row">
+          <label>Download Location: </label>
+          <input 
+            type="text" 
+            value="D:\\blubberbytes\\download\\files" 
+            readOnly 
+            className="preferences-input" 
+          />
+        </div>
+
+        {/* Hosted File List Export button */}
+        <div className="preferences-row">
+          <label>Hosted File List: </label>
+          <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
+            Export
+          </button>
+        </div>
+
+        {/* Purchased File List Export button */}
+        <div className="preferences-row">
+          <label>Purchased File List: </label>
+          <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
+            Export
+          </button>
+        </div>
+
+        {/* Transaction History Export button */}
+        <div className="preferences-row">
+          <label>Transaction History: </label>
+          <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
+            Export
+          </button>
+        </div>
+
+        {/* Proxy input */}
+        <div className="preferences-row">
+          <label>Proxy: </label>
+          <input 
+            type="text" 
+            value="" 
+            placeholder="specify a proxy server" 
+            readOnly 
+            className="preferences-input" 
+          />
+        </div>
+
+        {/* Default Number of Nodes */}
+        <div className="preferences-row">
+          <label>Default Number of Nodes: </label>
+          <input
+            type="number"
+            value={defaultNodes}
+            onChange={(e) => setDefaultNodes(e.target.value)}
+            className="preferences-input"
+            style={{ width: '10%' }}
+          />
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+
 
 export default SettingsPage;
