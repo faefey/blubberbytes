@@ -3,8 +3,10 @@ import '../stylesheets/selectedFileMenu.css';
 import TableContext from './TableContext';
 import React, { useContext } from 'react';
 
+import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
+import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
 export default function SelectedFileMenu() {
@@ -104,9 +106,11 @@ function FileFilters({ filters, setFilters }) {
 function FileActions({ selectedFiles }) {
   return (
     <div id="fileactions">
+      <Close className="icon" />
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
       <Download className="icon" />
       <Delete className="icon" />
+      <Share className="icon" />
       <Info className="icon" />
     </div>
   );
