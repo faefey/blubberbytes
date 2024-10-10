@@ -1,3 +1,4 @@
+import AccountSection from './AccountPage.js'
 import { useState } from 'react';
 
 import SideMenu from './sideMenu.js';
@@ -37,9 +38,9 @@ const SettingsPage = ({backToPrev}) => {
 
       <div id="settingscontent" className="content">
         {currSection === 'Account' && <AccountSection />}
-        
+
         {currSection === 'Preferences' && <PreferencesSection />}
-        
+
         {currSection === 'Wallet' && <h1>Wallet Section</h1>}
       </div>
     </div>
@@ -47,13 +48,14 @@ const SettingsPage = ({backToPrev}) => {
 };
 
 /* Account Section */
+/*
 const AccountSection = () => {
   return (
     <div>
       <h1>Account Section</h1>
       <div className="preferences-container">
 
-        {/* Hosted File List Export button */}
+        {/* Hosted File List Export button *//*}
         <div className="preferences-row">
           <label>Hosted File List: </label>
           <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
@@ -61,7 +63,8 @@ const AccountSection = () => {
           </button>
         </div>
 
-        {/* Purchased File List Export button */}
+
+
         <div className="preferences-row">
           <label>Purchased File List: </label>
           <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
@@ -69,7 +72,8 @@ const AccountSection = () => {
           </button>
         </div>
 
-        {/* Transaction History Export button */}
+      
+
         <div className="preferences-row">
           <label>Transaction History: </label>
           <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
@@ -80,12 +84,13 @@ const AccountSection = () => {
     </div>
   );
 };
+*/
 
 
 /* Preferences Section */
 const PreferencesSection = () => {
   const [theme, setTheme] = useState('Light'); // Default theme is Light
-  const [defaultNodes, setDefaultNodes] = useState(5); 
+  const [defaultNodes, setDefaultNodes] = useState(5);
   const [proxy, setProxy] = useState(''); // State for managing the proxy input
 
   // Handle theme change from the dropdown
@@ -110,22 +115,22 @@ const PreferencesSection = () => {
         {/* Display the download location, this field is currently read-only */}
         <div className="preferences-row">
           <label>Download Location: </label>
-          <input 
-            type="text" 
-            value="D:\\blubberbytes\\download\\files" 
-            readOnly 
-            className="preferences-input" 
+          <input
+            type="text"
+            value="D:\\blubberbytes\\download\\files"
+            readOnly
+            className="preferences-input"
           />
         </div>
 
         {/* Proxy input */}
         <div className="preferences-row">
           <label>Proxy: </label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={proxy} // Bind the input value to the state
             onChange={(e) => setProxy(e.target.value)} // Update the state when the user types
-            placeholder="Specify a proxy server" 
+            placeholder="Specify a proxy server"
             className="preferences-input" // Keep the class name for styling
           />
         </div>
