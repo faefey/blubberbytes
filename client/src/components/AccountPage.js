@@ -1,4 +1,3 @@
-import * as d3 from 'd3'; // for the graphs
 import React, { useState, useEffect, useRef } from 'react';
 
 // import tables:
