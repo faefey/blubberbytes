@@ -1,33 +1,35 @@
-import AccountSection from './AccountPage.js'
 import { useState } from 'react';
 
 import SideMenu from './sideMenu.js';
+import AccountSection from './AccountPage.js'
+import WalletSection from './WalletSection.js';
 
-import { ReactComponent as Back } from '../icons/arrow_back.svg';
-import { ReactComponent as Account } from '../icons/person.svg';
-import { ReactComponent as Preferences } from '../icons/wrench.svg';
-import { ReactComponent as Wallet } from '../icons/payments.svg';
+import { ReactComponent as BackArrow } from '../icons/arrow_back.svg';
+import { ReactComponent as PersonIcon } from '../icons/person.svg';
+import { ReactComponent as WrenchIcon } from '../icons/wrench.svg';
+import { ReactComponent as WalletIcon } from '../icons/payments.svg';
 
 import '../stylesheets/settingsPage.css';
 
 const SettingsPage = ({backToPrev}) => {
-  const [currSection, setCurrSection] = useState('Account'); // Default section is 'account'
+  // default section is 'account'
+  const [currSection, setCurrSection] = useState('Account');
 
   const settingsItems = [
     {
-      label: 'Settings', icon: <Back />,
+      label: 'Settings', icon: <BackArrow />,
       onClick: () => backToPrev()
     },
     {
-      label: 'Account', icon: <Account />,
+      label: 'Account', icon: <PersonIcon />,
       onClick: () => setCurrSection('Account')
     },
     {
-      label: 'Preferences', icon: <Preferences />,
+      label: 'Preferences', icon: <WrenchIcon />,
       onClick: () => setCurrSection('Preferences')
     },
     {
-      label: 'Wallet', icon: <Wallet />,
+      label: 'Wallet', icon: <WalletIcon />,
       onClick: () => setCurrSection('Wallet')
     }
   ];
@@ -41,51 +43,11 @@ const SettingsPage = ({backToPrev}) => {
 
         {currSection === 'Preferences' && <PreferencesSection />}
 
-        {currSection === 'Wallet' && <h1>Wallet Section</h1>}
+        {currSection === 'Wallet' && <WalletSection />}
       </div>
     </div>
   );
 };
-
-/* Account Section */
-/*
-const AccountSection = () => {
-  return (
-    <div>
-      <h1>Account Section</h1>
-      <div className="preferences-container">
-
-        {/* Hosted File List Export button *//*}
-        <div className="preferences-row">
-          <label>Hosted File List: </label>
-          <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
-            Export
-          </button>
-        </div>
-
-
-
-        <div className="preferences-row">
-          <label>Purchased File List: </label>
-          <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
-            Export
-          </button>
-        </div>
-
-      
-
-        <div className="preferences-row">
-          <label>Transaction History: </label>
-          <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
-            Export
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-*/
-
 
 /* Preferences Section */
 const PreferencesSection = () => {
