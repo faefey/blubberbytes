@@ -27,5 +27,45 @@
     "type": "document",
     "downloads": 10,
     "price": 100
+  },
+  {
+    "id": 4,
+    "FileName": "Minecraft",
+    "FileSize": "1.5 GB",
+    "sizeInGB": 1.5,
+    "DateListed": "2023-11-15",
+    "type": "media",
+    "downloads": 3000,
+    "price": 1.49
+  },
+  {
+    "id": 5,
+    "FileName": "PhotoshopCC",
+    "FileSize": "3.8 GB",
+    "sizeInGB": 3.8,
+    "DateListed": "2024-01-05",
+    "type": "software",
+    "downloads": 800,
+    "price": 19.99
+  },
+  {
+    "id": 6,
+    "FileName": "OfficeBundle",
+    "FileSize": "4.2 GB",
+    "sizeInGB": 4.2,
+    "DateListed": "2024-02-20",
+    "type": "software",
+    "downloads": 1200,
+    "price": 29.99
+  },
+  {
+    "id": 7,
+    "FileName": "GTA6",
+    "FileSize": "80 GB",
+    "sizeInGB": 80,
+    "DateListed": "2024-09-17",
+    "type": "media",
+    "downloads": 5000,
+    "price": 59.99
   }
 ]
