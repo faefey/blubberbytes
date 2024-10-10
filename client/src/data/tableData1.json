@@ -44,7 +44,7 @@
     "FileSize": "3.8 GB",
     "sizeInGB": 3.8,
     "DateListed": "2024-01-05",
-    "type": "software",
+    "type": "media",
     "downloads": 800,
     "price": 19.99
   },
@@ -54,7 +54,7 @@
     "FileSize": "4.2 GB",
     "sizeInGB": 4.2,
     "DateListed": "2024-02-20",
-    "type": "software",
+    "type": "document",
     "downloads": 1200,
     "price": 29.99
   },
