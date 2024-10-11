@@ -1,5 +1,3 @@
-
-import * as d3 from 'd3'; // for the graphs
 import React, { useState, useEffect, useRef } from 'react';
 
 // import tables:
@@ -139,3 +137,42 @@ const AccountSection = () => {
 };
 
 export default AccountSection;
+
+/* Account Section */
+/*
+const AccountSection = () => {
+  return (
+    <div>
+      <h1>Account Section</h1>
+      <div className="preferences-container">
+
+        {/* Hosted File List Export button *//*}
+        <div className="preferences-row">
+          <label>Hosted File List: </label>
+          <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
+            Export
+          </button>
+        </div>
+
+
+
+        <div className="preferences-row">
+          <label>Purchased File List: </label>
+          <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
+            Export
+          </button>
+        </div>
+
+      
+
+        <div className="preferences-row">
+          <label>Transaction History: </label>
+          <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+*/
