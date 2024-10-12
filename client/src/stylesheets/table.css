@@ -1,82 +1,128 @@
 * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    color: #383f4d;
-    line-height: 1.5;
-    font-size: 14px;
-    font-family:  "Segoe UI", "Helvetica Neue",
-      sans-serif;
-  }
-  
-  .table_container {
-    max-width: 750px;
-    margin: 0 auto;
-    overflow: auto;
-  }
-  
-  .table {
-    width: 100%;
-    border-spacing: 0;
-  }
-  
-  caption {
-    font-style: italic;
-    font-size: 90%;
-    margin-bottom: 10px;
-  }
-  
-  .table th {
-    background: var(--color-theme);
-    padding: 8px 10px;
-    border-bottom: 1px solid #1a1a1a;
-    font-weight: bold;
-    text-align: left;
-  }
-  
-  .table th.up {
-    background-image: url('../images/sortUp.png');
-  }
-  .table th.down {
-    background-image: url("../images/sortDown.png");
-  }
-  .table th.default {
-    background-image: url("../images/default.png");
-  }
-  
-  
-  th.up,
-  th.default,
-  th.down {
-    cursor: pointer;
-    background-repeat: no-repeat;
-    background-position: center right;
-  }
-  
-  .table td {
-    border-top: 1px solid #ddd;
-    padding: 8px 20px;
-  }
-  
-  .table tbody tr:first-child td {
-    border-top: none;
-  }
-  
-  .table tbody tr:nth-child(n) td {
-    background: #eff0f0;
-  }
-  
-  .table tbody tr:nth-child(2n) td {
-    background: #fff;
-  }
-  
-  .selected {
-    background-color: #3394c1; 
-  }
-  
-  .table input[type="checkbox"] {
-    cursor: pointer;
-  }
-  
-  
+  box-sizing: border-box;
+}
+
+body {
+  color: #383f4d;
+  line-height: 1.5;
+  font-size: 14px;
+  font-family:  "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+.table_container {
+  max-width: 750px;
+  margin: 0 auto;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-spacing: 0;
+  table-layout: fixed; 
+}
+
+caption {
+  font-style: italic;
+  font-size: 90%;
+  margin-bottom: 10px;
+}
+
+.table th {
+  background: var(--color-theme);
+  padding: 8px 10px;
+  border-bottom: 1px solid #1a1a1a;
+  font-weight: bold;
+  text-align: left; 
+}
+
+.table th.up {
+  background-image: url('../images/sortUp.png');
+}
+.table th.down {
+  background-image: url("../images/sortDown.png");
+}
+.table th.default {
+  background-image: url("../images/default.png");
+}
+
+th.up,
+th.default,
+th.down {
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center right;
+}
+
+.table td {
+  border-top: 1px solid #ddd;
+  padding: 8px 20px;
+  text-align: left; 
+}
+
+.table tbody tr:first-child td {
+  border-top: none;
+}
+
+.table tbody tr:nth-child(n) td {
+  background: #eff0f0;
+}
+
+.table tbody tr:nth-child(2n) td {
+  background: #fff;
+}
+
+.selected {
+  background-color: #3394c1; 
+}
+
+.table input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+
+
+.table tbody tr {
+  cursor: pointer; 
+}
+
+.table tbody tr:hover td {
+  background-color: #d1e4ed; 
+}
+
+.table th, .table td {
+  width: 16.6%; 
+}
+.table th:first-child {
+  padding-left: 20px; 
+}
+
+.table td:first-child {
+  padding-left: 20px; 
+}
+.table th:first-child, 
+.table td:first-child {
+    width: 5%;  
+    padding-left: 10px; 
+}
+
+.table th:not(:first-child),
+.table td:not(:first-child) {
+    width: 19%;  
+}
+
+
+.table th {
+  padding-left: 20px; 
+  text-align: left;    
+}
+
+.table td {
+  padding-left: 20px; 
+  text-align: left;    
+}

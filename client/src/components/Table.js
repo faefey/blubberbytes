@@ -1,10 +1,11 @@
-// Table.js
 import React, { useState, useEffect } from "react";
 import "../stylesheets/table.css";
 import TableContext from './TableContext';
-import SelectedFileMenu from './selectedfilemenu'; 
+import SelectedFileMenu from './selectedfilemenu';
+import checkboxOn from '../icons/checkbox_on.svg';
+import checkboxOff from '../icons/checkbox_off.svg';
 
-// TableHead.js content
+// TableHead component
 const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
   const [sortField, setSortField] = useState("");
   const [order, setOrder] = useState("asc");
@@ -21,7 +22,12 @@ const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
     <thead>
       <tr>
         <th>
-          <input type="checkbox" checked={selectAll} onChange={onSelectAll} />
+          <img
+            src={selectAll ? checkboxOn : checkboxOff}
+            alt={selectAll ? "Select All Checked" : "Select All Unchecked"}
+            className="custom-checkbox"
+            onClick={onSelectAll}
+          />
         </th>
         {columns.map(({ label, accessor, sortable }) => {
           const cl = sortable
@@ -46,19 +52,24 @@ const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
   );
 };
 
-// TableBody.js content
+// TableBody component
 const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
   return (
     <tbody>
       {tableData.map((data) => {
         const isSelected = selectedRows.includes(data.id);
         return (
-          <tr key={data.id} className={isSelected ? "selected" : ""}>
-            <td>
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={() => onSelectRow(data.id)}
+          <tr
+            key={data.id}
+            className={isSelected ? "selected" : ""}
+            onClick={() => onSelectRow(data.id)}
+          >
+            <td onClick={(e) => e.stopPropagation()}>
+              <img
+                src={isSelected ? checkboxOn : checkboxOff}
+                alt={isSelected ? "Row Selected" : "Row Unselected"}
+                className="custom-checkbox"
+                onClick={() => onSelectRow(data.id)}
               />
             </td>
             {columns.map(({ accessor }) => {
@@ -71,6 +82,7 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
     </tbody>
   );
 };
+
 
 // Main Table component
 const Table = ({ caption, data, columns }) => {
@@ -86,6 +98,11 @@ const Table = ({ caption, data, columns }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [tableData, handleSorting] = useSortableTable(data, columns, filters);
+  // Add useEffect to clear selected files when data changes
+  useEffect(() => {
+    // Clear selected files when the data changes 
+    setSelectedFiles([]);
+  }, [data]);
 
   const onSelectRow = (id) => {
     setSelectedFiles((prevSelectedFiles) =>
@@ -115,7 +132,7 @@ const Table = ({ caption, data, columns }) => {
 
   return (
     <TableContext.Provider value={contextValue}>
-      {/* Move SelectedFileMenu inside Table */}
+      {}
       <SelectedFileMenu />
       <table className="table">
         <caption>{caption}</caption>
