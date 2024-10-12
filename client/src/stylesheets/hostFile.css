@@ -1,12 +1,12 @@
 #label-div {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin: 10px;
 }
 
 #popup-border {
     position: relative;
-    border: 2px solid black;
 }
 
 #popup-text {
@@ -14,10 +14,16 @@
     font-size: 25px;
 }
 
+#input-price {
+    height: 25px;
+    border-radius: 5px;
+}
+
 .popup-content {
     width: 400px;
-    height: 300px;
-    background-color: white;
+    padding: 20px;
+    background-color: var(--color-theme); /* Using global variable */
+    border-radius: 10px;
 }
   
 .popup-overlay {
