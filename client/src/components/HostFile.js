@@ -89,7 +89,7 @@ export default function HostPopup() {
                     <br />
                     <div id="label-div">
                         <label><h3><span className="required">*</span>File Price: </h3></label>
-                        <input id="input-price" type="text" name ="fileprice" placeholder="Value"/>
+                        <input id="input-price" type="text" name ="fileprice" placeholder="Enter an amout"/>
                     </div>
 
                     {errors['priceError'] !== '' && <div className="errors">{errors['priceError']}</div>}
