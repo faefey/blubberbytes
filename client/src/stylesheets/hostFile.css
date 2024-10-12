@@ -63,3 +63,12 @@
     font-size: 15px;
     text-align: center;
 } 
+
+.required {
+    color: lightcoral;
+}
+
+.errors {
+    color: lightcoral;
+    font-style: italic;
+}

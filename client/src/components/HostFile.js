@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
@@ -10,6 +10,7 @@ import '../stylesheets/hostFile.css';
 export default function HostPopup() {
     const [fileName, setFileName] = useState('No file chosen');
     const fileInputRef = useRef(null);
+    const [errors, setErrors] = useState({'fileError' : '', 'priceError' : ''});
 
     const handleFileChange = (event) => {
       const selectedFile = event.target.files[0];
@@ -32,13 +33,30 @@ export default function HostPopup() {
         event.preventDefault();
         const formData = new FormData(event.target);
 
-        const filename = formData.get("filename");
-        const fileprice = formData.get("fileprice");
+        const fileName = formData.get("filename").name;
+        const filePrice = formData.get("fileprice");
 
-        console.log(`File name:${filename}\n File price:${fileprice}`);
+        let currErrors = {'fileError' : '', 'priceError' : ''};
 
-        setFileName("No file chosen");
-        close();
+        if (filePrice === "" || isNaN(filePrice))
+            currErrors['priceError'] = 'Please enter a non-negative number.';
+        else if (Number(filePrice) < 0)
+            currErrors['priceError'] = 'Number must be non-negative.';
+
+        if (fileName === "")
+            currErrors['fileError'] = 'Please select a file.';
+
+        console.log(currErrors);
+        setErrors(currErrors);
+
+        console.log("Errors: ", errors);
+        
+        if (currErrors['fileError'] === '' && currErrors['priceError'] === '') {
+            setFileName("No file chosen");
+
+            console.log(`File name:${fileName}\n File price:${filePrice}`);
+            close();
+        }
     }
     
     return (
@@ -46,13 +64,14 @@ export default function HostPopup() {
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
+                onClose = {() => setErrors({'fileError': '', 'priceError': ''})}
                 closeOnDocumentClick={true} modal>
 
             {(close) => (
             <div id="popup-border">
                 <form onSubmit={(event) => inputData(event, close)}>
                     <div id="label-div">
-                        <label><h3>File name:</h3></label>
+                        <label><h3><span className="required">*</span>File Name:</h3></label>
                         <div id="file-input-container">
                             <input type="file" 
                                    name = "filename" 
@@ -64,14 +83,17 @@ export default function HostPopup() {
                         </div>
                     </div>
                     <div id="file-name">{fileName}</div>
-                    <br />
+
+                    {errors['fileError'] !== '' && <div className="errors">{errors['fileError']}</div>}
+
                     <br />
                     <div id="label-div">
-                        <label><h3>File price: </h3></label>
+                        <label><h3><span className="required">*</span>File Price: </h3></label>
                         <input id="input-price" type="text" name ="fileprice" placeholder="Value"/>
                     </div>
-                    <br />
-                    <br />
+
+                    {errors['priceError'] !== '' && <div className="errors">{errors['priceError']}</div>}
+             
                     <button className="host-button" type="submit">
                         Host file
                     </button>
