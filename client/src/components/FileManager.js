@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import SelectedFileMenu from "./selectedfilemenu";
 import Table from "./Table";
-import data from "../data/tableData1.json"; // Import your data
+import data from "../data/tableData1.json"; 
 
 const FileManager = () => {
   const [filters, setFilters] = useState({
