@@ -102,6 +102,7 @@ const Table = ({ caption, data, columns }) => {
   useEffect(() => {
     // Clear selected files when the data changes 
     setSelectedFiles([]);
+    setFilters([]);
   }, [data]);
 
   const onSelectRow = (id) => {
