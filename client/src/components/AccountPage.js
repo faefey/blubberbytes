@@ -5,6 +5,13 @@ import hostedData from '../data/tableData1.json';
 import purchasedData from '../data/tableData2.json';
 import sharedData from '../data/tableData3.json';
 
+import { Line, Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip } from 'chart.js';
+import 'chartjs-adapter-date-fns';
+import { format } from 'date-fns';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip);
+
 const AccountSection = () => {
   const [totalHostedSize, setTotalHostedSize] = useState(0);
   const [totalPurchasedSize, setTotalPurchasedSize] = useState(0);
@@ -20,6 +27,8 @@ const AccountSection = () => {
 
   const connectionGraphRef = useRef();
   const downloadsGraphRef = useRef();
+  const connectionChartInstanceRef = useRef(null);
+  const downloadsChartInstanceRef = useRef(null);
 
   const calculateStats = (hostedData, purchasedData, sharedData) => {
     let hostedSize = 0, purchasedSize = 0, hostedFiles = 0, purchasedFiles = 0, downloadedByYou = 0, downloadedFromYou = 0;
@@ -40,6 +49,7 @@ const AccountSection = () => {
     sharedData.forEach(file => {
       downloadedByYou += file.downloads || 0; // files downloaded by the user
     });
+
 
     setTotalHostedSize(hostedSize);
     setTotalPurchasedSize(purchasedSize);
@@ -68,6 +78,30 @@ const AccountSection = () => {
     }
   };
 
+
+  const prepareDownloadsData = () => {
+    const downloadsData = hostedData.map(file => ({
+      date: new Date(file.DateListed),
+      downloads: file.downloads,
+    }));
+
+    downloadsData.sort((a, b) => a.date - b.date);
+
+    const labels = downloadsData.map(data => data.date.toLocaleDateString());
+    const downloads = downloadsData.map(data => data.downloads);
+
+    return {
+      labels,
+      datasets: [{
+        label: 'Files Downloaded',
+        data: downloads,
+        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 2,
+      }],
+    };
+  };
+
   return (
     <div>
       <h1>Account Section</h1>
@@ -77,7 +111,7 @@ const AccountSection = () => {
         <div className="preferences-row">
           <label>Account Created: </label>
           {/* how to know the date*/}
-          the/ date/
+          Oct 1, 2024
         </div>
         <div className="preferences-row">
           <label>Total Size of Hosted Files: </label>
@@ -116,27 +150,21 @@ const AccountSection = () => {
   </div>
        </div>
         {/* graphs */}
-        <div style={{ width: '35%' }}>
-                <div className="preferences-row">
-                  <h3>Connection History Over Time</h3>
-                  <h3> Graph1</h3>
-                  <svg ref={connectionGraphRef}></svg>
-                </div>
-                <div className="preferences-row">
-                  <h3>Files Downloaded Over Time</h3>
-                  <h3> Graph2</h3>
-                  <svg ref={downloadsGraphRef}></svg>
-                </div>
-              </div>
-
+        <div className="charts" style={{width: '50%'}}>
+          <h2>Files Downloaded Over Time</h2>
+          <Bar data={prepareDownloadsData()} options={{ responsive: true }} />
+        </div>
             </div>
           </div>
-
-
   );
 };
 
 export default AccountSection;
+
+
+
+//<h3>Connection History Over Time</h3>
+//<h3>Files Downloaded Over Time</h3>
 
 /* Account Section */
 /*
@@ -163,7 +191,7 @@ const AccountSection = () => {
           </button>
         </div>
 
-      
+
 
         <div className="preferences-row">
           <label>Transaction History: </label>
