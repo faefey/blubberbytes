@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Popup from 'reactjs-popup';
+import { Tooltip } from 'react-tooltip';
+
 import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
+
+import { ReactComponent as HostIcon } from '../icons/host.svg';
 
 /*
     Button that is displayed only when the hosted files are shown
@@ -58,9 +62,16 @@ export default function HostPopup() {
             close();
         }
     }
-    
+     //<button className="host-button"><HostIcon /></button>
     return (
-        <Popup  trigger={<button className="host-button">Host file</button>}
+        <>
+        <Tooltip id="host-tooltip" />
+        <Popup  trigger={<button className="host-button"
+                                 data-tooltip-id="host-tooltip"
+                                 data-tooltip-content="Host file"
+                                 data-tooltip-place="top">
+                            <HostIcon />
+                        </button>}
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
@@ -89,7 +100,11 @@ export default function HostPopup() {
                     <br />
                     <div id="label-div">
                         <label><h3><span className="required">*</span>File Price: </h3></label>
-                        <input id="input-price" type="text" name ="fileprice" placeholder="Enter an amout"/>
+                        <input id="input-price" 
+                               type="text" 
+                               name ="fileprice" 
+                               placeholder="Enter an amount"
+                               autoComplete="off"/>
                     </div>
 
                     {errors['priceError'] !== '' && <div className="errors">{errors['priceError']}</div>}
@@ -102,5 +117,6 @@ export default function HostPopup() {
             </div>
             )}
         </Popup>
+        </>
     );
 }

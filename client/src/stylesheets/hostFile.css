@@ -20,7 +20,7 @@
 }
 
 .popup-content {
-    width: 400px;
+    width: 420px;
     padding: 20px;
     background-color: var(--color-theme); /* Using global variable */
     border-radius: 10px;
@@ -71,4 +71,34 @@
 .errors {
     color: lightcoral;
     font-style: italic;
+}
+
+.file-metadata {
+    border: 1px solid #ddd;
+    border-radius: 8px; 
+    padding: 16px; 
+    background-color: white; 
+    margin: 20px; 
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.file-info span {
+    margin: 4px 0; 
+}
+
+.file-price {
+    border-top: 1px solid #ccc; 
+    padding-top: 8px;
+    font-size: 1.2em; 
+    color: #007bff; 
+}
+
+.meta-elem {
+    display: flex;
+    justify-content: space-between;
 }
