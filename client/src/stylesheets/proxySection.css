@@ -1,0 +1,28 @@
+.proxy-button {
+    background-color: transparent;
+    border: none;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 100px;
+}
+
+.non-title-container {
+    display: flex;
+    align-items: center;
+}
+
+.input-box {
+    padding-right: 20px; 
+    
+}
+
+.unit {
+    margin-left:-21px;
+}
+
+.text-container {
+    width: 100px;
+}

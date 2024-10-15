@@ -3,11 +3,13 @@ import { useState } from 'react';
 import SideMenu from './sideMenu.js';
 import AccountSection from './AccountPage.js'
 import WalletSection from './WalletSection.js';
+import ProxySection from './ProxySection.js';
 
 import { ReactComponent as BackArrow } from '../icons/arrow_back.svg';
 import { ReactComponent as PersonIcon } from '../icons/person.svg';
 import { ReactComponent as WrenchIcon } from '../icons/wrench.svg';
 import { ReactComponent as WalletIcon } from '../icons/payments.svg';
+import { ReactComponent as ProxyIcon } from '../icons/proxy.svg';
 
 import '../stylesheets/settingsPage.css';
 
@@ -31,6 +33,10 @@ const SettingsPage = ({backToPrev}) => {
     {
       label: 'Wallet', icon: <WalletIcon />,
       onClick: () => setCurrSection('Wallet')
+    },
+    {
+      label: 'Proxy', icon: <ProxyIcon />,
+      onClick: () => setCurrSection('Proxy')
     }
   ];
 
@@ -44,6 +50,8 @@ const SettingsPage = ({backToPrev}) => {
         {currSection === 'Preferences' && <PreferencesSection />}
 
         {currSection === 'Wallet' && <WalletSection />}
+
+        {currSection === 'Proxy' && <ProxySection />}
       </div>
     </div>
   );
