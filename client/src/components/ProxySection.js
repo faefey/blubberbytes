@@ -92,7 +92,7 @@ function SubmissionForm({title, variable, setVariable, unit = false}) {
                         placeholder={variable}
                         value={inputValue}
                         onChange={handleInputChange}/>
-                    {unit && <span className="unit">OC</span>}
+                    {unit && <span className="unit">OC/MB</span>}
                 </div>
                 <button type="submit" className="proxy-button"> <GreenCheck /> </button>
             </div>
