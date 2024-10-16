@@ -41,7 +41,14 @@ export default function DownloadPopup() {
                 setFileData(fileData);
             }
         }
-    };  
+    };
+
+    const handleDownload = () => {
+        const link = document.createElement('a');
+        link.href = 'samplefiles/file1.txt';
+        link.download = 'file1.txt';
+        link.click();
+    };
 
     return (
         <>
@@ -97,7 +104,7 @@ export default function DownloadPopup() {
                     {hashError !== '' && <div className="errors">{hashError}</div>}
 
                     {(hashError === '' && fileData !== '') &&
-                    <button className="host-button" type="submit">
+                    <button className="host-button" type="submit" onClick={handleDownload}>
                         Download File
                     </button>}
 

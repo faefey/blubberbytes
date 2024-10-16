@@ -91,6 +91,7 @@ function SubmissionForm({title, variable, setVariable, unit = false}) {
                         type="text" 
                         placeholder={variable}
                         value={inputValue}
+                        autoComplete="off" 
                         onChange={handleInputChange}/>
                     {unit && <span className="unit">OC/MB</span>}
                 </div>
