@@ -35,6 +35,7 @@ caption {
   text-align: left; 
 }
 
+
 .table th.up {
   background-image: url('../images/sortUp.png');
 }
@@ -44,7 +45,6 @@ caption {
 .table th.default {
   background-image: url("../images/default.png");
 }
-
 th.up,
 th.default,
 th.down {
@@ -85,8 +85,6 @@ th.down {
   cursor: pointer;
 }
 
-
-
 .table tbody tr {
   cursor: pointer; 
 }
@@ -95,35 +93,31 @@ th.down {
   background-color: #d1e4ed; 
 }
 
+/* Set width for the checkbox column (first column) */
+.table th:first-child,
+.table td:first-child {
+  width: 5%;  
+  padding-left: 17px; 
+  padding-top: 15px;
+}
+
+/* Set width for the "File Name" column (second column) */
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 30%;  /* Adjust this percentage as needed */
+}
+
+/* Set width for the remaining columns */
+.table th:not(:first-child):not(:nth-child(2)),
+.table td:not(:first-child):not(:nth-child(2)) {
+  width: auto;  
+}
+
+/* General styling for table headers and cells */
 .table th, .table td {
-  width: 16.6%; 
-}
-.table th:first-child {
-  padding-left: 20px; 
-}
-
-.table td:first-child {
-  padding-left: 20px; 
-}
-.table th:first-child, 
-.table td:first-child {
-    width: 5%;  
-    padding-left: 17px; 
-    padding-top:15px ;
-}
-
-.table th:not(:first-child),
-.table td:not(:first-child) {
-    width: 19%;  
-}
-
-
-.table th {
   padding-left: 20px; 
   text-align: left;    
-}
-
-.table td {
-  padding-left: 20px; 
-  text-align: left;    
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
