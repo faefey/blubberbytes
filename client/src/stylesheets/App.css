@@ -1,7 +1,25 @@
 :root {
+/* base theme colors */
     --color-theme: #ccebff;
-    /* --color-theme: #e8def8; */
+    --color-light-blue: #e1f5fe;
+    --color-text: #37474f;
+    --color-white: #ffffff;
+
+    /* accent colors */
+    --color-accent-blue: #b3e5fc;
+    --color-accent-mint: #a7ffeb;
+    --color-accent-coral: #ffb3b3;
+
+    /* functional colors */
+    --color-blue-active: #80d6ff;
+    --color-price-blue: #0093e9;
+
+    /* neutral colors */
+    --color-muted-gray: #b0bec5;
+    --color-light-gray: #dddddd;
+    --color-soft-gray: #eff0f0;
 }
+
 
 body {
     padding: 10px;
