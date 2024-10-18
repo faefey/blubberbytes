@@ -104,14 +104,38 @@ function FileFilters({ filters, setFilters }) {
 }
 
 function FileActions({ selectedFiles }) {
+  const { setSelectedFiles } = useContext(TableContext);
+
   return (
     <div id="fileactions">
-      <Close className="icon" />
+      <Close className="icon" onClick={() => setSelectedFiles([])} />
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
-      <Download className="icon" />
+      <Download
+        className="icon"
+        onClick={() => {
+          const link = document.createElement('a');
+          link.href = 'samplefiles/file1.txt';
+          link.download = 'file1.txt';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      />
       <Delete className="icon" />
-      <Share className="icon" />
-      <Info className="icon" />
+      <Share
+        className="icon"
+        onClick={() => {
+          const hash = '77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f0';
+          const url = `http://localhost:3001/${hash}`;
+          navigator.clipboard.writeText(url)
+            .then(() => {
+              alert('Saved to clipboard');
+            })
+            .catch(err => {
+              console.error('Failed to copy: ', err);
+            });
+        }}
+      />      <Info className="icon" />
     </div>
   );
 }
