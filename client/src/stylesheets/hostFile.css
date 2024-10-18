@@ -112,11 +112,11 @@
     border-collapse: collapse;
 }
 
-th {
+.teeh {
     background: lightgray;
 }
 
-td {
+.teedee {
     border: 1px solid #ccc;
     text-align: center;
 }

@@ -115,14 +115,14 @@ export default function DownloadPopup() {
                         <table className="peer-table">
                             <tbody>
                                 <tr className="body-row">
-                                    <th>
+                                    <th className="teeh">
                                         <span className="required"
                                               data-tooltip-id="truncation"
                                               data-tooltip-content={"The first 10 characters of the Peer Id. Hover over to see the full Peer Id."}
                                               data-tooltip-place="top"> ? </span>
                                         Truncated Peer ID</th>
-                                    <th>Location</th>
-                                    <th>Price (OC)</th>
+                                    <th className="teeh">Location</th>
+                                    <th className="teeh">Price (OC)</th>
                                 </tr>
                                 {samplePeers.map((peer, index) => {
                                     if (index >= currEntries * numRows && index < (currEntries + 1) * numRows)
@@ -130,25 +130,26 @@ export default function DownloadPopup() {
                                         <tr key={peer.peerid} 
                                             className={`body-row ${peerData[0] === peer.peerid ? 'selected' : ''}`}
                                             onClick={() => handleRowClick(peer)}>
-                                            <td data-tooltip-id={peer.peerid}
+                                            <td className="teedee"
+                                                data-tooltip-id={peer.peerid}
                                                 data-tooltip-content={peer.peerid}
                                                 data-tooltip-place="top">
                                                     {peer.peerid.substring(0, 10)}
                                             </td>
-                                            <td>{peer.location}</td>
-                                            <td>{peer.price}</td>
+                                            <td className="teedee">{peer.location}</td>
+                                            <td className="teedee">{peer.price}</td>
                                         </tr>
                                         );
                                 })}
                                 {(samplePeers.length > numRows) && (<tr>
-                                    <td className="button-td prev">
+                                    <td className="teedee button-td prev">
                                         {currEntries > 0 && (<button className="host-button trans"
                                                 onClick={(event) => handleTransition(event, "-")}>
                                                     Prev
                                         </button>)}
                                     </td>
-                                    <td className="button-td"></td>
-                                    <td className="button-td next">
+                                    <td className="teedee button-td"></td>
+                                    <td className="teedee button-td next">
                                         {((currEntries + 1)* numRows < samplePeers.length) && (<button className="host-button trans"
                                                 onClick={(event) => handleTransition(event, "+")}>
                                                     Next

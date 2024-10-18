@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Popup from 'reactjs-popup';
 import { Tooltip } from 'react-tooltip';
 
@@ -11,7 +11,7 @@ import { ReactComponent as HostIcon } from '../icons/host.svg';
     Button that is displayed only when the hosted files are shown
     When clicked, a popup is prompted
 */
-export default function HostPopup({hostFile}) {
+export default function HostPopup() {
     const [fileName, setFileName] = useState('No file chosen');
     const fileInputRef = useRef(null);
     const [errors, setErrors] = useState({'fileError' : '', 'priceError' : ''});
@@ -57,7 +57,7 @@ export default function HostPopup({hostFile}) {
         
         if (currErrors['fileError'] === '' && currErrors['priceError'] === '') {
             setFileName("No file chosen");
-            hostFile(fileInputRef.current.files[0], filePrice)
+
             console.log(`File name:${fileName}\n File price:${filePrice}`);
             close();
         }
@@ -104,7 +104,13 @@ export default function HostPopup({hostFile}) {
                                type="text" 
                                name ="fileprice" 
                                placeholder="Enter an amount"
-                               autoComplete="off"/>
+                               autoComplete="off"
+                               onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                }
+                            }} 
+                            />
                     </div>
 
                     {errors['priceError'] !== '' && <div className="errors">{errors['priceError']}</div>}
