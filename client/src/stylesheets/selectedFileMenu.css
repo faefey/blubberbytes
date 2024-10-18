@@ -41,15 +41,6 @@
   padding-right: 10px;
 }
 
-#fileactions p {
-  user-select: none;
-}
-
-.icon {
-  border-radius: 8px;
-}
-
-.icon:hover {
-  cursor: pointer;
+#fileactions .icon:hover {
   background-color: rgb(143, 212, 249);
 }

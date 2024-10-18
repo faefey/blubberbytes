@@ -12,6 +12,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-left: 10px;
+}
+
+#side-menu-buttons {
+    display: flex;
+    margin-left: auto;
 }
 
 /* Navigation item styling */
@@ -35,8 +41,22 @@
     font-weight: bold;
 }
 
-/* Move text to the right and prevent selecting the text */
+/* Move text to the right */
 .nav-label {
     margin-left: 10px;
-    user-select: none;
+}
+
+/* Align extra icon to the right */
+.extraicon {
+    margin-left: auto;
+}
+
+/* Set color for status icon (will change with backend) */
+#status {
+    fill: rgb(33, 154, 33);
+}
+
+/* Change background color on hover */
+#refresh:hover {
+    background-color: rgb(99, 186, 236);
 }

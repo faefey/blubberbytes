@@ -6,6 +6,7 @@
 body {
     padding: 10px;
     margin: 0px;
+    user-select: none;
 }
 
 .App {
@@ -41,4 +42,9 @@ body {
 
 #settingscontent h1 {
     margin: 0px;
+}
+
+.icon {
+    cursor: pointer;
+    border-radius: 8px;
 }
