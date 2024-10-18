@@ -9,13 +9,13 @@ import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu() {
+export default function SelectedFileMenu({removeFiles}) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
   return selectedFiles.length === 0 ? (
     <FileFilters filters={filters} setFilters={setFilters} />
   ) : (
-    <FileActions selectedFiles={selectedFiles} />
+    <FileActions selectedFiles={selectedFiles} removeFiles={removeFiles} />
   );
 }
 
@@ -103,7 +103,7 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
-function FileActions({ selectedFiles }) {
+function FileActions({ selectedFiles, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
 
   return (
@@ -121,7 +121,7 @@ function FileActions({ selectedFiles }) {
           document.body.removeChild(link);
         }}
       />
-      <Delete className="icon" />
+      <Delete className="icon" onClick={() => removeFiles(selectedFiles)} />
       <Share
         className="icon"
         onClick={() => {

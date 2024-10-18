@@ -9,8 +9,7 @@ import {ReactComponent as Explore} from '../icons/globe1.svg'
 import {ReactComponent as Status} from '../icons/status.svg'
 import {ReactComponent as Refresh} from '../icons/refresh.svg'
 
-export default function MainContent({columns, currSection, currShownData, updateShownData, hostFile, removeFile, refreshExplore}) {
-  console.log(currShownData)
+export default function MainContent({columns, currSection, currShownData, updateShownData, hostFile, removeFiles, refreshExplore}) {
   const fileItems = [
     {
       label: 'Hosting', icon: <Hosting />,
@@ -36,7 +35,7 @@ export default function MainContent({columns, currSection, currShownData, update
       <div className="maincontent">
         <SideMenu items={fileItems} currSection={currSection} hostFile={hostFile} />
         <div className="content">
-          <Table data={currShownData} columns={columns} removeFile={removeFile} />
+          <Table data={currShownData} columns={columns} removeFiles={removeFiles} />
         </div>
       </div>
   );

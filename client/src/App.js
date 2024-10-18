@@ -28,10 +28,7 @@ function App() {
 
   function updateShownData(section) {
     setCurrSection(section);
-    if(section == 'Explore')
-      refreshExplore()
-    else
-      setCurrShownData(data[section]);
+    setCurrShownData(data[section]);
   }
 
   function hostFile(file, price) {
@@ -52,15 +49,17 @@ function App() {
     setCurrShownData(newData)
   }
 
-  function removeFile(file) {
-    const newData = data[currSection].filter(x => x !== file)
+  function removeFiles(files) {
+    const s = new Set(files)
+    const newData = data[currSection].filter(x => !s.has(x["id"]))
     setData({...data, [currSection]: newData})
     setCurrShownData(newData)
   }
   
-  function refreshExplore() {
+  function refreshExplore(e) {
     const newData = data['Explore'].slice(0, Math.floor(Math.random()*(data['Explore'].length + 1)))
     setCurrShownData(newData)
+    e.stopPropagation()
   }
 
   return (
@@ -79,7 +78,7 @@ function App() {
           currShownData={currShownData}
           updateShownData={updateShownData}
           hostFile={hostFile}
-          removeFile={removeFile}
+          removeFiles={removeFiles}
           refreshExplore={refreshExplore}
         />
       }
