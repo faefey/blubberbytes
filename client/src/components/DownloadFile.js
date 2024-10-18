@@ -9,6 +9,7 @@ import samplePeers from '../data/samplePeers.json';
 
 import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
 
+//                                    console.log(`Curr entries: ${currEntries} minimum: ${currEntries * numRows} maximum: ${(currEntries + 1) * numRows}`);
 /*
     Button that is displayed only when the hosted files are shown
     When clicked, a popup is prompted
@@ -19,6 +20,9 @@ export default function DownloadPopup() {
     const [hashError, setHashError] = useState('');
     const [peerError, setPeerError] = useState('');
     const inputRef = useRef(null);
+
+    const [currEntries, setCurrEntries] = useState(0);
+    const numRows = 5;
 
     //Where file is to be downloaded
     const inputData = (event, close) => {
@@ -57,6 +61,15 @@ export default function DownloadPopup() {
             }
         }
     };
+
+    const handleTransition = (event, type) => {
+        event.preventDefault();
+
+        if (type === "+") 
+            setCurrEntries(currEntries + 1);
+        else
+            setCurrEntries(currEntries - 1);
+    }
 
     const handleDownload = () => {
         if (peerData[1] !== "XXX") {
@@ -111,19 +124,37 @@ export default function DownloadPopup() {
                                     <th>Location</th>
                                     <th>Price (OC)</th>
                                 </tr>
-                                {samplePeers.map(peer => (
-                                    <tr key={peer.peerid} 
-                                        className={`body-row ${peerData[0] === peer.peerid ? 'selected' : ''}`}
-                                        onClick={() => handleRowClick(peer)}>
-                                        <td data-tooltip-id={peer.peerid}
-                                            data-tooltip-content={peer.peerid}
-                                            data-tooltip-place="top">
-                                                {peer.peerid.substring(0, 10)}
-                                        </td>
-                                        <td>{peer.location}</td>
-                                        <td>{peer.price}</td>
-                                    </tr>
-                                ))}
+                                {samplePeers.map((peer, index) => {
+                                    if (index >= currEntries * numRows && index < (currEntries + 1) * numRows)
+                                        return (
+                                        <tr key={peer.peerid} 
+                                            className={`body-row ${peerData[0] === peer.peerid ? 'selected' : ''}`}
+                                            onClick={() => handleRowClick(peer)}>
+                                            <td data-tooltip-id={peer.peerid}
+                                                data-tooltip-content={peer.peerid}
+                                                data-tooltip-place="top">
+                                                    {peer.peerid.substring(0, 10)}
+                                            </td>
+                                            <td>{peer.location}</td>
+                                            <td>{peer.price}</td>
+                                        </tr>
+                                        );
+                                })}
+                                {(samplePeers.length > numRows) && (<tr>
+                                    <td className="button-td prev">
+                                        {currEntries > 0 && (<button className="host-button trans"
+                                                onClick={(event) => handleTransition(event, "-")}>
+                                                    Prev
+                                        </button>)}
+                                    </td>
+                                    <td className="button-td"></td>
+                                    <td className="button-td next">
+                                        {((currEntries + 1)* numRows < samplePeers.length) && (<button className="host-button trans"
+                                                onClick={(event) => handleTransition(event, "+")}>
+                                                    Next
+                                        </button>)}
+                                    </td>
+                                </tr>)}
                             </tbody>
                         </table>
                         {peerError !== '' && <div className="errors peer-error">{peerError}</div>}
