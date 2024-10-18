@@ -2,8 +2,10 @@ import React, { useState, useRef } from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
-import FakeFileData from '../data/fakeFileData.json';
 import { Tooltip } from 'react-tooltip';
+
+import FakeFileData from '../data/fakeFileData.json';
+import samplePeers from '../data/samplePeers.json';
 
 import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
 
@@ -13,15 +15,28 @@ import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
 */
 export default function DownloadPopup() {
     const [fileData, setFileData] = useState('');
+    const [peerData, setPeerData] = useState(['', 'XXX']);
     const [hashError, setHashError] = useState('');
+    const [peerError, setPeerError] = useState('');
     const inputRef = useRef(null);
 
     //Where file is to be downloaded
     const inputData = (event, close) => {
         event.preventDefault();
 
+        let currPeerError = "";
+
+        if (peerData[0] === "")
+            currPeerError = "Please select a peer to download from.";
+            
         console.log(fileData);
-        close();
+
+        setPeerError(currPeerError);
+
+        console.log(currPeerError);
+        if (currPeerError === "")
+            close();
+
     }
     
     const handleSearch = (event) => {
@@ -44,10 +59,16 @@ export default function DownloadPopup() {
     };
 
     const handleDownload = () => {
-        const link = document.createElement('a');
-        link.href = 'samplefiles/file1.txt';
-        link.download = 'file1.txt';
-        link.click();
+        if (peerData[1] !== "XXX") {
+            const link = document.createElement('a');
+            link.href = 'samplefiles/file1.txt';
+            link.download = 'file1.txt';
+            link.click();
+        }
+    };
+
+    const handleRowClick = (peer) => {
+        setPeerData([peer.peerid, peer.price]);
     };
 
     return (
@@ -62,7 +83,7 @@ export default function DownloadPopup() {
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
-                onClose = {() => {setHashError(''); setFileData('');}}
+                onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError("");}}
                 closeOnDocumentClick={true} modal>
 
             {(close) => (
@@ -76,6 +97,38 @@ export default function DownloadPopup() {
                         <button className="host-button" onClick={handleSearch}>Search</button>
                     </div>
                     {(hashError === '' && fileData !== '') &&
+                    <>
+                    <h3 className="peer-title"><span className="required">*</span>Select a Peer to Download From</h3>
+                        <table className="peer-table">
+                            <tbody>
+                                <tr className="body-row">
+                                    <th>
+                                        <span className="required"
+                                              data-tooltip-id="truncation"
+                                              data-tooltip-content={"The first 10 characters of the Peer Id. Hover over to see the full Peer Id."}
+                                              data-tooltip-place="top"> ? </span>
+                                        Truncated Peer ID</th>
+                                    <th>Location</th>
+                                    <th>Price (OC)</th>
+                                </tr>
+                                {samplePeers.map(peer => (
+                                    <tr key={peer.peerid} 
+                                        className={`body-row ${peerData[0] === peer.peerid ? 'selected' : ''}`}
+                                        onClick={() => handleRowClick(peer)}>
+                                        <td data-tooltip-id={peer.peerid}
+                                            data-tooltip-content={peer.peerid}
+                                            data-tooltip-place="top">
+                                                {peer.peerid.substring(0, 10)}
+                                        </td>
+                                        <td>{peer.location}</td>
+                                        <td>{peer.price}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {peerError !== '' && <div className="errors peer-error">{peerError}</div>}
+                        {samplePeers.map(peer => (<Tooltip id={peer.peerid}/>))}
+                        <Tooltip id="truncation" />
                         <div className="file-metadata">
                             <div className="file-info">
                                 <span className="meta-elem">
@@ -97,9 +150,9 @@ export default function DownloadPopup() {
                             </div>
                             <div className="file-price meta-elem">
                                 <div>Price:</div>
-                                <div><strong>OC{fileData.price}</strong></div>
+                                <div><strong>OC{peerData[1]}</strong></div>
                             </div>
-                        </div>}
+                        </div></>}
 
                     {hashError !== '' && <div className="errors">{hashError}</div>}
 

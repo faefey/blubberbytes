@@ -102,3 +102,36 @@
     display: flex;
     justify-content: space-between;
 }
+
+.peer-table {
+    background: white;
+    margin: auto;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    border-radius: 8px;
+}
+
+th {
+    background: lightgray;
+}
+
+td {
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.body-row:hover {
+    background-color: lightgray;
+}
+
+.peer-title {
+    text-align: center;
+}
+
+.selected {
+    background-color: lightgray !important;
+}
+
+.peer-error {
+    text-align: center;
+}
