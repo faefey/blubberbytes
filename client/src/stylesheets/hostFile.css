@@ -1,12 +1,12 @@
 #label-div {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin: 10px;
 }
 
 #popup-border {
     position: relative;
-    border: 2px solid black;
 }
 
 #popup-text {
@@ -14,10 +14,16 @@
     font-size: 25px;
 }
 
+#input-price {
+    height: 25px;
+    border-radius: 5px;
+}
+
 .popup-content {
-    width: 400px;
-    height: 300px;
-    background-color: white;
+    width: 420px;
+    padding: 20px;
+    background-color: var(--color-theme); /* Using global variable */
+    border-radius: 10px;
 }
   
 .popup-overlay {
@@ -35,6 +41,10 @@
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.trans {
+    margin: 0px;
 }
   
 .host-button:hover {
@@ -57,3 +67,91 @@
     font-size: 15px;
     text-align: center;
 } 
+
+.required {
+    color: lightcoral;
+}
+
+.errors {
+    color: lightcoral;
+    font-style: italic;
+}
+
+.file-metadata {
+    border: 1px solid #ddd;
+    border-radius: 8px; 
+    padding: 16px; 
+    background-color: white; 
+    margin: 20px; 
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.file-info span {
+    margin: 4px 0; 
+}
+
+.file-price {
+    border-top: 1px solid #ccc; 
+    padding-top: 8px;
+    font-size: 1.2em; 
+    color: #007bff; 
+}
+
+.meta-elem {
+    display: flex;
+    justify-content: space-between;
+}
+
+.peer-table {
+    background: white;
+    margin: auto;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+}
+
+th {
+    background: lightgray;
+}
+
+td {
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.button-td {
+    border: none;
+}
+
+.prev {
+    text-align: left;
+}
+
+.next {
+    text-align: right;
+}
+
+.body-row:hover {
+    background-color: lightgray;
+}
+
+.peer-title {
+    text-align: center;
+}
+
+.selected {
+    background-color: lightgray !important;
+}
+
+.peer-error {
+    text-align: center;
+}
+
+#buttons {
+    display: flex;
+    justify-content: space-between;
+}

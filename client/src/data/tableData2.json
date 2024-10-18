@@ -27,5 +27,75 @@
     "type": "document",
     "downloads": 10,
     "price": 100
+  },
+  {
+    "id": 4,
+    "FileName": "Inception",
+    "FileSize": "4.2 GB",
+    "sizeInGB": 4.2,
+    "DateListed": "2024-03-15",
+    "type": "media",
+    "downloads": 1800,
+    "price": 3.99
+  },
+  {
+    "id": 5,
+    "FileName": "Annual Report 2023",
+    "FileSize": "15 MB",
+    "sizeInGB": 0.015,
+    "DateListed": "2024-01-30",
+    "type": "document",
+    "downloads": 500,
+    "price": 0.99
+  },
+  {
+    "id": 6,
+    "FileName": "Photoshop Tutorial",
+    "FileSize": "1.8 GB",
+    "sizeInGB": 1.8,
+    "DateListed": "2024-07-05",
+    "type": "media",
+    "downloads": 750,
+    "price": 4.99
+  },
+  {
+    "id": 7,
+    "FileName": "Game of Thrones S01",
+    "FileSize": "20 GB",
+    "sizeInGB": 20,
+    "DateListed": "2023-12-10",
+    "type": "media",
+    "downloads": 5000,
+    "price": 14.99
+  },
+  {
+    "id": 8,
+    "FileName": "Python Programming Guide",
+    "FileSize": "500 MB",
+    "sizeInGB": 0.5,
+    "DateListed": "2024-05-20",
+    "type": "document",
+    "downloads": 1200,
+    "price": 9.99
+  },
+  {
+    "id": 9,
+    "FileName": "Yoga for Beginners",
+    "FileSize": "3.5 GB",
+    "sizeInGB": 3.5,
+    "DateListed": "2024-02-28",
+    "type": "media",
+    "downloads": 950,
+    "price": 5.99
+  },
+  {
+    "id": 10,
+    "FileName": "World Map High Res",
+    "FileSize": "250 MB",
+    "sizeInGB": 0.25,
+    "DateListed": "2024-08-12",
+    "type": "document",
+    "downloads": 300,
+    "price": 1.49
   }
 ]

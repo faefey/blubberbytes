@@ -1,5 +1,5 @@
 import HostPopup from './HostFile';
-
+import DownloadPopup from './DownloadFile';
 import '../stylesheets/sideMenu.css';
 
 // side menu navigation item component
@@ -17,7 +17,10 @@ const SideMenu = ({items, files=true, currSection}) => {
       {files === true && 
         <div id="side-menu-header">
           <h3>Files</h3>
-          <HostPopup />
+          <div>
+            <DownloadPopup />
+            <HostPopup />
+          </div>
         </div>
       }
       

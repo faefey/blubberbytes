@@ -3,8 +3,10 @@ import '../stylesheets/selectedFileMenu.css';
 import TableContext from './TableContext';
 import React, { useContext } from 'react';
 
+import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
+import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
 export default function SelectedFileMenu() {
@@ -37,7 +39,7 @@ function FileFilters({ filters, setFilters }) {
         value={filters.type}
         onChange={(e) => setFilters({ ...filters, type: e.target.value })}
       >
-        <option value="">Type</option>
+        <option value="" hidden>Type</option>
         <option value="document">Document</option>
         <option value="media">Media</option>
         <option value="other">Other</option>
@@ -49,7 +51,7 @@ function FileFilters({ filters, setFilters }) {
         value={filters.size}
         onChange={(e) => setFilters({ ...filters, size: e.target.value })}
       >
-        <option value="">Size</option>
+        <option value="" hidden>Size</option>
         <option value="less1gb">{'<'} 1 GB</option>
         <option value="1to5gb">1 - 5 GB</option>
         <option value="more5gb">{'>'} 5 GB</option>
@@ -61,7 +63,7 @@ function FileFilters({ filters, setFilters }) {
         value={filters.date}
         onChange={(e) => setFilters({ ...filters, date: e.target.value })}
       >
-        <option value="">Date</option>
+        <option value="" hidden>Date</option>
         <option value="today">Today</option>
         <option value="7days">Last 7 days</option>
         <option value="30days">Last 30 days</option>
@@ -76,7 +78,7 @@ function FileFilters({ filters, setFilters }) {
         value={filters.downloads}
         onChange={(e) => setFilters({ ...filters, downloads: e.target.value })}
       >
-        <option value="">Downloads</option>
+        <option value="" hidden>Downloads</option>
         <option value="less100">{'<'} 100</option>
         <option value="100to1000">100 - 1000</option>
         <option value="more1000">{'>'} 1000</option>
@@ -88,7 +90,7 @@ function FileFilters({ filters, setFilters }) {
         value={filters.price}
         onChange={(e) => setFilters({ ...filters, price: e.target.value })}
       >
-        <option value="">Price</option>
+        <option value="" hidden>Price</option>
         <option value="less1">{'<'} 1</option>
         <option value="1to2">1 - 2</option>
         <option value="more2">{'>'} 2</option>
@@ -102,12 +104,38 @@ function FileFilters({ filters, setFilters }) {
 }
 
 function FileActions({ selectedFiles }) {
+  const { setSelectedFiles } = useContext(TableContext);
+
   return (
     <div id="fileactions">
+      <Close className="icon" onClick={() => setSelectedFiles([])} />
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
-      <Download className="icon" />
+      <Download
+        className="icon"
+        onClick={() => {
+          const link = document.createElement('a');
+          link.href = 'samplefiles/file1.txt';
+          link.download = 'file1.txt';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      />
       <Delete className="icon" />
-      <Info className="icon" />
+      <Share
+        className="icon"
+        onClick={() => {
+          const hash = '77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f0';
+          const url = `http://localhost:3001/${hash}`;
+          navigator.clipboard.writeText(url)
+            .then(() => {
+              alert('Saved to clipboard');
+            })
+            .catch(err => {
+              console.error('Failed to copy: ', err);
+            });
+        }}
+      />      <Info className="icon" />
     </div>
   );
 }

@@ -13,7 +13,7 @@ import tableData3 from "./data/tableData3.json";
 import tableData4 from "./data/tableData4.json";
 
 const data = {'Hosting': tableData1, 'Purchased': tableData2, 'Sharing': tableData3, 'Explore': tableData4}
-const columns = [ { label: "File Name", accessor: "FileName", sortable: true }, { label: "FileSize", accessor: "FileSize", sortable: true }, { label: "DateListed", accessor: "DateListed", sortable: true }, { label: "downloads", accessor: "downloads", sortable: true }, { label: "price", accessor: "price", sortable: true }, { label: "type", accessor: "type", sortable: true },];
+const columns = [ { label: "File Name", accessor: "FileName", sortable: true }, { label: "File Size", accessor: "FileSize", sortable: true }, { label: "Uploaded Date", accessor: "DateListed", sortable: true }, { label: "Downloads", accessor: "downloads", sortable: true }, { label: "Price", accessor: "price", sortable: true }, { label: "Type", accessor: "type", sortable: true },];
 
 function App() {
   const [currPage, setCurrPage] = useState(0);

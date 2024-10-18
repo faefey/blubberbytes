@@ -1,33 +1,42 @@
 import { useState } from 'react';
 
 import SideMenu from './sideMenu.js';
+import AccountSection from './AccountPage.js'
+import WalletSection from './WalletSection.js';
+import ProxySection from './ProxySection.js';
 
-import { ReactComponent as Back } from '../icons/arrow_back.svg';
-import { ReactComponent as Account } from '../icons/person.svg';
-import { ReactComponent as Preferences } from '../icons/wrench.svg';
-import { ReactComponent as Wallet } from '../icons/payments.svg';
+import { ReactComponent as BackArrow } from '../icons/arrow_back.svg';
+import { ReactComponent as PersonIcon } from '../icons/person.svg';
+import { ReactComponent as WrenchIcon } from '../icons/wrench.svg';
+import { ReactComponent as WalletIcon } from '../icons/payments.svg';
+import { ReactComponent as ProxyIcon } from '../icons/proxy.svg';
 
 import '../stylesheets/settingsPage.css';
 
 const SettingsPage = ({backToPrev}) => {
-  const [currSection, setCurrSection] = useState('Account'); // Default section is 'account'
+  // default section is 'account'
+  const [currSection, setCurrSection] = useState('Account');
 
   const settingsItems = [
     {
-      label: 'Settings', icon: <Back />,
+      label: 'Settings', icon: <BackArrow />,
       onClick: () => backToPrev()
     },
     {
-      label: 'Account', icon: <Account />,
+      label: 'Account', icon: <PersonIcon />,
       onClick: () => setCurrSection('Account')
     },
     {
-      label: 'Preferences', icon: <Preferences />,
+      label: 'Preferences', icon: <WrenchIcon />,
       onClick: () => setCurrSection('Preferences')
     },
     {
-      label: 'Wallet', icon: <Wallet />,
+      label: 'Wallet', icon: <WalletIcon />,
       onClick: () => setCurrSection('Wallet')
+    },
+    {
+      label: 'Proxy', icon: <ProxyIcon />,
+      onClick: () => setCurrSection('Proxy')
     }
   ];
 
@@ -37,55 +46,21 @@ const SettingsPage = ({backToPrev}) => {
 
       <div id="settingscontent" className="content">
         {currSection === 'Account' && <AccountSection />}
-        
+
         {currSection === 'Preferences' && <PreferencesSection />}
-        
-        {currSection === 'Wallet' && <h1>Wallet Section</h1>}
+
+        {currSection === 'Wallet' && <WalletSection />}
+
+        {currSection === 'Proxy' && <ProxySection />}
       </div>
     </div>
   );
 };
-
-/* Account Section */
-const AccountSection = () => {
-  return (
-    <div>
-      <h1>Account Section</h1>
-      <div className="preferences-container">
-
-        {/* Hosted File List Export button */}
-        <div className="preferences-row">
-          <label>Hosted File List: </label>
-          <button className="preferences-button" onClick={() => alert('Hosted File List Export')}>
-            Export
-          </button>
-        </div>
-
-        {/* Purchased File List Export button */}
-        <div className="preferences-row">
-          <label>Purchased File List: </label>
-          <button className="preferences-button" onClick={() => alert('Purchased File List Export')}>
-            Export
-          </button>
-        </div>
-
-        {/* Transaction History Export button */}
-        <div className="preferences-row">
-          <label>Transaction History: </label>
-          <button className="preferences-button" onClick={() => alert('Transaction History Export')}>
-            Export
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 
 /* Preferences Section */
 const PreferencesSection = () => {
   const [theme, setTheme] = useState('Light'); // Default theme is Light
-  const [defaultNodes, setDefaultNodes] = useState(5); 
+  const [defaultNodes, setDefaultNodes] = useState(5);
   const [proxy, setProxy] = useState(''); // State for managing the proxy input
 
   // Handle theme change from the dropdown
@@ -110,22 +85,22 @@ const PreferencesSection = () => {
         {/* Display the download location, this field is currently read-only */}
         <div className="preferences-row">
           <label>Download Location: </label>
-          <input 
-            type="text" 
-            value="D:\\blubberbytes\\download\\files" 
-            readOnly 
-            className="preferences-input" 
+          <input
+            type="text"
+            value="D:\\blubberbytes\\download\\files"
+            readOnly
+            className="preferences-input"
           />
         </div>
 
         {/* Proxy input */}
         <div className="preferences-row">
           <label>Proxy: </label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={proxy} // Bind the input value to the state
             onChange={(e) => setProxy(e.target.value)} // Update the state when the user types
-            placeholder="Specify a proxy server" 
+            placeholder="Specify a proxy server"
             className="preferences-input" // Keep the class name for styling
           />
         </div>

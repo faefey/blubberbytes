@@ -52,10 +52,11 @@ function SearchBar({origShownData, setCurrShownData}) {
         <div className='searchbar-container'>
             <Search />
             <input type="text"
+               autoComplete="off"
                id="searchbar"
                placeholder="Search..."
                onChange={inputChangeHandler}
-               onKeyDown={keyPressHandler}/>
+               onKeyDown={keyPressHandler} />
             {searched && <ClearSearch className="icon" onClick={() => {setCurrShownData(origShownData); setSearched(false)}} />}
         </div>
       );
