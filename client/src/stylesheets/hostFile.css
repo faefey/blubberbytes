@@ -42,6 +42,10 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
+.trans {
+    margin: 0px;
+}
   
 .host-button:hover {
     background-color: rgb(127, 190, 201);
@@ -108,7 +112,6 @@
     margin: auto;
     border: 1px solid #ccc;
     border-collapse: collapse;
-    border-radius: 8px;
 }
 
 th {
@@ -118,6 +121,18 @@ th {
 td {
     border: 1px solid #ccc;
     text-align: center;
+}
+
+.button-td {
+    border: none;
+}
+
+.prev {
+    text-align: left;
+}
+
+.next {
+    text-align: right;
 }
 
 .body-row:hover {
@@ -134,4 +149,9 @@ td {
 
 .peer-error {
     text-align: center;
+}
+
+#buttons {
+    display: flex;
+    justify-content: space-between;
 }
