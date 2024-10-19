@@ -20,6 +20,9 @@ export default function DownloadPopup({addFile}) {
     const [hashError, setHashError] = useState('');
     const [peerError, setPeerError] = useState('');
     const inputRef = useRef(null);
+    
+    const [showButton, setShowButton] = useState(false);
+    const [onPeerTable, setOnPeerTable] = useState(true);
 
     const [currEntries, setCurrEntries] = useState(0);
     const numRows = 5;
@@ -53,13 +56,23 @@ export default function DownloadPopup({addFile}) {
         else {
             const fileData = FakeFileData.find(file => file.hash === hash);
 
-            if (!fileData)
+            if (!fileData) {
                 setHashError("No file found with that hash.");
+                setOnPeerTable(false);
+                setPeerError("");
+                setShowButton(false);
+                console.log(onPeerTable);
+            }
             else {
+                setShowButton(true);
+                setOnPeerTable(true);
                 setHashError("");
                 setFileData(fileData);
             }
+
         }
+
+        
     };
 
     const handleTransition = (event, type) => {
@@ -69,6 +82,18 @@ export default function DownloadPopup({addFile}) {
             setCurrEntries(currEntries + 1);
         else
             setCurrEntries(currEntries - 1);
+    }
+
+    const handleTransitionToData = (event) => {
+        event.preventDefault();
+        setPeerError("");
+
+        console.log(!onPeerTable, !(peerData[1] === "XXX"), peerData)
+        if (!onPeerTable || !(peerData[1] === "XXX"))
+            setOnPeerTable(!onPeerTable);
+        else
+            setPeerError("Please select a peer.");
+
     }
 
     const handleDownload = () => {
@@ -82,6 +107,7 @@ export default function DownloadPopup({addFile}) {
     };
 
     const handleRowClick = (peer) => {
+        //setOnPeerTable(false);
         setPeerData([peer.peerid, peer.price]);
     };
 
@@ -97,7 +123,7 @@ export default function DownloadPopup({addFile}) {
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
-                onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError("");}}
+                onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError(""); setShowButton(false);}}
                 closeOnDocumentClick={true} modal>
 
             {(close) => (
@@ -110,8 +136,10 @@ export default function DownloadPopup({addFile}) {
                         </div>
                         <button className="host-button" onClick={handleSearch}>Search</button>
                     </div>
+                    {showButton && (<button className="host-button" onClick={handleTransitionToData}>{onPeerTable ? "Next Page" : "Previous Page"}</button>)}
                     {(hashError === '' && fileData !== '') &&
                     <>
+                    {onPeerTable && (<>
                     <h3 className="peer-title"><span className="required">*</span>Select a Peer to Download From</h3>
                         <table className="peer-table">
                             <tbody>
@@ -162,7 +190,8 @@ export default function DownloadPopup({addFile}) {
                         {peerError !== '' && <div className="errors peer-error">{peerError}</div>}
                         {samplePeers.map(peer => (<Tooltip id={peer.peerid}/>))}
                         <Tooltip id="truncation" />
-                        <div className="file-metadata">
+                        </>)}
+                        {!onPeerTable && (<div className="file-metadata">
                             <div className="file-info">
                                 <span className="meta-elem">
                                     <div>File Name:</div>
@@ -185,17 +214,17 @@ export default function DownloadPopup({addFile}) {
                                 <div>Price:</div>
                                 <div><strong>OC{peerData[1]}</strong></div>
                             </div>
-                        </div></>}
+                        </div>)}</>}
 
                     {hashError !== '' && <div className="errors">{hashError}</div>}
 
-                    {(hashError === '' && fileData !== '') &&
+                    {(hashError === '' && fileData !== '' && !onPeerTable) &&
                     <button className="host-button" type="submit" onClick={handleDownload}>
                         Download File
                     </button>}
 
-                </form>
 
+                </form>
             </div>
             )}
         </Popup>
