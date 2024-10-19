@@ -64,7 +64,7 @@ export default function DownloadPopup({addFile}) {
                 console.log(onPeerTable);
             }
             else {
-                setShowButton(true);
+                //setShowButton(true);
                 setOnPeerTable(true);
                 setHashError("");
                 setFileData(fileData);
@@ -107,7 +107,7 @@ export default function DownloadPopup({addFile}) {
     };
 
     const handleRowClick = (peer) => {
-        //setOnPeerTable(false);
+        setShowButton(true);
         setPeerData([peer.peerid, peer.price]);
     };
 
@@ -124,10 +124,10 @@ export default function DownloadPopup({addFile}) {
                 className="popup-content"
                 overlayClassName="popup-overlay"
                 onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError(""); setShowButton(false);}}
-                closeOnDocumentClick={true} modal>
-
+                closeOnDocumentClick={false} modal>
             {(close) => (
             <div id="popup-border">
+                <button className="ecks-button" onClick= {() => close()}>X</button>
                 <form onSubmit={(event) => inputData(event, close)}>
                     <div id="label-div">
                         <label><h3><span className="required">*</span>File hash:</h3></label>
@@ -136,7 +136,6 @@ export default function DownloadPopup({addFile}) {
                         </div>
                         <button className="host-button" onClick={handleSearch}>Search</button>
                     </div>
-                    {showButton && (<button className="host-button" onClick={handleTransitionToData}>{onPeerTable ? "Next Page" : "Previous Page"}</button>)}
                     {(hashError === '' && fileData !== '') &&
                     <>
                     {onPeerTable && (<>
@@ -222,7 +221,7 @@ export default function DownloadPopup({addFile}) {
                     <button className="host-button" type="submit" onClick={handleDownload}>
                         Download File
                     </button>}
-
+                    {showButton && (<button className="host-button trans-peer-button" onClick={handleTransitionToData}>{onPeerTable ? "Next Page" : "Previous Page"}</button>)}
 
                 </form>
             </div>

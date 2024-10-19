@@ -108,6 +108,7 @@
 .peer-table {
     background: white;
     margin: auto;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-collapse: collapse;
 }
@@ -152,4 +153,19 @@
 #buttons {
     display: flex;
     justify-content: space-between;
+}
+
+.trans-peer-button {
+    float: right;
+}
+
+.ecks-button {
+    font-weight: bold;
+    font-size: 20px;
+    color: red;
+    background: none; 
+    border: none;    
+    padding: 0;     
+    cursor: pointer;  
+
 }
