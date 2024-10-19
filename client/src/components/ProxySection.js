@@ -98,10 +98,10 @@ export default function ProxySection() {
 
     return (
         <div>
-            <h1>Proxy Section</h1>
+            <h2>Proxy Section</h2>
             <FormControlLabel
                 control={<Switch checked={checked} onChange={handleChange} />}
-                label={checked ? <h3>Be A Proxy</h3> : <h3>Use A Proxy</h3>}
+                label={checked ? <label>Be A Proxy</label> : <label>Use A Proxy</label>}
             />
             {checked && (
                 <>
@@ -114,7 +114,7 @@ export default function ProxySection() {
                         variable={maxUsers}
                         setVariable={setMaxUsers} />
 
-                    <h2>Bandwidth</h2>
+                    <h3>Bandwidth</h3>
                     <div className="wallet-graph">
                         <Line data={bandwidthData} options={chartOptions} />
                     </div>
@@ -122,7 +122,7 @@ export default function ProxySection() {
             )}
             {!checked && (
                 <div>
-                    <h2>Available Proxies</h2>
+                    <h3>Available Proxies</h3>
                     <table className="table-container">
                         <thead>
                             <tr>
@@ -184,7 +184,7 @@ function SubmissionForm({ title, variable, setVariable, unit = false }) {
         <>
             <form onSubmit={(event) => { inputHandler(event); setInputValue(""); }}>
                 <div className="input-container">
-                    <h3 className="text-container">{title}</h3>
+                    <label className="text-container">{title}</label>
                     <div className="non-title-container">
                         <div>
                             <input className="input-box"
