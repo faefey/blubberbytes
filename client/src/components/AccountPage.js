@@ -85,21 +85,25 @@ const AccountSection = () => {
       <div className="wallet-info">
         <h2>Account Stats</h2>
         <div className="two-column">
-          <div className="label-value-pair">
-            <label>Number of Hosted Files:</label>
-            <span>{totalHostedFiles}</span>
+          <div className="row">
+            <div className="label-value-pair">
+              <label>Number of Hosted Files:</label>
+              <span>{totalHostedFiles} files</span>
+            </div>
+            <div className="label-value-pair">
+              <label>Total Size of Hosted Files:</label>
+              <span>{totalHostedSize} GB</span>
+            </div>
           </div>
-          <div className="label-value-pair">
-            <label>Total Size of Hosted Files:</label>
-            <span>{totalHostedSize} GB</span>
-          </div>
-          <div className="label-value-pair">
-            <label>Number of Purchased Files:</label>
-            <span>{totalPurchasedFiles}</span>
-          </div>
-          <div className="label-value-pair">
-            <label>Total Size of Purchased Files:</label>
-            <span>{totalPurchasedSize} GB</span>
+          <div className="row">
+            <div className="label-value-pair">
+              <label>Number of Purchased Files:</label>
+              <span>{totalPurchasedFiles} files</span>
+            </div>
+            <div className="label-value-pair">
+              <label>Total Size of Purchased Files:</label>
+              <span>{totalPurchasedSize} GB</span>
+            </div>
           </div>
         </div>
       </div>
