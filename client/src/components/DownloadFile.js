@@ -51,6 +51,8 @@ export default function DownloadPopup({addFile}) {
     const handleSearch = (event) => {
         event.preventDefault();
 
+        setPeerData(['', 'XXX']);
+        
         const hash = inputRef.current.value;
 
         if (hash === "")
@@ -89,7 +91,7 @@ export default function DownloadPopup({addFile}) {
     const handleTransitionToData = (event) => {
         event.preventDefault();
         setPeerError("");
-
+        setPeerData(["", "XXX"]);
         setOnPeerTable(!onPeerTable);
         // console.log(!onPeerTable, !(peerData[1] === "XXX"), peerData)
         // if (!onPeerTable || !(peerData[1] === "XXX"))
