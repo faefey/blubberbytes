@@ -4,18 +4,25 @@
 }
 
 .two-column {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 250px;
-  width: 75%;
-  padding-left: 0;
-  justify-content: start;
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 25%;
 }
 
 .label-value-pair {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 20px;
+  align-items: center;
+  width: 50%;
 }
 
 label {
@@ -104,11 +111,13 @@ span {
 }
 
 .table-container {
+  width: 100%;
   max-height: 400px;
   overflow-y: auto;
   border: 1px solid var(--color-light-gray);
   border-radius: 4px;
   margin-top: 20px;
+  padding: 0;
 }
 
 .table-container table {
@@ -170,11 +179,10 @@ span {
 
 .input-box {
   padding-right: 47px; 
-  
 }
 
 .unit {
-  margin-left:-47px;
+  margin-left: -47px;
 }
 
 .text-container {

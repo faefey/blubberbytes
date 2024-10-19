@@ -91,28 +91,28 @@ const Histories = () => {
 
   const columns = {
     transaction: [
-      { header: 'Date', field: 'Date', render: (value) => format(new Date(value), 'MM/dd/yyyy') },
-      { header: 'Amount (OC)', field: 'Amount' },
-      { header: "2nd Party's Wallet ID", field: '2nd Party Wallet ID' },
+      { header: 'Date', field: 'Date', render: (value) => format(new Date(value), 'MM/dd/yyyy'), width: '15%' },
+      { header: 'Amount (OC)', field: 'Amount', width: '10%' },
+      { header: "2nd Party's Wallet ID", field: '2nd Party Wallet ID', width: '75%' },
     ],
     upload: [
-      { header: 'Date Listed', field: 'DateListed', render: (value) => format(new Date(value), 'MM/dd/yyyy') },
-      { header: 'File Name', field: 'FileName' },
-      { header: 'File Size', field: 'FileSize' },
+      { header: 'Date Listed', field: 'DateListed', render: (value) => format(new Date(value), 'MM/dd/yyyy'), width: '20%' },
+      { header: 'File Name', field: 'FileName', width: '50%' },
+      { header: 'File Size', field: 'FileSize', width: '30%' },
     ],
     download: [
-      { header: 'Date Listed', field: 'DateListed', render: (value) => format(new Date(value), 'MM/dd/yyyy') },
-      { header: 'File Name', field: 'FileName' },
-      { header: 'File Size', field: 'FileSize' },
+      { header: 'Date Listed', field: 'DateListed', render: (value) => format(new Date(value), 'MM/dd/yyyy'), width: '20%' },
+      { header: 'File Name', field: 'FileName', width: '50%' },
+      { header: 'File Size', field: 'FileSize', width: '30%' },
     ],
     proxy: [
-      { header: 'Connection Date', field: 'connectionDate', render: (value) => format(new Date(value), 'MM/dd/yyyy') },
-      { header: 'Connection Type', field: 'connectionType' },
-      { header: 'Target/Source Proxy ID', field: 'targetProxyID' },
-      { header: 'Status', field: 'status' },
-      { header: 'Response Time', field: 'responseTime' },
+      { header: 'Connection Date', field: 'connectionDate', render: (value) => format(new Date(value), 'MM/dd/yyyy'), width: '20%' },
+      { header: 'Connection Type', field: 'connectionType', width: '20%' },
+      { header: 'Target/Source Proxy ID', field: 'targetProxyID', width: '30%' },
+      { header: 'Status', field: 'status', width: '15%' },
+      { header: 'Response Time', field: 'responseTime', width: '15%' },
     ],
-  };
+  };  
 
   return (
     <div className="history-section">

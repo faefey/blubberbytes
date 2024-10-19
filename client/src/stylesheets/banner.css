@@ -6,8 +6,9 @@
 }
 
 #logo {
-    width: auto;
-    height: 50px;
+    min-width: 150px;
+    width: 17%;
+    height: auto;
 }
 
 #profile-button {
