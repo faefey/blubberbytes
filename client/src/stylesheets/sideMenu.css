@@ -53,7 +53,7 @@
 
 /* Set color for status icon (will change with backend) */
 #status {
-    fill: rgb(33, 154, 33);
+    fill: green;
 }
 
 /* Change background color on hover */
