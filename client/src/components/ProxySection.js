@@ -3,8 +3,8 @@ import { Switch, FormControlLabel } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import '../stylesheets/UserAccount.css';
 
-import { ReactComponent as XButton } from '../icons/red_x_button.svg';
-import { ReactComponent as GreenCheck } from '../icons/green_check.svg';
+import { ReactComponent as Cross } from '../icons/close.svg';
+import { ReactComponent as Check } from '../icons/check.svg';
 
 export default function ProxySection() {
     const [checked, setChecked] = useState(false);
@@ -61,20 +61,18 @@ export default function ProxySection() {
             }
 
             // Reset bandwidth data and set color for "Use a proxy"
-            setBandwidthData(prevData => {
-                return {
-                    ...prevData,
-                    datasets: [
-                        {
-                            label: 'Bandwidth Usage Over Time',
-                            data: [],
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            fill: false,
-                            tension: 0.4,
-                        },
-                    ],
-                };
-            });
+            setBandwidthData(prevData => ({
+                ...prevData,
+                datasets: [
+                    {
+                        label: 'Bandwidth Usage Over Time',
+                        data: [],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false,
+                        tension: 0.4,
+                    },
+                ],
+            }));
         }
 
         return () => {
@@ -105,18 +103,24 @@ export default function ProxySection() {
                 control={<Switch checked={checked} onChange={handleChange} />}
                 label={checked ? <h3>Be A Proxy</h3> : <h3>Use A Proxy</h3>}
             />
-            {checked &&
+            {checked && (
                 <>
                     <SubmissionForm title={"Usage rate: "}
-                        variable = {usageRate}
-                        setVariable = {setUsageRate}
-                        unit = {true} />
+                        variable={usageRate}
+                        setVariable={setUsageRate}
+                        unit={true} />
 
                     <SubmissionForm title={"Max users: "}
-                        variable = {maxUsers}
-                        setVariable = {setMaxUsers} />
-                </>}
-            {checked === false && (
+                        variable={maxUsers}
+                        setVariable={setMaxUsers} />
+
+                    <h2>Bandwidth</h2>
+                    <div className="wallet-graph">
+                        <Line data={bandwidthData} options={chartOptions} />
+                    </div>
+                </>
+            )}
+            {!checked && (
                 <div>
                     <h2>Available Proxies</h2>
                     <table className="table-container">
@@ -143,15 +147,11 @@ export default function ProxySection() {
                     </table>
                 </div>
             )}
-            <h2>Bandwidth</h2>
-            <div className="wallet-graph">
-                <Line data={bandwidthData} options={chartOptions} />
-            </div>
         </div>
     );
 }
 
-function SubmissionForm({title, variable, setVariable, unit = false}) {
+function SubmissionForm({ title, variable, setVariable, unit = false }) {
     const [inputValue, setInputValue] = useState("");
     const [error, setError] = useState("");
 
@@ -170,8 +170,7 @@ function SubmissionForm({title, variable, setVariable, unit = false}) {
 
         if (newVariable === "") {
             newError = "Please enter a value.";
-        }
-        else if (isNaN(newVariable)) {
+        } else if (isNaN(newVariable)) {
             newError = "Please enter a number.";
         }
 
@@ -179,29 +178,29 @@ function SubmissionForm({title, variable, setVariable, unit = false}) {
 
         if (newError === "")
             setVariable(newVariable);
-
     };
 
     return (
         <>
-        <form onSubmit = {(event) => {inputHandler(event); setInputValue("");}}>
-            <div className="input-container">
-                <h3 className="text-container">{title}</h3>
-                <div className="non-title-container">
-                    <div>
-                        <input className="input-box" 
-                            name="variable" 
-                            type="text" 
-                            placeholder={variable}
-                            value={inputValue}
-                            autoComplete="off" 
-                            onChange={handleInputChange}/>
-                        {unit && <span className="unit">OC/MB</span>}
+            <form onSubmit={(event) => { inputHandler(event); setInputValue(""); }}>
+                <div className="input-container">
+                    <h3 className="text-container">{title}</h3>
+                    <div className="non-title-container">
+                        <div>
+                            <input className="input-box"
+                                name="variable"
+                                type="text"
+                                placeholder={variable}
+                                value={inputValue}
+                                autoComplete="off"
+                                onChange={handleInputChange} />
+                            {unit && <span className="unit">OC/MB</span>}
+                        </div>
+                        <button type="submit" className="proxy-button"> <Check style={{ fill: 'green' }} /> </button>
                     </div>
-                    <button type="submit" className="proxy-button"> <GreenCheck /> </button>
                 </div>
-            </div>
-            {error !== "" && <div>{error}</div>}
-        </form>
-        </>);
-    }    
+                {error !== "" && <div>{error}</div>}
+            </form>
+        </>
+    );
+}
