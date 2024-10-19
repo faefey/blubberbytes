@@ -6,7 +6,7 @@
 .two-column {
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: fit-content;
   gap: 10px;
 }
 
@@ -22,12 +22,13 @@
   justify-content: space-between;
   gap: 20px;
   align-items: center;
-  width: 50%;
+  width: 375px;
 }
 
 label {
   text-align: left;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 span {
