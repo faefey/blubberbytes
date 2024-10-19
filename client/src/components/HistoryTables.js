@@ -118,7 +118,7 @@ const Histories = () => {
     <div className="history-section">
       <div className="history-header">
         <div className="history-title">
-          <h3>{historyTitle}</h3>
+          <h2>{historyTitle}</h2>
           <img src={dropDown} alt="Dropdown Icon" onClick={() => setShowDropdown(!showDropdown)} />
           {showDropdown && <Dropdown onSelect={handleHistorySelection} />}
         </div>

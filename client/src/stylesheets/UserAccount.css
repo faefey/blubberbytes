@@ -184,6 +184,7 @@ span {
 
 .unit {
   margin-left: -50px;
+  position: absolute;
 }
 
 .text-container {
