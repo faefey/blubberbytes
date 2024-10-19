@@ -31,21 +31,21 @@ function App() {
     setCurrShownData(data[section]);
   }
 
-  function hostFile(file, price) {
+  function addFile(section, file, price) {
     const fileSize = Math.round(file.size / 10000) / 100
     const fileInfo = {
-      id: data['Hosting'].length + 1,
+      id: data[section].length + 1,
       FileName: file.name,
       FileSize: fileSize + " MB",
       sizeInGB: fileSize / 1000,
-      DateListed: (new Date()).toISOString().slice(0, 10),
+      DateListed: section === "Hosting" ? (new Date()).toISOString().slice(0, 10) : file.date,
       type: file.type,
-      downloads: 0,
+      downloads: section === "Hosting" ? 0 : file.downloads,
       price: price
     }
-    const newData = [...data['Hosting'], fileInfo]
-    setData({...data, 'Hosting': newData})
-    setCurrSection('Hosting')
+    const newData = [...data[section], fileInfo]
+    setData({...data, [section]: newData})
+    setCurrSection(section)
     setCurrShownData(newData)
   }
 
@@ -77,7 +77,7 @@ function App() {
           currSection={currSection}
           currShownData={currShownData}
           updateShownData={updateShownData}
-          hostFile={hostFile}
+          addFile={addFile}
           removeFiles={removeFiles}
           refreshExplore={refreshExplore}
         />

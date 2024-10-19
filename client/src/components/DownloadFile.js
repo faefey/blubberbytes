@@ -14,7 +14,7 @@ import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
     Button that is displayed only when the hosted files are shown
     When clicked, a popup is prompted
 */
-export default function DownloadPopup() {
+export default function DownloadPopup({addFile}) {
     const [fileData, setFileData] = useState('');
     const [peerData, setPeerData] = useState(['', 'XXX']);
     const [hashError, setHashError] = useState('');
@@ -77,6 +77,7 @@ export default function DownloadPopup() {
             link.href = 'samplefiles/file1.txt';
             link.download = 'file1.txt';
             link.click();
+            addFile('Purchased', fileData, fileData.price)
         }
     };
 

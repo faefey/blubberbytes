@@ -12,15 +12,15 @@ const NavItem = ({label, icon, onClick, extraIcon, isActive}) => (
 );
 
 // side menu list components
-const SideMenu = ({files=true, items, currSection, hostFile}) => {
+const SideMenu = ({files=true, items, currSection, addFile}) => {
   return (
     <div className="side-menu">
       {files === true && 
         <div id="side-menu-header">
           <h3>Files</h3>
           <div id="side-menu-buttons">
-            <DownloadPopup />
-            <HostPopup hostFile={hostFile} />
+            <DownloadPopup addFile={addFile} />
+            <HostPopup addFile={addFile} />
           </div>
         </div>
       }
