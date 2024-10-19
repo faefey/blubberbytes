@@ -7,6 +7,8 @@ import { Tooltip } from 'react-tooltip';
 import FakeFileData from '../data/fakeFileData.json';
 import samplePeers from '../data/samplePeers.json';
 
+import { ReactComponent as EcksButton } from '../icons/red_x_button.svg';
+
 import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
 
 //                                    console.log(`Curr entries: ${currEntries} minimum: ${currEntries * numRows} maximum: ${(currEntries + 1) * numRows}`);
@@ -127,7 +129,7 @@ export default function DownloadPopup({addFile}) {
                 closeOnDocumentClick={false} modal>
             {(close) => (
             <div id="popup-border">
-                <button className="ecks-button" onClick= {() => close()}>X</button>
+                <button className="ecks-button" onClick= {() => close()}><EcksButton /></button>
                 <form onSubmit={(event) => inputData(event, close)}>
                     <div id="label-div">
                         <label><h3><span className="required">*</span>File hash:</h3></label>
