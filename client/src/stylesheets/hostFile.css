@@ -135,7 +135,7 @@
 }
 
 .body-row:hover {
-    background-color: lightgray;
+    background-color: #bbb;
 }
 
 .peer-title {
@@ -166,6 +166,15 @@
     background: none; 
     border: none;    
     padding: 0;     
-    cursor: pointer;  
+    cursor: pointer;
+    position: absolute;
+    left: 360px;
+    top: -20px;
 
+}
+
+#bottom-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
