@@ -148,11 +148,11 @@ export default function DownloadPopup({addFile}) {
                             <tbody>
                                 <tr className="body-row">
                                     <th className="teeh">
+                                        Truncated Peer ID                                         
                                         <span className="required"
                                               data-tooltip-id="truncation"
                                               data-tooltip-content={"The first 10 characters of the Peer Id. Hover over to see the full Peer Id."}
-                                              data-tooltip-place="top"> ? </span>
-                                        Truncated Peer ID</th>
+                                              data-tooltip-place="top"> ? </span></th>
                                     <th className="teeh">Location</th>
                                     <th className="teeh">Price (OC)</th>
                                 </tr>
