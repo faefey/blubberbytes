@@ -53,9 +53,12 @@ body {
 
 #settingscontent {
     background-color: var(--color-theme);
-    padding: 35px 50px 50px 50px;
     border-radius: 10px;
+    box-sizing: border-box;
     min-height: 80vh;
+    overflow: hidden;
+    padding: 2vh 4% 2vh 4%;
+    width: 100%;
 }
 
 #settingscontent h1 {

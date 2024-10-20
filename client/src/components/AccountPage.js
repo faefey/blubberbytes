@@ -108,13 +108,11 @@ const AccountSection = () => {
         </div>
       </div>
 
-      <div className="wallet-graph">
-        <div className="graph-header">
+      <div className="chart">
+        <div className="chart-header">
           <h3>Files Downloaded Over Time</h3>
         </div>
-        <div className="chart">
-          <Line data={prepareDownloadsData()} options={chartOptions} />
-        </div>
+        <Line data={prepareDownloadsData()} options={chartOptions} />
       </div>
     </div>
   );

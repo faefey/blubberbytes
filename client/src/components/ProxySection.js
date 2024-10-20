@@ -114,15 +114,19 @@ export default function ProxySection() {
                         variable={maxUsers}
                         setVariable={setMaxUsers} />
 
-                    <h3>Bandwidth</h3>
-                    <div className="wallet-graph">
+                    <div className="chart">
+                        <div className="chart-header">
+                            <h3>Bandwidth</h3>
+                        </div>
                         <Line data={bandwidthData} options={chartOptions} />
                     </div>
                 </>
             )}
             {!checked && (
                 <div>
-                    <h3>Available Proxies</h3>
+                    <div className="chart-header">
+                        <h3>Available Proxies</h3>
+                    </div>
                     <table className="table-container">
                         <thead>
                             <tr>

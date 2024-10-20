@@ -92,8 +92,8 @@ const Wallet = () => {
               <span>{transactions[0]?.['Running Balance'] || 0} OC</span>
         </div>
       </div>
-      <div className="wallet-graph">
-        <div className="graph-header">
+      <div className="chart">
+        <div className="chart-header">
           <h3>{chartTitle}</h3>
           <img src={dropDown} alt="Dropdown Icon" onClick={() => setShowDropdown(!showDropdown)} />
           {showDropdown && <Dropdown onSelect={handleChartSelection} />}
