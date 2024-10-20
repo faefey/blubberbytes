@@ -1,5 +1,5 @@
 :root {
-/* base theme colors */
+    /* base theme colors */
     --color-theme: #ccebff;
     --color-light-blue: #e1f5fe;
     --color-text: #37474f;
@@ -11,15 +11,19 @@
     --color-accent-coral: #ffb3b3;
 
     /* functional colors */
-    --color-blue-active: #80d6ff;
+    --color-blue-active: #99D7FF;
     --color-price-blue: #0093e9;
 
     /* neutral colors */
     --color-muted-gray: #b0bec5;
     --color-light-gray: #dddddd;
     --color-soft-gray: #eff0f0;
-}
 
+    /* graph colors */
+    --color-graphA: rgba(75, 192, 192, 1);
+    --color-graphB: rgba(153, 102, 255, 0.6);
+    --color-graphC: rgba(255, 99, 132, 1);
+}
 
 body {
     padding: 10px;

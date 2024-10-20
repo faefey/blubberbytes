@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // import tables:
 import hostedData from '../data/tableData1.json';
 import purchasedData from '../data/tableData2.json';
 
-import { Line, Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { format } from 'date-fns';
 
 import './../stylesheets/UserAccount.css';
 
