@@ -1,0 +1,65 @@
+[
+    {
+        "id": 1,
+        "proxyID": "proxy001",
+        "connectionType": "Outgoing",
+        "targetProxyID": "proxyA123",
+        "connectionDate": "2024-08-15",
+        "status": "Successful",
+        "responseTime": "350 ms"
+    },
+    {
+        "id": 2,
+        "proxyID": "proxy002",
+        "connectionType": "Incoming",
+        "sourceProxyID": "proxyB456",
+        "connectionDate": "2024-09-10",
+        "status": "Failed",
+        "responseTime": "500 ms"
+    },
+    {
+        "id": 3,
+        "proxyID": "proxy003",
+        "connectionType": "Outgoing",
+        "targetProxyID": "proxyC789",
+        "connectionDate": "2024-10-05",
+        "status": "Successful",
+        "responseTime": "300 ms"
+    },
+    {
+        "id": 4,
+        "proxyID": "proxy004",
+        "connectionType": "Incoming",
+        "sourceProxyID": "proxyD012",
+        "connectionDate": "2024-07-30",
+        "status": "Pending",
+        "responseTime": "N/A"
+    },
+    {
+        "id": 5,
+        "proxyID": "proxy005",
+        "connectionType": "Outgoing",
+        "targetProxyID": "proxyE345",
+        "connectionDate": "2024-09-25",
+        "status": "Successful",
+        "responseTime": "400 ms"
+    },
+    {
+        "id": 6,
+        "proxyID": "proxy006",
+        "connectionType": "Incoming",
+        "sourceProxyID": "proxyF678",
+        "connectionDate": "2024-10-12",
+        "status": "Failed",
+        "responseTime": "600 ms"
+    },
+    {
+        "id": 7,
+        "proxyID": "proxy007",
+        "connectionType": "Outgoing",
+        "targetProxyID": "proxyG901",
+        "connectionDate": "2024-08-22",
+        "status": "Successful",
+        "responseTime": "450 ms"
+    }
+]

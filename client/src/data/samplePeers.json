@@ -1,17 +1,17 @@
 [
     {
-        "peerid" : "QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N", 
-        "location" : "New York, NY, USA",
+        "peerid": "QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N",
+        "location": "New York, NY, USA",
         "price": 0.51
     },
     {
-        "peerid" : "3rLUdRPhAZcSkKUPFXm7aSD7hv4RPsYf9sFqM29VbZW54a",
-        "location" : "Brisbane, QL, AU",
+        "peerid": "3rLUdRPhAZcSkKUPFXm7aSD7hv4RPsYf9sFqM29VbZW54a",
+        "location": "Brisbane, QL, AU",
         "price": 0.11
     },
     {
-        "peerid" : "2kj3pWZLMtfzduyN8qEHPpx8YAmrKbYSLV4Fd4X6nvMB35",
-        "location" : "Islip, NY, USA",
+        "peerid": "2kj3pWZLMtfzduyN8qEHPpx8YAmrKbYSLV4Fd4X6nvMB35",
+        "location": "Islip, NY, USA",
         "price": 0.15
     }
 ]
