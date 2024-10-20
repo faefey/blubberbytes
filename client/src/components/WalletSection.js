@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Tooltip, BarElement } from 'chart.js';
 import 'chartjs-adapter-date-fns';
+import { addDays, format } from 'date-fns';
 
 import './../stylesheets/UserAccount.css';
 import dropDown from '../icons/drop_down.svg';
@@ -9,29 +10,112 @@ import transactions from '../data/transactions.json';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Tooltip, BarElement);
 
-// utility to process transaction data
-const processData = (transactions) => {
+const rootStyles = getComputedStyle(document.documentElement);
+const colorGraphA = rootStyles.getPropertyValue('--color-graphA').trim();
+const colorGraphB = rootStyles.getPropertyValue('--color-graphB').trim();
+const colorGraphC = rootStyles.getPropertyValue('--color-graphC').trim();
+
+const processData = (transactions, rangeFilter) => {
   const sortedTransactions = [...transactions].sort((a, b) => new Date(a['Date']) - new Date(b['Date']));
 
+  let startDate = new Date(sortedTransactions[0].Date);
+  const endDate = new Date();
+
+  switch (rangeFilter) {
+    case '7days':
+      startDate = new Date(endDate);
+      startDate.setDate(startDate.getDate() - 7);
+      break;
+    case '30days':
+      startDate = new Date(endDate);
+      startDate.setDate(startDate.getDate() - 30);
+      break;
+    case 'ytd':
+      startDate = new Date(endDate.getFullYear(), 0, 1);
+      break;
+    default:
+      break;
+  }
+
   const balanceData = {
-    labels: sortedTransactions.map(txn => new Date(txn['Date'])),
-    datasets: [{ label: 'Balance', data: sortedTransactions.map(txn => txn['Running Balance']), borderColor: 'rgba(75,192,192,1)', fill: false }],
+    labels: [],
+    datasets: [{
+      label: 'Balance',
+      data: [],
+      borderColor: colorGraphA,
+      fill: false,
+    },
+    ],
   };
 
   const earningsData = {
-    labels: sortedTransactions.map(txn => new Date(txn['Date'])),
-    datasets: [{ label: 'Monthly Earnings', data: sortedTransactions.map(txn => txn['Amount']), backgroundColor: 'rgba(153,102,255,0.6)' }],
+    labels: [],
+    datasets: [
+      {
+        label: 'Monthly Earnings',
+        data: [],
+        backgroundColor: colorGraphB,
+      },
+    ],
   };
 
   const transactionCountData = {
-    labels: sortedTransactions.map(txn => new Date(txn['Date'])),
-    datasets: [{ label: 'Transactions', data: sortedTransactions.map(() => 1), borderColor: 'rgba(255,99,132,1)', fill: false }],
+    labels: [],
+    datasets: [
+      {
+        label: 'Transactions',
+        data: [],
+        borderColor: colorGraphC,
+        fill: false,
+      },
+    ],
   };
 
-  return { sortedTransactions, balanceData, earningsData, transactionCountData };
+  let currentBalance = sortedTransactions[0]['Running Balance'];
+  let currentDate = startDate;
+
+  const monthlyEarnings = {};
+
+  while (currentDate <= endDate) {
+    const formattedDate = format(currentDate, 'yyyy-MM-dd');
+
+    const dailyTransactions = sortedTransactions.filter(
+      (t) => format(new Date(t.Date), 'yyyy-MM-dd') === formattedDate
+    );
+
+    if (dailyTransactions.length > 0) {
+      currentBalance = dailyTransactions[dailyTransactions.length - 1]['Running Balance'];
+    }
+    balanceData.labels.push(formattedDate);
+    balanceData.datasets[0].data.push(currentBalance);
+
+    transactionCountData.labels.push(formattedDate);
+    transactionCountData.datasets[0].data.push(dailyTransactions.length);
+
+    if (dailyTransactions.length > 0) {
+      const monthYear = format(currentDate, 'yyyy-MM');
+      dailyTransactions.forEach((t) => {
+        if (t.Amount > 0) {
+          if (!monthlyEarnings[monthYear]) {
+            monthlyEarnings[monthYear] = 0;
+          }
+          monthlyEarnings[monthYear] += t.Amount;
+        }
+      });
+    }
+
+    currentDate = addDays(currentDate, 1);
+  }
+
+  const earningsMonths = Object.keys(monthlyEarnings).sort();
+  earningsMonths.slice(-12).forEach((month) => {
+    earningsData.labels.push(month);
+    earningsData.datasets[0].data.push(monthlyEarnings[month]);
+  });
+
+  return { balanceData, transactionCountData, earningsData };
 };
 
-// utility to generate chart options
 const chartOptions = (yAxisLabel) => ({
   responsive: true,
   maintainAspectRatio: false,
