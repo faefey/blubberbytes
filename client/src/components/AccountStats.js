@@ -12,7 +12,7 @@ import './../stylesheets/UserAccount.css';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip);
 
-const AccountSection = () => {
+const AccountStats = () => {
   const [totalHostedSize, setTotalHostedSize] = useState(0);
   const [totalPurchasedSize, setTotalPurchasedSize] = useState(0);
   const [totalHostedFiles, setTotalHostedFiles] = useState(0);
@@ -117,4 +117,4 @@ const AccountSection = () => {
   );
 };
 
-export default AccountSection;
+export default AccountStats;
