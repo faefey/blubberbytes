@@ -58,6 +58,17 @@ span {
   height: 20px;
 }
 
+.filter-container,
+.time-filter-container {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.time-filter-container {
+  margin-left: auto;
+}
+
 .dropdown-menu {
   list-style: none;
   padding: 0;
@@ -65,8 +76,8 @@ span {
   border: 1px solid var(--color-light-gray);
   border-radius: 4px;
   position: absolute;
-  top: 40px;
-  left: 0;
+  top: 25px;
+  right: 0;
   background-color: var(--color-white);
   z-index: 1000;
   width: 200px;
@@ -75,7 +86,6 @@ span {
 .dropdown-menu li {
   padding: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .dropdown-menu li:hover {
@@ -163,8 +173,8 @@ span {
   border: 1px solid var(--color-light-gray);
   border-radius: 4px;
   position: absolute;
-  top: 40px;
-  left: 0;
+  top: 50px;
+  right: 0;
   background-color: var(--color-white);
   z-index: 1000;
   width: 200px;
@@ -173,7 +183,6 @@ span {
 .dropdown li {
   padding: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .dropdown li:hover {
@@ -193,7 +202,7 @@ span {
 }
 
 .input-box {
-  padding-right: 50px; 
+  padding-right: 50px;
 }
 
 .unit {

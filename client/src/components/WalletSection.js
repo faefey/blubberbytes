@@ -126,7 +126,6 @@ const chartOptions = (yAxisLabel) => ({
   },
 });
 
-// chart dropdown component
 const Dropdown = ({ onSelect }) => (
   <ul className="dropdown-menu">
     <li onClick={() => onSelect('balance', 'Balance over Time')}>Balance over Time</li>
@@ -135,7 +134,15 @@ const Dropdown = ({ onSelect }) => (
   </ul>
 );
 
-// chart container component
+const TimeFilterDropdown = ({ onSelect }) => (
+  <ul className="dropdown-menu">
+    <li onClick={() => onSelect('7days')}>Last 7 Days</li>
+    <li onClick={() => onSelect('30days')}>Last 30 Days</li>
+    <li onClick={() => onSelect('ytd')}>Year to Date</li>
+    <li onClick={() => onSelect('all')}>All Time</li>
+  </ul>
+);
+
 const ChartContainer = ({ chartType, chartData, chartTitle }) => {
   switch (chartType) {
     case 'balance':
@@ -149,18 +156,30 @@ const ChartContainer = ({ chartType, chartData, chartTitle }) => {
   }
 };
 
-// wallet component
-const Wallet = () => {
-  const { balanceData, earningsData, transactionCountData } = processData(transactions);
+const colorMapping = {
+  balance: 'var(--color-graphA)',
+  earnings: 'var(--color-graphB)',
+  transactions: 'var(--color-graphC)',
+};
 
-  const [showDropdown, setShowDropdown] = useState(false);
+const Wallet = () => {
+  const [selectedRange, setSelectedRange] = useState('all');
+  const [showChartDropdown, setShowChartDropdown] = useState(false);
+  const [showTimeFilterDropdown, setShowTimeFilterDropdown] = useState(false);
+  const { balanceData, earningsData, transactionCountData } = processData(transactions, selectedRange);
+
   const [chartType, setChartType] = useState('balance');
   const [chartTitle, setChartTitle] = useState('Balance over Time');
 
   const handleChartSelection = (type, title) => {
     setChartType(type);
     setChartTitle(title);
-    setShowDropdown(false);
+    setShowChartDropdown(false);
+  };
+
+  const handleTimeFilterSelection = (range) => {
+    setSelectedRange(range);
+    setShowTimeFilterDropdown(false);
   };
 
   return (
@@ -168,19 +187,30 @@ const Wallet = () => {
       <h2>Wallet</h2>
       <div className="two-column">
         <div className="label-value-pair">
-              <label>Wallet ID:</label>
-              <span>YourPublicWalletID</span>
+          <label>Wallet ID:</label>
+          <span>YourPublicWalletID</span>
         </div>
         <div className="label-value-pair">
-              <label>Balance:</label>
-              <span>{transactions[0]?.['Running Balance'] || 0} OC</span>
+          <label>Balance:</label>
+          <span>{transactions[0]?.['Running Balance'] || 0} OC</span>
         </div>
       </div>
       <div className="chart">
         <div className="chart-header">
           <h3>{chartTitle}</h3>
-          <img src={dropDown} alt="Dropdown Icon" onClick={() => setShowDropdown(!showDropdown)} />
-          {showDropdown && <Dropdown onSelect={handleChartSelection} />}
+          <div className="filter-container">
+            <img src={dropDown} alt="Chart Dropdown Icon" onClick={() => setShowChartDropdown(!showChartDropdown)} />
+            {showChartDropdown && <Dropdown onSelect={handleChartSelection} />}
+          </div>
+          <div className="time-filter-container">
+            <img
+              src={dropDown}
+              alt="Time Filter Icon"
+              onClick={() => setShowTimeFilterDropdown(!showTimeFilterDropdown)}
+              style={{ filter: `drop-shadow(0 0 2px ${colorMapping[chartType]})` }}
+            />
+            {showTimeFilterDropdown && <TimeFilterDropdown onSelect={handleTimeFilterSelection} />}
+          </div>
         </div>
         <ChartContainer chartType={chartType} chartData={{ balanceData, earningsData, transactionCountData }} chartTitle={chartTitle} />
       </div>
