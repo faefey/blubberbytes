@@ -17,12 +17,12 @@ export default function MainContent({columns, currSection, currShownData, update
       extraIcon: <Status id="status" className="icon extraicon" />
     },
     {
-      label: 'Purchased', icon: <Purchased />,
-      onClick: () => updateShownData('Purchased')
-    },
-    {
       label: 'Sharing', icon: <Sharing />,
       onClick: () => updateShownData('Sharing')
+    },
+    {
+      label: 'Purchased', icon: <Purchased />,
+      onClick: () => updateShownData('Purchased')
     },
     {
       label: 'Explore', icon: <Explore />,
