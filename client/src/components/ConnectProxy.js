@@ -8,7 +8,7 @@ import { ReactComponent as Cross } from '../icons/close.svg';
 import { ReactComponent as Check } from '../icons/check.svg';
 import { ReactComponent as Fresh } from '../icons/refresh.svg';
 
-export default function ProxySection() {
+export default function ConnectProxy() {
     const [checked, setChecked] = useState(false);
     const [usageRate, setUsageRate] = useState(0);
     const [maxUsers, setMaxUsers] = useState(0);

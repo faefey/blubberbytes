@@ -5,7 +5,7 @@ import './stylesheets/App.css';
 
 import Banner from './components/Banner.js';
 import MainContent from './components/mainContent.js'
-import SettingsPage from './components/SettingsPage.js';
+import UserAccount from './components/UserAccount.js';
 
 import tableData1 from "./data/tableData1.json";
 import tableData2 from "./data/tableData2.json";
@@ -84,7 +84,7 @@ function App() {
       }
       
       {currPage === 1 && 
-        <SettingsPage
+        <UserAccount
           backToPrev={backToPrev}
         />
       }
