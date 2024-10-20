@@ -140,8 +140,20 @@ span {
   word-wrap: break-word;
 }
 
-.table-container th {
-  font-weight: bold;
+.table-container td>.switch-container {
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.proxy-row.hover {
+  background-color: var(--color-blue-active);
+}
+
+.proxy-row.selected {
+  background-color: lightgreen !important;
 }
 
 .dropdown {

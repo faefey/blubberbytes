@@ -135,16 +135,36 @@ export default function ProxySection() {
                                 <th>Location</th>
                                 <th>Latency</th>
                                 <th>Price (OC)</th>
+                                <th>Connect</th>
                             </tr>
                         </thead>
                         <tbody>
                             {dummyProxies.map(proxy => (
-                                <tr key={proxy.id}>
+                                <tr key={proxy.id}
+                                    className={`proxy-row ${selectedProxy === proxy.id
+                                        ? 'selected' : ''}`}
+                                    onMouseEnter={(e) =>
+                                        e.currentTarget.classList.add('hover')}
+                                    onMouseLeave={(e) =>
+                                        e.currentTarget.classList.remove('hover')}
+                                >
                                     <td>{proxy.node}</td>
                                     <td>{proxy.ip}</td>
                                     <td>{proxy.location}</td>
                                     <td>{proxy.latency}</td>
                                     <td>{proxy.price}</td>
+                                    <td>
+                                        <div className="switch-container">
+                                            <Switch
+                                                checked={selectedProxy === proxy.id}
+                                                onChange={() =>
+                                                    setSelectedProxy((prevProxy) =>
+                                                        prevProxy === proxy.id ? null : proxy.id
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
