@@ -141,7 +141,7 @@ const Table = ({ caption, data, columns, removeFiles }) => {
   return (
     <TableContext.Provider value={contextValue}>
       {}
-      <SelectedFileMenu removeFiles={removeFiles} />
+      <SelectedFileMenu removeFiles={removeFiles} data={data}/>
       <table className="table">
         <caption>{caption}</caption>
         <TableHead

@@ -5,6 +5,7 @@ import { Tooltip } from 'react-tooltip';
 import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
 
+import { ReactComponent as EcksButton } from '../icons/close.svg';
 import { ReactComponent as HostIcon } from '../icons/host.svg';
 
 /*
@@ -57,8 +58,9 @@ export default function HostPopup({addFile}) {
         
         if (currErrors['fileError'] === '' && currErrors['priceError'] === '') {
             setFileName("No file chosen");
+            //console.log(fileInputRef.current.files[0]);
             addFile('Hosting', fileInputRef.current.files[0], filePrice)
-            console.log(`File name:${fileName}\n File price:${filePrice}`);
+            //console.log(`File name:${fileName}\n File price:${filePrice}`);
             close();
         }
     }
@@ -76,10 +78,11 @@ export default function HostPopup({addFile}) {
                 className="popup-content"
                 overlayClassName="popup-overlay"
                 onClose = {() => setErrors({'fileError': '', 'priceError': ''})}
-                closeOnDocumentClick={true} modal>
+                closeOnDocumentClick={false} modal>
 
             {(close) => (
             <div id="popup-border">
+                <button className="ecks-button" onClick= {() => close()}><EcksButton /></button>
                 <form onSubmit={(event) => inputData(event, close)}>
                     <div id="label-div">
                         <label><h3><span className="required">*</span>File Name:</h3></label>

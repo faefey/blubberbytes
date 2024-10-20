@@ -2,6 +2,7 @@
 import '../stylesheets/selectedFileMenu.css';
 import TableContext from './TableContext';
 import React, { useContext } from 'react';
+import InfoPopup from './InfoPopup.js';
 
 import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
@@ -9,13 +10,13 @@ import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({removeFiles}) {
+export default function SelectedFileMenu({removeFiles, data}) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
   return selectedFiles.length === 0 ? (
     <FileFilters filters={filters} setFilters={setFilters} />
   ) : (
-    <FileActions selectedFiles={selectedFiles} removeFiles={removeFiles} />
+    <FileActions selectedFiles={selectedFiles} removeFiles={removeFiles} data={data}/>
   );
 }
 
@@ -103,7 +104,7 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
-function FileActions({ selectedFiles, removeFiles }) {
+function FileActions({ selectedFiles, removeFiles, data }) {
   const { setSelectedFiles } = useContext(TableContext);
 
   return (
@@ -135,7 +136,9 @@ function FileActions({ selectedFiles, removeFiles }) {
               console.error('Failed to copy: ', err);
             });
         }}
-      />      <Info className="icon" />
+      />      
+              {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />} 
+                                                         fileInfo={data.filter(file => file.id === selectedFiles[0])}/>)}
     </div>
   );
 }

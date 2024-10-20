@@ -107,7 +107,7 @@ export default function DownloadPopup({addFile}) {
             link.href = 'samplefiles/file1.txt';
             link.download = 'file1.txt';
             link.click();
-            addFile('Purchased', fileData, fileData.price)
+            addFile('Purchased', fileData, peerData[1]);
         }
     };
 

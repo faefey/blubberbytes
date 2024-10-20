@@ -173,8 +173,19 @@
 
 }
 
+.ecks-button-info {
+    position: absolute;
+    left: 380px;
+    top: 15px;
+}
+
 #bottom-buttons {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+#info-box {
+    background-color: white;
+    border-radius: 8px;
 }
