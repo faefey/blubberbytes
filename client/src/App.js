@@ -34,7 +34,7 @@ function App() {
   function addFile(section, file, price) {
     const fileSize = Math.round(file.size / 10000) / 100
     const fileInfo = {
-      id: data[section].length + 1,
+      id: data[section][data[section].length - 1].id + 1,
       FileName: file.name,
       FileSize: fileSize + " MB",
       sizeInGB: fileSize / 1000,
