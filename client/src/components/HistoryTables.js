@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import transactionsData from '../data/transactions.json';
 import uploadData from '../data/tableData1.json';
 import downloadData from '../data/tableData2.json';
-import proxyData from '../data/proxyData.json';
+import proxyHistory from '../data/proxyHistory.json';
 import dropDown from '../icons/drop_down.svg';
 import './../stylesheets/UserAccount.css';
 
@@ -41,8 +41,8 @@ const Dropdown = ({ onSelect }) => (
 
 const Histories = () => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [historyType, setHistoryType] = useState('transaction');
-  const [historyTitle, setHistoryTitle] = useState('Transaction History');
+  const [historyType, setHistoryType] = useState('upload');
+  const [historyTitle, setHistoryTitle] = useState('Upload History');
 
   const handleHistorySelection = (type, title) => {
     setHistoryType(type);
@@ -53,12 +53,8 @@ const Histories = () => {
   const handleExport = () => {
     let csvData = '';
     let filename = '';
-    const dataMap = {
-      transaction: transactionsData,
-      upload: uploadData,
-      download: downloadData,
-      proxy: proxyData,
-    };
+
+    const sortedData = getSortedData(dataMap[historyType]);
     const columnsMap = {
       transaction: ['Date', 'Amount', '2nd Party Wallet ID'],
       upload: ['DateListed', 'FileName', 'FileSize'],
@@ -66,12 +62,11 @@ const Histories = () => {
       proxy: ['connectionDate', 'connectionType', 'targetProxyID', 'status', 'responseTime'],
     };
 
-    const selectedData = dataMap[historyType];
     const selectedColumns = columnsMap[historyType];
 
-    csvData = selectedData
-      .map((item) => selectedColumns.map((field) => item[field]).join(','))
-      .join('\n');
+    csvData = sortedData.map((item) =>
+      selectedColumns.map((field) =>
+        item[field]).join(',')).join('\n');
     filename = `${historyType}-history.csv`;
 
     const blob = new Blob([csvData], { type: 'text/csv' });
@@ -86,7 +81,7 @@ const Histories = () => {
     transaction: transactionsData,
     upload: uploadData,
     download: downloadData,
-    proxy: proxyData,
+    proxy: proxyHistory,
   };
 
   const columns = {
@@ -112,7 +107,24 @@ const Histories = () => {
       { header: 'Status', field: 'status', width: '15%' },
       { header: 'Response Time', field: 'responseTime', width: '15%' },
     ],
-  };  
+  };
+
+  const getSortedData = (data) => {
+    const dateFields = {
+      transaction: 'Date',
+      upload: 'DateListed',
+      download: 'DateListed',
+      proxy: 'connectionDate',
+    };
+
+    return [...data].sort((a, b) => {
+      const dateA = new Date(a[dateFields[historyType]]);
+      const dateB = new Date(b[dateFields[historyType]]);
+      return dateB - dateA;
+    });
+  };
+
+  const sortedData = getSortedData(dataMap[historyType]);
 
   return (
     <div className="history-section">
@@ -124,7 +136,7 @@ const Histories = () => {
         </div>
         <button onClick={handleExport}>Export CSV</button>
       </div>
-      <Table data={dataMap[historyType]} columns={columns[historyType]} />
+      <Table data={sortedData} columns={columns[historyType]} />
     </div>
   );
 };
