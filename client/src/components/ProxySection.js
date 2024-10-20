@@ -27,16 +27,21 @@ export default function ProxySection() {
     };
 
     useEffect(() => {
+        let interval;
         if (checked) {
-            const interval = setInterval(() => {
-                // simulate real-time bandwidth data tracking
+            interval = setInterval(() => {
                 const now = new Date();
                 const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-                const newBandwidthValue = Math.floor(Math.random() * 100) + 50;
+
+                const scaleFactor = (usageRate + maxUsers) * 0.75;
+                const newBandwidthValue = Math.random() * scaleFactor;
 
                 setBandwidthData(prevData => {
                     const updatedLabels = [...prevData.labels, timeLabel].slice(-20);
                     const updatedData = [...(prevData.datasets[0]?.data || []), newBandwidthValue].slice(-20);
+
+                    const usageRateLine = new Array(updatedLabels.length).fill(usageRate);
+                    const maxUsersLine = new Array(updatedLabels.length).fill(maxUsers);
 
                     return {
                         labels: updatedLabels,
@@ -48,21 +53,29 @@ export default function ProxySection() {
                                 fill: false,
                                 tension: 0.4,
                             },
+                            {
+                                label: 'Usage Rate',
+                                data: usageRateLine,
+                                borderColor: 'rgba(54, 162, 235, 0.6)',
+                                borderDash: [5, 5],
+                                fill: false,
+                                tension: 0.4,
+                            },
+                            {
+                                label: 'Max Users',
+                                data: maxUsersLine,
+                                borderColor: 'rgba(255, 99, 132, 0.6)',
+                                borderDash: [10, 5],
+                                fill: false,
+                                tension: 0.4,
+                            },
                         ],
                     };
                 });
             }, 1000);
-
-            setIntervalId(interval);
         } else {
-            if (intervalId) {
-                clearInterval(intervalId);
-                setIntervalId(null);
-            }
-
-            // Reset bandwidth data and set color for "Use a proxy"
-            setBandwidthData(prevData => ({
-                ...prevData,
+            setBandwidthData({
+                labels: [],
                 datasets: [
                     {
                         label: 'Bandwidth Usage Over Time',
@@ -72,15 +85,13 @@ export default function ProxySection() {
                         tension: 0.4,
                     },
                 ],
-            }));
+            });
         }
 
         return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
+            if (interval) clearInterval(interval);
         };
-    }, [checked]);
+    }, [checked, maxUsers, usageRate]);
 
     const chartOptions = {
         responsive: true,
@@ -108,11 +119,13 @@ export default function ProxySection() {
                     <SubmissionForm title={"Usage rate: "}
                         variable={usageRate}
                         setVariable={setUsageRate}
-                        unit={true} />
+                        unit={true}
+                        allowDecimals={true} />
 
                     <SubmissionForm title={"Max users: "}
                         variable={maxUsers}
-                        setVariable={setMaxUsers} />
+                        setVariable={setMaxUsers}
+                        allowDecimals={false} />
 
                     <div className="chart">
                         <div className="chart-header">
@@ -175,56 +188,56 @@ export default function ProxySection() {
     );
 }
 
-function SubmissionForm({ title, variable, setVariable, unit = false }) {
-    const [inputValue, setInputValue] = useState("");
-    const [error, setError] = useState("");
+function SubmissionForm({ title, variable, setVariable,
+    unit = false, allowDecimals = true }) {
+    const [inputValue, setInputValue] = useState(variable.toString());
 
     const handleInputChange = (event) => {
-        setInputValue(event.target.value);
-    };
+        const newValue = event.target.value;
+        setInputValue(newValue);
 
-    const inputHandler = (event) => {
-        event.preventDefault();
+        const parsedValue = allowDecimals ? parseFloat(newValue) : parseInt(newValue, 10);
 
-        setError("");
-
-        const formData = new FormData(event.target);
-        const newVariable = formData.get("variable");
-        let newError = "";
-
-        if (newVariable === "") {
-            newError = "Please enter a value.";
-        } else if (isNaN(newVariable)) {
-            newError = "Please enter a number.";
+        if (!isNaN(parsedValue) && parsedValue > 0 &&
+            (allowDecimals || Number.isInteger(parsedValue))) {
+            setVariable(parsedValue);
         }
-
-        setError(newError);
-
-        if (newError === "")
-            setVariable(newVariable);
     };
+
+    const isValid = !isNaN(parseFloat(inputValue)) && parseFloat(inputValue) > 0 &&
+        (allowDecimals || Number.isInteger(parseFloat(inputValue)));
 
     return (
         <>
-            <form onSubmit={(event) => { inputHandler(event); setInputValue(""); }}>
                 <div className="input-container">
                     <label className="text-container">{title}</label>
                     <div className="non-title-container">
                         <div>
-                            <input className="input-box"
+                        <input
+                            className="input-box"
                                 name="variable"
                                 type="text"
                                 placeholder={variable}
                                 value={inputValue}
                                 autoComplete="off"
-                                onChange={handleInputChange} />
+                            onChange={handleInputChange}
+                        />
                             {unit && <span className="unit">OC/MB</span>}
                         </div>
-                        <button type="submit" className="proxy-button"> <Check style={{ fill: 'green' }} /> </button>
+                    {!isValid ? (
+                        <div className="error-message">
+                            <Cross style={{ fill: 'red' }} />
+                            <span>
+                                {allowDecimals
+                                    ? "please input a rational number greater than zero."
+                                    : "please input a whole number greater than zero."}
+                            </span>
                     </div>
+                    ) : (
+                        <Check style={{ fill: 'green' }} />
+                    )}
                 </div>
-                {error !== "" && <div>{error}</div>}
-            </form>
+            </div>
         </>
     );
 }

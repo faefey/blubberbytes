@@ -180,11 +180,6 @@ span {
   background-color: var(--color-light-gray);
 }
 
-.proxy-button {
-  background-color: transparent;
-  border: none;
-}
-
 .input-container {
   display: flex;
   align-items: center;
@@ -194,6 +189,7 @@ span {
 .non-title-container {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .input-box {
@@ -207,4 +203,14 @@ span {
 
 .text-container {
   width: 100px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.error-message span {
+  color: red;
 }
