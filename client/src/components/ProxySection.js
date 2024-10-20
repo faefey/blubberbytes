@@ -1,20 +1,72 @@
 import React, { useState, useEffect } from "react";
-import { Switch, FormControlLabel } from '@mui/material';
+import { Switch, FormControlLabel, IconButton } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import '../stylesheets/UserAccount.css';
 
+import fakeProxies from '../data/fakeProxies.json';
 import { ReactComponent as Cross } from '../icons/close.svg';
 import { ReactComponent as Check } from '../icons/check.svg';
+import { ReactComponent as Fresh } from '../icons/refresh.svg';
 
 export default function ProxySection() {
     const [checked, setChecked] = useState(false);
     const [usageRate, setUsageRate] = useState(0);
     const [maxUsers, setMaxUsers] = useState(0);
     const [bandwidthData, setBandwidthData] = useState({ labels: [], datasets: [] });
-    const [intervalId, setIntervalId] = useState(null);
+    const [selectedProxy, setSelectedProxy] = useState(null);
+    const [displayedProxies, setDisplayedProxies] = useState([]);
+
+    useEffect(() => {
+        const savedChecked = JSON.parse(localStorage.getItem('proxySwitchChecked'));
+        const savedUsageRate = parseFloat(localStorage.getItem('usageRate')) || 0;
+        const savedMaxUsers = parseInt(localStorage.getItem('maxUsers'), 10) || 0;
+        const savedSelectedProxy = JSON.parse(localStorage.getItem('selectedProxy'));
+        const savedDisplayedProxies = JSON.parse(localStorage.getItem('displayedProxies')) || [];
+
+        if (savedChecked) {
+            setChecked(savedChecked);
+            if (savedUsageRate > 0) setUsageRate(savedUsageRate);
+            if (savedMaxUsers > 0) setMaxUsers(savedMaxUsers);
+        }
+        if (savedSelectedProxy) setSelectedProxy(savedSelectedProxy);
+        if (savedDisplayedProxies.length > 0) setDisplayedProxies(savedDisplayedProxies);
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('proxySwitchChecked', JSON.stringify(checked));
+        if (checked) {
+            localStorage.setItem('usageRate', usageRate);
+            localStorage.setItem('maxUsers', maxUsers);
+        }
+    }, [checked, usageRate, maxUsers]);
+
+    useEffect(() => {
+        localStorage.setItem('selectedProxy', JSON.stringify(selectedProxy));
+    }, [selectedProxy]);
+
+    useEffect(() => {
+        localStorage.setItem('displayedProxies', JSON.stringify(displayedProxies));
+    }, [displayedProxies]);
 
     const handleChange = (event) => {
-        setChecked(event.target.checked);
+        const newChecked = event.target.checked;
+        setChecked(newChecked);
+
+        if (newChecked) {
+            setSelectedProxy(null);
+            localStorage.removeItem('selectedProxy');
+        } else {
+            setUsageRate(0);
+            setMaxUsers(0);
+            localStorage.removeItem('usageRate');
+            localStorage.removeItem('maxUsers');
+        }
+    };
+
+    const handleRefresh = () => {
+        const shuffledProxies = fakeProxies.sort(() => 0.5 - Math.random());
+        setDisplayedProxies(shuffledProxies.slice(0, 5));
+        setSelectedProxy(null);
     };
 
     const updateMaxUsers = (event) => {
@@ -99,14 +151,6 @@ export default function ProxySection() {
         scales: { y: { beginAtZero: true } }
     };
 
-    const dummyProxies = [
-        { id: 1, node: 'Node-01', ip: '192.168.1.1', location: 'New York, USA', latency: '50ms', price: '5.00' },
-        { id: 2, node: 'Node-02', ip: '192.168.1.2', location: 'London, UK', latency: '70ms', price: '6.00' },
-        { id: 3, node: 'Node-03', ip: '192.168.1.3', location: 'Sydney, Australia', latency: '120ms', price: '7.00' },
-        { id: 4, node: 'Node-04', ip: '192.168.1.4', location: 'Tokyo, Japan', latency: '90ms', price: '6.50' },
-        { id: 5, node: 'Node-05', ip: '192.168.1.5', location: 'Berlin, Germany', latency: '80ms', price: '5.50' },
-    ];
-
     return (
         <div>
             <h2>Proxy Section</h2>
@@ -139,6 +183,9 @@ export default function ProxySection() {
                 <div>
                     <div className="chart-header">
                         <h3>Available Proxies</h3>
+                        <IconButton className="refresh-button" onClick={handleRefresh}>
+                            <Fresh />
+                        </IconButton>
                     </div>
                     <table className="table-container">
                         <thead>
@@ -152,7 +199,7 @@ export default function ProxySection() {
                             </tr>
                         </thead>
                         <tbody>
-                            {dummyProxies.map(proxy => (
+                            {displayedProxies.map(proxy => (
                                 <tr key={proxy.id}
                                     className={`proxy-row ${selectedProxy === proxy.id
                                         ? 'selected' : ''}`}
@@ -209,21 +256,21 @@ function SubmissionForm({ title, variable, setVariable,
 
     return (
         <>
-                <div className="input-container">
-                    <label className="text-container">{title}</label>
-                    <div className="non-title-container">
-                        <div>
+            <div className="input-container">
+                <label className="text-container">{title}</label>
+                <div className="non-title-container">
+                    <div>
                         <input
                             className="input-box"
-                                name="variable"
-                                type="text"
-                                placeholder={variable}
-                                value={inputValue}
-                                autoComplete="off"
+                            name="variable"
+                            type="text"
+                            placeholder={variable}
+                            value={inputValue}
+                            autoComplete="off"
                             onChange={handleInputChange}
                         />
-                            {unit && <span className="unit">OC/MB</span>}
-                        </div>
+                        {unit && <span className="unit">OC/MB</span>}
+                    </div>
                     {!isValid ? (
                         <div className="error-message">
                             <Cross style={{ fill: 'red' }} />
@@ -232,7 +279,7 @@ function SubmissionForm({ title, variable, setVariable,
                                     ? "please input a rational number greater than zero."
                                     : "please input a whole number greater than zero."}
                             </span>
-                    </div>
+                        </div>
                     ) : (
                         <Check style={{ fill: 'green' }} />
                     )}
