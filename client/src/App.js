@@ -35,13 +35,13 @@ function App() {
     const fileSize = Math.round(file.size / 10000) / 100
     const fileInfo = {
       id: data[section][data[section].length - 1].id + 1,
-      FileName: file.name,
-      FileSize: fileSize + " MB",
-      sizeInGB: fileSize / 1000,
-      DateListed: section === "Hosting" ? (new Date()).toISOString().slice(0, 10) : file.date,
+      FileName: file.name || file.FileName,
+      FileSize: fileSize ? fileSize + " MB" : file.FileSize,
+      sizeInGB: fileSize / 1000 || file.sizeInGB,
+      DateListed: section === "Hosting" ? (new Date()).toISOString().slice(0, 10) : file.date || file.DateListed,
       type: file.type,
       downloads: section === "Hosting" ? 0 : file.downloads,
-      price: price
+      price: price || file.price
     }
     const newData = [...data[section], fileInfo]
     setData({...data, [section]: newData})

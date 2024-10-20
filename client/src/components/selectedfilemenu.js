@@ -10,13 +10,13 @@ import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({removeFiles, data}) {
+export default function SelectedFileMenu({addFile, removeFiles, data}) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
   return selectedFiles.length === 0 ? (
     <FileFilters filters={filters} setFilters={setFilters} />
   ) : (
-    <FileActions selectedFiles={selectedFiles} removeFiles={removeFiles} data={data}/>
+    <FileActions selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles} data={data}/>
   );
 }
 
@@ -104,7 +104,7 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
-function FileActions({ selectedFiles, removeFiles, data }) {
+function FileActions({ selectedFiles, addFile, removeFiles, data }) {
   const { setSelectedFiles } = useContext(TableContext);
 
   return (
@@ -135,6 +135,7 @@ function FileActions({ selectedFiles, removeFiles, data }) {
             .catch(err => {
               console.error('Failed to copy: ', err);
             });
+          addFile('Sharing', data[selectedFiles[0] - 1], data[selectedFiles[0] - 1].price);
         }}
       />      
               {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />} 
