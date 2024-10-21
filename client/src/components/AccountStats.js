@@ -82,7 +82,7 @@ const AccountStats = () => {
   return (
     <div className="wallet-section">
       <div className="wallet-info">
-        <h2>Account Stats</h2>
+        <h2>Account Statistics</h2>
         <div className="two-column">
           <div className="row">
             <div className="label-value-pair">
