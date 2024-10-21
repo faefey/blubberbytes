@@ -18,7 +18,7 @@ const UserAccount = ({backToPrev}) => {
 
   const settingsItems = [
     {
-      label: 'Settings', icon: <BackArrow />,
+      label: 'User Center', icon: <BackArrow />,
       onClick: () => backToPrev()
     },
     {
