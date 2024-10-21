@@ -17,13 +17,13 @@ export default function MainContent({columns, currSection, currShownData, update
       extraIcon: <Status id="status" className="icon extraicon" />
     },
     {
+      label: 'Sharing', icon: <Sharing />,
+      onClick: () => updateShownData('Sharing')
+    },
+    {
       label: 'Purchased', icon: <Purchased />,
       onClick: () => updateShownData('Purchased')
     },
-    // {
-    //   label: 'Sharing', icon: <Sharing />,
-    //   onClick: () => updateShownData('Sharing')
-    // },
     {
       label: 'Explore', icon: <Explore />,
       onClick: () => updateShownData('Explore'),
@@ -35,7 +35,7 @@ export default function MainContent({columns, currSection, currShownData, update
       <div className="maincontent">
         <SideMenu items={fileItems} currSection={currSection} addFile={addFile} />
         <div className="content">
-          <Table data={currShownData} columns={columns} removeFiles={removeFiles} />
+          <Table data={currShownData} columns={columns} addFile={addFile} removeFiles={removeFiles} />
         </div>
       </div>
   );

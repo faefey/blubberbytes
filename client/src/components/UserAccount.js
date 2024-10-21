@@ -12,18 +12,18 @@ import { ReactComponent as HistoryIcon } from '../icons/history.svg';
 import { ReactComponent as WalletIcon } from '../icons/payments.svg';
 import { ReactComponent as ProxyIcon } from '../icons/proxy.svg';
 
-const UserAccount = ({backToPrev}) => {
-    // default section is 'account'
-  const [currSection, setCurrSection] = useState('Account');
+const UserStatistics = ({backToPrev}) => {
+    // default section is 'Statistics'
+  const [currSection, setCurrSection] = useState('Statistics');
 
   const settingsItems = [
     {
-      label: 'Settings', icon: <BackArrow />,
+      label: 'Account', icon: <BackArrow />,
       onClick: () => backToPrev()
     },
     {
-      label: 'Account', icon: <PersonIcon />,
-      onClick: () => setCurrSection('Account')
+      label: 'Statistics', icon: <PersonIcon />,
+      onClick: () => setCurrSection('Statistics')
     },
     {
       label: 'History', icon: <HistoryIcon />,
@@ -41,7 +41,7 @@ const UserAccount = ({backToPrev}) => {
 
   const renderContent = () => {
     switch (currSection) {
-      case 'Account':
+      case 'Statistics':
         return <Statistics />;
       case 'History':
         return <Histories />;
@@ -65,4 +65,4 @@ const UserAccount = ({backToPrev}) => {
   );
 };
 
-export default UserAccount;
+export default UserStatistics;

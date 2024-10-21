@@ -103,7 +103,7 @@ const Histories = () => {
     proxy: [
       { header: 'Connection Date', field: 'connectionDate', render: (value) => format(new Date(value), 'MM/dd/yyyy'), width: '20%' },
       { header: 'Connection Type', field: 'connectionType', width: '20%' },
-      { header: 'Target/Source Proxy ID', field: 'targetProxyID', width: '30%' },
+      { header: 'Target/Source Node ID', field: 'targetProxyID', width: '30%' },
       { header: 'Status', field: 'status', width: '15%' },
       { header: 'Response Time', field: 'responseTime', width: '15%' },
     ],

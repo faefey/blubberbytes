@@ -153,7 +153,7 @@ export default function ConnectProxy() {
 
     return (
         <div>
-            <h2>Proxy Section</h2>
+            <h2>Proxy Connections</h2>
             <FormControlLabel
                 control={<Switch checked={checked} onChange={handleChange} />}
                 label={checked ? <label>Be A Proxy</label> : <label>Use A Proxy</label>}
@@ -194,7 +194,7 @@ export default function ConnectProxy() {
                                 <th>IP Address</th>
                                 <th>Location</th>
                                 <th>Latency</th>
-                                <th>Price (OC)</th>
+                                <th>Price (OC/MB)</th>
                                 <th>Connect</th>
                             </tr>
                         </thead>

@@ -85,7 +85,7 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
 
 
 // Main Table component
-const Table = ({ caption, data, columns, removeFiles }) => {
+const Table = ({ caption, data, columns, addFile, removeFiles }) => {
   // Move filters and selectedFiles state here
   const [filters, setFilters] = useState({
     type: '',
@@ -141,7 +141,7 @@ const Table = ({ caption, data, columns, removeFiles }) => {
   return (
     <TableContext.Provider value={contextValue}>
       {}
-      <SelectedFileMenu removeFiles={removeFiles} data={data}/>
+      <SelectedFileMenu addFile={addFile} removeFiles={removeFiles} data={data}/>
       <table className="table">
         <caption>{caption}</caption>
         <TableHead
