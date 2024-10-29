@@ -1,141 +1,39 @@
-package main
+package p2p
 
 import (
-    "context"        // for context usage
-    "fmt"            // for formatted I/O (e.g., fmt.Sprintf)
-    "log"            // for logging
-    "os"             // for file operations
-    "path/filepath"  // for file path manipulations
-    "time"           // for generating timestamps
-	"io"
-
-    // Add the necessary packages from libp2p, for example:
-    "github.com/libp2p/go-libp2p/core/host"   // for host.Host
-    "github.com/libp2p/go-libp2p/core/network" // for network.Stream
-	"github.com/libp2p/go-libp2p/core/peer"
-
+	"context"
+	"fmt"
+	"log"
 )
 
+var (
+	node_id             = "114369970" // give your SBU ID
+	relay_node_addr     = "/ip4/130.245.173.221/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
+	bootstrap_node_addr = "/ip4/130.245.173.222/tcp/61000/p2p/12D3KooWQd1K1k8XA9xVEzSAu7HUCodC7LJB6uW5Kw4VwkRdstPE"
+	globalCtx           context.Context
+)
 
-
-func receiveDataFromPeer(node host.Host, folderPath string) {
-	log.Println("Setting up stream handler to listen for incoming streams on '/senddata/p2p' protocol.")
-
-	// Set a stream handler to listen for incoming streams on the "/senddata/p2p" protocol
-	node.SetStreamHandler("/senddata/p2p", func(s network.Stream) {
-		log.Printf("New stream opened from peer: %s", s.Conn().RemotePeer())
-		defer func() {
-			log.Printf("Stream closed by peer: %s", s.Conn().RemotePeer())
-			s.Close()
-		}()
-
-		// Generate a unique file name for each incoming file based on timestamp (no extension for now)
-		fileName := fmt.Sprintf("received_file_%d", time.Now().UnixNano())
-		filePath := filepath.Join(folderPath, fileName)
-
-		// Log the attempt to create the file
-		log.Printf("Attempting to create file at path: %s", filePath)
-
-		// Open the file to store the received data
-		file, err := os.Create(filePath)
-		if err != nil {
-			log.Printf("Failed to create file in folder %s: %v", folderPath, err)
-			return
-		}
-		defer func() {
-			log.Printf("File closed: %s", filePath)
-			file.Close()
-		}()
-
-		log.Printf("Writing received data to file: %s", filePath)
-
-		// Read the entire stream content and write it to the file
-		data, err := io.ReadAll(s)
-		if err != nil {
-			log.Printf("Error reading from stream from peer %s: %v", s.Conn().RemotePeer(), err)
-			return
-		}
-
-		// Write the data to the file
-		n, err := file.Write(data)
-		if err != nil {
-			log.Printf("Error writing to file %s: %v", filePath, err)
-			return
-		}
-
-		log.Printf("File writing complete. Total bytes written: %d to file: %s", n, filePath)
-	})
-
-	log.Println("Listening for incoming streams on '/senddata/p2p' protocol.")
-}
-
-
-
-
-
-
-
-
-func sendDataToPeer(node host.Host, targetPeerID string, filePath string) {
-	ctx := context.Background()
-
-	// Decode the target peer ID
-	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+func P2P() {
+	node, dht, err := createNode()
 	if err != nil {
-		log.Printf("Failed to decode target peer ID: %v", err)
-		return
+		log.Fatalf("Failed to create node: %s", err)
 	}
 
-	log.Printf("Target peer ID successfully decoded: %s", targetPeerIDParsed)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	globalCtx = ctx
 
-	// Log file path and check if the file exists
-	log.Printf("Attempting to send file at path: %s to peer %s", filePath, targetPeerIDParsed)
+	fmt.Println("Node multiaddresses:", node.Addrs())
+	fmt.Println("Node Peer ID:", node.ID())
 
-	// Open the file to read its content
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Printf("Failed to open file: %v", err)
-		return
-	}
-	defer func() {
-		log.Printf("File closed after sending: %s", filePath)
-		file.Close()
-	}()
+	connectToPeer(node, relay_node_addr)     // connect to relay node
+	makeReservation(node)                    // make reservation on realy node
+	connectToPeer(node, bootstrap_node_addr) // connect to bootstrap node
+	go handlePeerExchange(node)
+	go receiveDataFromPeer(node, "D:/blubberbytes/cse416-dht-go-main/") // Ensures a folder path is used
+	go handleInput(ctx, dht, node)
 
-	// Log file size and name
-	fileInfo, err := file.Stat()
-	if err != nil {
-		log.Printf("Could not retrieve file info for: %s", filePath)
-		return
-	}
-	log.Printf("File Info - Name: %s, Size: %d bytes", fileInfo.Name(), fileInfo.Size())
+	defer node.Close()
 
-	// Attempt to open a stream to the target peer
-	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
-	if err != nil {
-		log.Printf("Failed to open stream to %s: %v", targetPeerIDParsed, err)
-		return
-	}
-	defer func() {
-		log.Printf("Closing stream to peer %s", targetPeerIDParsed)
-		s.Close()
-	}()
-
-	log.Printf("Stream opened successfully to peer %s", targetPeerIDParsed)
-
-	// Read the entire file content and send it
-	fileContent, err := io.ReadAll(file)
-	if err != nil {
-		log.Printf("Error reading file content: %v", err)
-		return
-	}
-
-	// Send the entire file content over the stream
-	n, err := s.Write(fileContent)
-	if err != nil {
-		log.Printf("Failed to send file content to peer %s: %v", targetPeerIDParsed, err)
-		return
-	}
-
-	log.Printf("File sent successfully. Total bytes sent: %d to peer %s", n, targetPeerIDParsed)
+	select {}
 }
