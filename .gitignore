@@ -3,9 +3,7 @@ node_modules/
 build/
 
 # Server Side
-.btcctl
-.btcd
-.btcwallet
+
 
 # Hidden Files
 .DS_Store

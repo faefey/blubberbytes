@@ -1,0 +1,7 @@
+cd server
+
+./btcd/btcd -C "./conf/btcd.conf" -a "130.245.173.221:8333"
+
+./btcwallet/btcwallet -C "./conf/btcwallet.conf"
+
+./btcd/cmd/btcctl/btcctl -C "./conf/btcctl.conf"
