@@ -13,6 +13,8 @@ import (
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multihash"
+	"github.com/libp2p/go-libp2p/core/host"
+
 )
 
 func provideKey(ctx context.Context, dht *dht.IpfsDHT, key string) error {
@@ -32,7 +34,7 @@ func provideKey(ctx context.Context, dht *dht.IpfsDHT, key string) error {
 	return nil
 }
 
-func handleInput(ctx context.Context, dht *dht.IpfsDHT) {
+func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("User Input \n ")
 	for {
@@ -47,6 +49,16 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT) {
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "SEND":
+			if len(args) < 3 {
+				fmt.Println("Expected target peer ID and message")
+				continue
+			}
+			targetPeerID := args[1]
+			message := strings.Join(args[2:], " ")
+			fmt.Printf("Sending message to peer %s: %s\n", targetPeerID, message)
+			sendDataToPeer(node, targetPeerID, message)
+
 		case "GET":
 			if len(args) < 2 {
 				fmt.Println("Expected key")
@@ -112,6 +124,9 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT) {
 			}
 			key := args[1]
 			provideKey(ctx, dht, key)
+
+		
+
 		default:
 			fmt.Println("Expected GET, GET_PROVIDERS, PUT or PUT_PROVIDER")
 		}
