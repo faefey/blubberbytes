@@ -3,7 +3,7 @@ node_modules/
 build/
 
 # Server Side
-
+walletaddress.txt
 
 # Hidden Files
 .DS_Store
