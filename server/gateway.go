@@ -4,55 +4,87 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	//"os"
 	"path/filepath"
+	"sync"
+	"time"
 )
 
-// to test ---> go run gateway.go
-// go to http://localhost:3000/hash098765
+var fileMapping = struct {
+	sync.RWMutex
+	m map[string]fileEntry
+}{m: make(map[string]fileEntry)}
 
-// mapping file hashes to file paths
-var fileMapping = map[string]string{
-	"hash098765": "files/dog.jpg",
+type fileEntry struct {
+	path        string
+	expiration  time.Time
+	accessLimit int
 }
 
-// fileHandler handles requests to /hash and serves the file
+// fileHandler serves files based on hash
 func fileHandler(w http.ResponseWriter, r *http.Request) {
-	hash := r.URL.Path[len("/"):] // to get hash from URL path
+	hash := r.URL.Path[len("/hash/"):]
+	//fmt.Println("received hash:", hash) // Debugging line
 
-	//  get the file path from the hash
-	filePath, ok := fileMapping[hash]
-	if !ok {
-		http.Error(w, "File not found", http.StatusNotFound)
+	fileMapping.RLock()
+	entry, ok := fileMapping.m[hash]
+	fileMapping.RUnlock()
+
+	//fmt.Println("file exists in map:", ok)
+	//fmt.Println("file entry:", entry)
+
+	if !ok || time.Now().After(entry.expiration) || entry.accessLimit <= 0 {
+		http.Error(w, "File not found or expired", http.StatusNotFound)
+		//fmt.Println("expiration:", entry.expiration)
+		//fmt.Println("acccess Limit:", entry.accessLimit)
 		return
 	}
 
-	// get absolute path to prevent directory traversal attacks
-	absPath, err := filepath.Abs(filePath)
+	absPath, err := filepath.Abs(entry.path)
+	//fmt.Println("Absolute Path:", absPath)
+
 	if err != nil || !isInFilesDir(absPath) {
 		http.Error(w, "File not accessible", http.StatusForbidden)
 		return
 	}
 
-	// serve the file
 	http.ServeFile(w, r, absPath)
+	fileMapping.Lock()
+	entry.accessLimit--
+	fileMapping.m[hash] = entry
+	fileMapping.Unlock()
 }
 
-// isInFilesDir makes sure that the requested file is ni the files directory
 func isInFilesDir(filePath string) bool {
 	base, err := filepath.Abs("files")
 	if err != nil {
 		return false
 	}
-	return filepath.HasPrefix(filePath, base)
+	rel, err := filepath.Rel(base, filePath)
+	return err == nil && !filepath.IsAbs(rel) && !filepath.HasPrefix(rel, "..")
 }
 
-func gateway() {
-	http.HandleFunc("/", fileHandler) // route all requests to fileHandler
+func addFile(hash, path string, duration time.Duration, maxAccess int) {
+	expiration := time.Now().Add(duration)
+	fileMapping.Lock()
+	fileMapping.m[hash] = fileEntry{path: path, expiration: expiration, accessLimit: maxAccess}
+	fileMapping.Unlock()
+	fmt.Printf("Added file: %s %s %v %d\n", hash, path, expiration, maxAccess)
+}
 
+//  HTTP server
+func gateway() {
+	http.HandleFunc("/hash/", fileHandler)
 	fmt.Println("Starting server on http://localhost:3000")
 	if err := http.ListenAndServe(":3000", nil); err != nil {
 		log.Fatalf("Server failed: %s", err)
 	}
+}
+
+func main() {
+	addFile("hash098765", "files/dog.jpg", time.Hour, 2) // 2 --> access limit 
+	fileMapping.RLock()
+	fmt.Println("File mapping after adding file:", fileMapping.m)
+	fileMapping.RUnlock()
+
+	gateway()
 }
