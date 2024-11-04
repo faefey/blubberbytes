@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"server/btc"
+	"server/database"
 	"time"
 )
 
@@ -30,7 +31,15 @@ func main() {
 
 	btc.InterruptProcesses(btcdCmd, btcwalletCmd)
 
-	// p2p.P2P()
+	//Database testing
+	db, err := database.SetupDatabase("./data.db")
+	if err != nil {
+		log.Println("Error setting up database:", err)
+		return
+	}
+	defer db.Close()
+
+	// p2p.P2P(db)
 	// gateway()
 	// server()
 }
