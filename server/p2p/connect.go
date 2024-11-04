@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
@@ -30,6 +31,21 @@ func makeReservation(node host.Host) {
 	fmt.Printf("Reservation successfull \n")
 }
 
+func refreshReservation(node host.Host, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			makeReservation(node)
+		case <-globalCtx.Done():
+			fmt.Println("Context done, stopping reservation refresh.")
+			return
+		}
+	}
+}
+
 func connectToPeer(node host.Host, peerAddr string) {
 	addr, err := multiaddr.NewMultiaddr(peerAddr)
 	if err != nil {
@@ -50,7 +66,6 @@ func connectToPeer(node host.Host, peerAddr string) {
 		return
 	}
 
-	fmt.Println("Connected to:", info.ID)
 }
 
 func connectToPeerUsingRelay(node host.Host, targetPeerID string) {
@@ -74,7 +89,6 @@ func connectToPeerUsingRelay(node host.Host, targetPeerID string) {
 		return
 	}
 
-	fmt.Printf("Connected to peer via relay: %s\n", targetPeerID)
 }
 
 func handlePeerExchange(node host.Host) {

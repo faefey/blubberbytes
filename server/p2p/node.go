@@ -94,12 +94,21 @@ func createNode() (host.Host, *dht.IpfsDHT, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("DHT bootstrap complete.")
 
 	// Set up notifications for new connections
 	node.Network().Notify(&network.NotifyBundle{
 		ConnectedF: func(n network.Network, conn network.Conn) {
-			fmt.Printf("Notification: New peer connected %s\n", conn.RemotePeer().String())
+			peerID := conn.RemotePeer().String()
+
+			// Show a specific message based on the peer type after a successful connection
+			switch peerID {
+			case "12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN":
+				fmt.Println("Connected to Relay Node")
+			case "12D3KooWQd1K1k8XA9xVEzSAu7HUCodC7LJB6uW5Kw4VwkRdstPE":
+				fmt.Println("Connected to Bootstrap Node")
+			default:
+				fmt.Println("Connected to peer:", peerID)
+			}
 		},
 	})
 

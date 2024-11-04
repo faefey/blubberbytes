@@ -4,18 +4,175 @@ import (
 	"bufio"
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/ipfs/go-cid"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
-	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/multiformats/go-multihash"
 	"github.com/libp2p/go-libp2p/core/host"
-
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/multiformats/go-multibase"
+	"github.com/multiformats/go-multihash"
 )
+
+// FileMetadata stores metadata about a file
+type FileMetadata struct {
+	FileSize      int64  `json:"file_size"`      // Size of the file
+	Extension     string `json:"extension"`      // File extension
+	DownloadTimes int    `json:"download_times"` // Number of times the file has been downloaded
+}
+
+// ProviderFileMetadata stores information specific to each provider of the file
+type ProviderFileMetadata struct {
+	PeerID    string  `json:"peer_id"`    // Peer ID of the provider
+	FileName  string  `json:"file_name"`  // Name of the file provided by this peer
+	FilePrice float64 `json:"file_price"` // Price of the file provided by this peer
+}
+
+// FileRecord stores metadata and a list of providers for a file in the DHT
+type FileRecord struct {
+	Metadata  FileMetadata           `json:"metadata"`
+	Providers []ProviderFileMetadata `json:"providers"`
+}
+
+// Function to hash file content and return a base58-encoded multihash string
+func hashFileContent(filePath string) (string, error) {
+	log.Printf("Opening file: %s\n", filePath)
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	log.Printf("Hashing file content...\n")
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", fmt.Errorf("failed to hash file content: %w", err)
+	}
+
+	log.Printf("Encoding hash as multihash...\n")
+	mh, err := multihash.EncodeName(hash.Sum(nil), "sha2-256")
+	if err != nil {
+		return "", fmt.Errorf("failed to encode multihash: %w", err)
+	}
+
+	log.Printf("Encoding multihash to base58 string...\n")
+	encoded, err := multibase.Encode(multibase.Base58BTC, mh)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode multihash to base58: %w", err)
+	}
+
+	log.Printf("File hash (multihash): %s\n", encoded)
+	return encoded, nil
+}
+
+// Function to check if the file hash exists in the DHT
+func fileHashExists(ctx context.Context, dht *dht.IpfsDHT, dhtKey string) (bool, error) {
+	log.Printf("Checking if file hash exists under DHT key: %s\n", dhtKey)
+	_, err := dht.GetValue(ctx, dhtKey)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			log.Printf("File hash does not exist in DHT.\n")
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to check file hash in DHT: %w", err)
+	}
+	log.Printf("File hash already exists in DHT.\n")
+	return true, nil
+}
+
+// Function to get file metadata
+func getFileMetadata(filePath string) (FileMetadata, error) {
+	log.Printf("Getting metadata for file: %s\n", filePath)
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		return FileMetadata{}, fmt.Errorf("failed to get file info: %w", err)
+	}
+
+	fileSize := fileInfo.Size()
+	fileExt := strings.ToLower(filepath.Ext(filePath))
+
+	metadata := FileMetadata{
+		FileSize:      fileSize,
+		Extension:     fileExt,
+		DownloadTimes: 0, // Initially, the download count is 0
+	}
+
+	log.Printf("File metadata: Size = %d, Extension = %s, DownloadTimes = %d\n", metadata.FileSize, metadata.Extension, metadata.DownloadTimes)
+	return metadata, nil
+}
+
+// Function to store file metadata in the DHT with the new structure
+func storeFileInDHT(ctx context.Context, dht *dht.IpfsDHT, filePath string, filePrice float64) error {
+	// Step 1: Hash the file content
+	log.Printf("Hashing file content for: %s\n", filePath)
+	fileHash, err := hashFileContent(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to hash file: %w", err)
+	}
+	fmt.Printf("File hash (key): %s\n", fileHash)
+
+	// Step 2: Retrieve or create the DHT key for the file hash
+	dhtKey := "/orcanet/" + fileHash
+	var fileRecord FileRecord
+	exists, err := fileHashExists(ctx, dht, dhtKey)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		// Fetch the existing record and decode it
+		log.Printf("Retrieving existing record from DHT for key: %s\n", dhtKey)
+		value, err := dht.GetValue(ctx, dhtKey)
+		if err != nil {
+			return fmt.Errorf("failed to get existing file record from DHT: %w", err)
+		}
+		if err := json.Unmarshal(value, &fileRecord); err != nil {
+			return fmt.Errorf("failed to unmarshal existing file record: %w", err)
+		}
+	} else {
+		// If not existing, initialize a new file record with metadata
+		fileMetadata, err := getFileMetadata(filePath)
+		if err != nil {
+			return fmt.Errorf("failed to get file metadata: %w", err)
+		}
+		fileRecord = FileRecord{
+			Metadata:  fileMetadata,
+			Providers: []ProviderFileMetadata{},
+		}
+	}
+
+	// Step 3: Add provider information
+	peerID := dht.Host().ID().String()
+	fileName := filepath.Base(filePath)
+	provider := ProviderFileMetadata{
+		PeerID:    peerID,
+		FileName:  fileName,
+		FilePrice: filePrice,
+	}
+	fileRecord.Providers = append(fileRecord.Providers, provider)
+
+	// Step 4: Serialize and store the updated file record in the DHT
+	log.Printf("Serializing and storing updated file record under DHT key: %s\n", dhtKey)
+	fileRecordJSON, err := json.Marshal(fileRecord)
+	if err != nil {
+		return fmt.Errorf("failed to marshal file record: %w", err)
+	}
+
+	err = dht.PutValue(ctx, dhtKey, fileRecordJSON)
+	if err != nil {
+		return fmt.Errorf("failed to store file record in DHT: %w", err)
+	}
+	log.Println("File record with metadata and providers successfully stored in DHT.")
+
+	return nil
+}
 
 func provideKey(ctx context.Context, dht *dht.IpfsDHT, key string) error {
 	data := []byte(key)
@@ -49,7 +206,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host) {
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
-		case "SEND":
+		case "SEND_MESSAGE":
 			if len(args) < 3 {
 				fmt.Println("Expected target peer ID and message")
 				continue
@@ -57,7 +214,17 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host) {
 			targetPeerID := args[1]
 			message := strings.Join(args[2:], " ")
 			fmt.Printf("Sending message to peer %s: %s\n", targetPeerID, message)
-			sendDataToPeer(node, targetPeerID, message)
+			sendDataToPeer(node, targetPeerID, "", message)
+
+		case "SEND_FILE":
+			if len(args) < 3 {
+				fmt.Println("Expected target peer ID and file path")
+				continue
+			}
+			targetPeerID := args[1]
+			filePath := args[2]
+			fmt.Printf("Sending file to peer %s: %s\n", targetPeerID, filePath)
+			sendDataToPeer(node, targetPeerID, filePath, "")
 
 		case "GET":
 			if len(args) < 2 {
@@ -125,7 +292,30 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host) {
 			key := args[1]
 			provideKey(ctx, dht, key)
 
-		
+			// New command handling for storing file metadata in DHT with a specified price
+		case "HOST_FILE":
+			if len(args) < 3 {
+				fmt.Println("Expected file path and price")
+				continue
+			}
+
+			filePath := args[1]
+			filePrice, err := strconv.ParseFloat(args[2], 64) // Parse the price argument as a float
+			if err != nil {
+				fmt.Println("Invalid price, please provide a valid number")
+				continue
+			}
+
+			fmt.Printf("Storing file metadata for file: %s with price: %.2f\n", filePath, filePrice)
+
+			// Call the updated storeFileInDHT function to hash the file, get metadata, and store it
+			err = storeFileInDHT(ctx, dht, filePath, filePrice)
+			if err != nil {
+				fmt.Printf("Failed to store file metadata: %v\n", err)
+				continue
+			}
+
+			fmt.Println("File metadata stored successfully in DHT with the new provider structure.")
 
 		default:
 			fmt.Println("Expected GET, GET_PROVIDERS, PUT or PUT_PROVIDER")

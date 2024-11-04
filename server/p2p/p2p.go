@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 )
 
 var (
@@ -29,12 +30,11 @@ func P2P() {
 	defer cancel()
 	globalCtx = ctx
 
-	fmt.Println("Node multiaddresses:", node.Addrs())
 	fmt.Println("Node Peer ID:", node.ID())
-	fmt.Println("Your Student ID:", node_id)
 
-	connectToPeer(node, relay_node_addr)     // connect to relay node
-	makeReservation(node)                    // make reservation on relay node
+	connectToPeer(node, relay_node_addr) // connect to relay node
+	makeReservation(node)                // make reservation on relay node
+	go refreshReservation(node, 10*time.Minute)
 	connectToPeer(node, bootstrap_node_addr) // connect to bootstrap node
 	go handlePeerExchange(node)
 	go receiveDataFromPeer(node, "D:/blubberbytes/cse416-dht-go-main/") // Ensures a folder path is used
