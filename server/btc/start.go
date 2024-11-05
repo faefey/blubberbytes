@@ -14,6 +14,7 @@ func Start(net string) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Clie
 	if err != nil {
 		init = false
 	}
+	init = false
 
 	var btcdCmd, btcwalletCmd *exec.Cmd
 	var btcd, btcwallet *rpcclient.Client

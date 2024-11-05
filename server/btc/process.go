@@ -13,25 +13,30 @@ import (
 	"syscall"
 
 	"github.com/btcsuite/btcd/btcutil"
+	"golang.org/x/sys/windows"
 )
 
 // Start the btcd process.
 func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
-	if net == "mainnet" {
-		net = ""
-	} else {
-		net = "--" + net
+	netCmd := ""
+	if net != "mainnet" {
+		netCmd = "--" + net
 	}
 
-	var cmd *exec.Cmd
-	if miningaddr == "" {
-		cmd = exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", "-a", "130.245.173.221:8333", net)
-	} else {
-		cmd = exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", "-a", "130.245.173.221:8333", net, "--miningaddr="+miningaddr)
+	publicNode := "130.245.173.221:8333"
+	if net == "testnet" {
+		publicNode = "130.245.173.221:18333"
 	}
 
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
+	miningaddrCmd := ""
+	if miningaddr != "" {
+		miningaddrCmd = "--miningaddr=" + miningaddr
+	}
+
+	cmd := exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", netCmd, "-a", publicNode, miningaddrCmd)
+
+	cmd.SysProcAttr = &windows.SysProcAttr{
+		CreationFlags: windows.CREATE_NEW_PROCESS_GROUP,
 	}
 
 	cmdStdout, err := cmd.StdoutPipe()
@@ -52,7 +57,7 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 			fmt.Println(scanner.Text())
 		}
 
-		if net == "" {
+		if net == "mainnet" {
 			if strings.Contains(scanner.Text(), "Syncing to block height") {
 				return cmd, nil
 			}
@@ -73,16 +78,15 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 		return nil, errors.New("the wallet does not exist, run ./btcwallet/btcwallet --create to initialize and create it")
 	}
 
-	if net == "mainnet" {
-		net = ""
-	} else {
-		net = "--" + net
+	netCmd := ""
+	if net != "mainnet" {
+		netCmd = "--" + net
 	}
 
-	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./conf/btcwallet.conf", net)
+	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./conf/btcwallet.conf", netCmd)
 
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
+	cmd.SysProcAttr = &windows.SysProcAttr{
+		CreationFlags: windows.CREATE_NEW_PROCESS_GROUP,
 	}
 
 	cmdStdout, err := cmd.StdoutPipe()
@@ -142,10 +146,11 @@ func InterruptProcesses(cmds ...*exec.Cmd) {
 }
 
 func sendCtrlBreak(pid int) error {
-	d, err := syscall.LoadDLL("kernel32.dll")
+	d, err := windows.LoadDLL("kernel32.dll")
 	if err != nil {
 		return err
 	}
+	defer d.Release()
 
 	p, err := d.FindProc("GenerateConsoleCtrlEvent")
 	if err != nil {

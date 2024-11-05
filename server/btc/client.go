@@ -1,16 +1,23 @@
 package btc
 
-import "github.com/btcsuite/btcd/rpcclient"
+import (
+	"github.com/btcsuite/btcd/rpcclient"
+)
 
 // Create a new RPC client using websockets.
 func createClient(port string, net string) (*rpcclient.Client, error) {
+	netParam := net
+	if net == "testnet" {
+		netParam = "testnet3"
+	}
+
 	connCfg := &rpcclient.ConnConfig{
 		Host:       "localhost:" + port,
 		Endpoint:   "ws",
 		User:       "user",
 		Pass:       "password",
 		DisableTLS: true,
-		Params:     net,
+		Params:     netParam,
 	}
 
 	client, err := rpcclient.New(connCfg, nil)
