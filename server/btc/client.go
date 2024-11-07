@@ -38,10 +38,8 @@ func createBtcwalletClient(net string) (*rpcclient.Client, error) {
 	return createClient("8332", net)
 }
 
-// Shutdown rpcclient.Client clients.
-func ShutdownClients(clients ...*rpcclient.Client) {
-	for _, client := range clients {
-		client.Shutdown()
-		client.WaitForShutdown()
-	}
+// Shutdown a client.
+func ShutdownClient(client *rpcclient.Client) {
+	client.Shutdown()
+	client.WaitForShutdown()
 }

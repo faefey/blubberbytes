@@ -8,7 +8,7 @@ import (
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
-func Start(net string) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
+func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
 	init := true
 	file, err := os.Open("walletaddress.txt")
 	if err != nil {
@@ -25,12 +25,12 @@ func Start(net string) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Clie
 			return nil, nil, nil, nil, err
 		}
 
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, string(miningaddr))
+		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, string(miningaddr), debug)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
 	} else {
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, "")
+		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, "", debug)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
@@ -40,11 +40,13 @@ func Start(net string) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Clie
 			return nil, nil, nil, nil, err
 		}
 
-		ShutdownClients(btcd, btcwallet)
+		ShutdownClient(btcd)
+		ShutdownClient(btcwallet)
 
-		InterruptProcesses(btcdCmd, btcwalletCmd)
+		InterruptCmd(btcwalletCmd)
+		InterruptCmd(btcdCmd)
 
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, miningaddr.String())
+		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, miningaddr.String(), debug)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
@@ -54,28 +56,30 @@ func Start(net string) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Clie
 }
 
 // Start all btc-related processes.
-func startBtc(net string, miningaddr string) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
-	btcdCmd, err := startBtcd(net, miningaddr, false)
+func startBtc(net string, miningaddr string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
+	btcdCmd, err := startBtcd(net, miningaddr, debug)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	btcwalletCmd, err := startBtcwallet(net, false)
+	btcwalletCmd, err := startBtcwallet(net, debug)
 	if err != nil {
-		InterruptProcesses(btcdCmd)
+		InterruptCmd(btcdCmd)
 		return nil, nil, nil, nil, err
 	}
 
 	btcd, err := createBtcdClient(net)
 	if err != nil {
-		InterruptProcesses(btcdCmd, btcwalletCmd)
+		InterruptCmd(btcwalletCmd)
+		InterruptCmd(btcdCmd)
 		return nil, nil, nil, nil, err
 	}
 
 	btcwallet, err := createBtcwalletClient(net)
 	if err != nil {
-		ShutdownClients(btcd)
-		InterruptProcesses(btcdCmd, btcwalletCmd)
+		ShutdownClient(btcd)
+		InterruptCmd(btcwalletCmd)
+		InterruptCmd(btcdCmd)
 		return nil, nil, nil, nil, err
 	}
 

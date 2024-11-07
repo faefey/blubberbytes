@@ -4,16 +4,12 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/btcsuite/btcd/btcutil"
-	"golang.org/x/sys/windows"
 )
 
 // Start the btcd process.
@@ -35,17 +31,24 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 
 	cmd := exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", netCmd, "-a", publicNode, miningaddrCmd)
 
-	cmd.SysProcAttr = &windows.SysProcAttr{
-		CreationFlags: windows.CREATE_NEW_PROCESS_GROUP,
-	}
+	cmd.SysProcAttr = sysProcAttr
 
 	cmdStdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
 	}
-	defer cmdStdout.Close()
 
 	scanner := bufio.NewScanner(cmdStdout)
+
+	defer func() {
+		go func() {
+			for scanner.Scan() {
+				if debug {
+					fmt.Println(scanner.Text())
+				}
+			}
+		}()
+	}()
 
 	err = cmd.Start()
 	if err != nil {
@@ -85,17 +88,24 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 
 	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./conf/btcwallet.conf", netCmd)
 
-	cmd.SysProcAttr = &windows.SysProcAttr{
-		CreationFlags: windows.CREATE_NEW_PROCESS_GROUP,
-	}
+	cmd.SysProcAttr = sysProcAttr
 
 	cmdStdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
 	}
-	defer cmdStdout.Close()
 
 	scanner := bufio.NewScanner(cmdStdout)
+
+	defer func() {
+		go func() {
+			for scanner.Scan() {
+				if debug {
+					fmt.Println(scanner.Text())
+				}
+			}
+		}()
+	}()
 
 	err = cmd.Start()
 	if err != nil {
@@ -121,46 +131,4 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 	}
 
 	return nil, errors.New("failed to start btcwallet")
-}
-
-// Interrupt exec.Cmd processes.
-func InterruptProcesses(cmds ...*exec.Cmd) {
-	for _, cmd := range cmds {
-		if runtime.GOOS == "windows" {
-			err := sendCtrlBreak(cmd.Process.Pid)
-			if err != nil {
-				log.Println(err)
-			}
-		} else {
-			err := cmd.Process.Signal(os.Interrupt)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-
-		err := cmd.Wait()
-		if err != nil {
-			log.Println(err)
-		}
-	}
-}
-
-func sendCtrlBreak(pid int) error {
-	d, err := windows.LoadDLL("kernel32.dll")
-	if err != nil {
-		return err
-	}
-	defer d.Release()
-
-	p, err := d.FindProc("GenerateConsoleCtrlEvent")
-	if err != nil {
-		return err
-	}
-
-	r, _, err := p.Call(syscall.CTRL_BREAK_EVENT, uintptr(pid))
-	if r == 0 {
-		return err
-	}
-
-	return nil
 }
