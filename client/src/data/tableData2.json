@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a1",
     "FileName": "Home alone",
     "FileSize": "2 GB",
     "sizeInGB": 2,
@@ -10,7 +10,7 @@
     "price": 1.99
   },
   {
-    "id": 2,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a2",
     "FileName": "Avengers",
     "FileSize": "5.5 GB",
     "sizeInGB": 5.5,
@@ -20,7 +20,7 @@
     "price": 2.99
   },
   {
-    "id": 3,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a3",
     "FileName": "Spiderman",
     "FileSize": "40 GB",
     "sizeInGB": 40,
@@ -30,7 +30,7 @@
     "price": 100
   },
   {
-    "id": 4,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a4",
     "FileName": "Inception",
     "FileSize": "4.2 GB",
     "sizeInGB": 4.2,
@@ -40,7 +40,7 @@
     "price": 3.99
   },
   {
-    "id": 5,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a5",
     "FileName": "Annual Report 2023",
     "FileSize": "15 MB",
     "sizeInGB": 0.015,
@@ -50,7 +50,7 @@
     "price": 0.99
   },
   {
-    "id": 6,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a6",
     "FileName": "Photoshop Tutorial",
     "FileSize": "1.8 GB",
     "sizeInGB": 1.8,
@@ -60,7 +60,7 @@
     "price": 4.99
   },
   {
-    "id": 7,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902a7",
     "FileName": "Game of Thrones S01",
     "FileSize": "20 GB",
     "sizeInGB": 20,
@@ -70,7 +70,7 @@
     "price": 14.99
   },
   {
-    "id": 8,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902b1",
     "FileName": "Python Programming Guide",
     "FileSize": "500 MB",
     "sizeInGB": 0.5,
@@ -80,7 +80,7 @@
     "price": 9.99
   },
   {
-    "id": 9,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902b2",
     "FileName": "Yoga for Beginners",
     "FileSize": "3.5 GB",
     "sizeInGB": 3.5,
@@ -90,7 +90,7 @@
     "price": 5.99
   },
   {
-    "id": 10,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902b3",
     "FileName": "World Map High Res",
     "FileSize": "250 MB",
     "sizeInGB": 0.25,

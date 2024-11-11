@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f1",
     "FileName": "COD",
     "FileSize": "2 GB",
     "sizeInGB": 2,
@@ -10,7 +10,7 @@
     "price": 1.99
   },
   {
-    "id": 2,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f2",
     "FileName": "Fortnite",
     "FileSize": "5.5 GB",
     "sizeInGB": 5.5,
@@ -20,7 +20,7 @@
     "price": 2.99
   },
   {
-    "id": 3,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f3",
     "FileName": "Battlefield",
     "FileSize": "40 GB",
     "sizeInGB": 40,
@@ -30,7 +30,7 @@
     "price": 100
   },
   {
-    "id": 4,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f4",
     "FileName": "Minecraft",
     "FileSize": "1.5 GB",
     "sizeInGB": 1.5,
@@ -40,7 +40,7 @@
     "price": 1.49
   },
   {
-    "id": 5,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f5",
     "FileName": "PhotoshopCC",
     "FileSize": "3.8 GB",
     "sizeInGB": 3.8,
@@ -50,7 +50,7 @@
     "price": 19.99
   },
   {
-    "id": 6,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f6",
     "FileName": "OfficeBundle",
     "FileSize": "4.2 GB",
     "sizeInGB": 4.2,
@@ -60,7 +60,7 @@
     "price": 29.99
   },
   {
-    "id": 7,
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f7",
     "FileName": "GTA6",
     "FileSize": "80 GB",
     "sizeInGB": 80,

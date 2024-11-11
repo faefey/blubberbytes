@@ -50,11 +50,12 @@ function App() {
   }
 
   function removeFiles(files) {
-    const s = new Set(files)
-    const newData = data[currSection].filter(x => !s.has(x["id"]))
-    setData({...data, [currSection]: newData})
-    setCurrShownData(newData)
+    const hashesToRemove = new Set(files.map(file => file.hash));
+    const newData = data[currSection].filter(x => !hashesToRemove.has(x["hash"]));
+    setData({ ...data, [currSection]: newData });
+    setCurrShownData(newData);
   }
+
   
   function refreshExplore(e) {
     const newData = data['Explore'].slice(0, Math.floor(Math.random()*(data['Explore'].length + 1)))

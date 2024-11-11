@@ -10,16 +10,15 @@ import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({addFile, removeFiles, data}) {
+export default function SelectedFileMenu({ addFile, removeFiles }) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
   return selectedFiles.length === 0 ? (
     <FileFilters filters={filters} setFilters={setFilters} />
   ) : (
-    <FileActions selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles} data={data}/>
+    <FileActions selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles} />
   );
 }
-
 
 function FileFilters({ filters, setFilters }) {
   function clearFilters() {
@@ -31,6 +30,8 @@ function FileFilters({ filters, setFilters }) {
       price: '',
     });
   }
+
+
 
   return (
     <div id="filefilters">
@@ -104,8 +105,9 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
-function FileActions({ selectedFiles, addFile, removeFiles, data }) {
+function FileActions({ selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
+  console.log("Selected files:", selectedFiles);
 
   return (
     <div id="fileactions">
@@ -122,11 +124,14 @@ function FileActions({ selectedFiles, addFile, removeFiles, data }) {
           document.body.removeChild(link);
         }}
       />
+
+
       <Delete className="icon" onClick={() => removeFiles(selectedFiles)} />
       <Share
         className="icon"
         onClick={() => {
-          const hash = '77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f0';
+          const selectedFile = selectedFiles[0];
+          const hash = selectedFile.hash;
           const url = `http://localhost:3001/${hash}`;
           navigator.clipboard.writeText(url)
             .then(() => {
@@ -135,11 +140,13 @@ function FileActions({ selectedFiles, addFile, removeFiles, data }) {
             .catch(err => {
               console.error('Failed to copy: ', err);
             });
-          addFile('Sharing', data[selectedFiles[0] - 1], data[selectedFiles[0] - 1].price);
+          addFile('Sharing', selectedFile, selectedFile.price);
         }}
-      />      
-              {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />} 
-                                                         fileInfo={data.filter(file => file.id === selectedFiles[0])}/>)}
+      />  
+      {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
+          fileInfo={[selectedFiles[0]]}
+        />
+      )}
     </div>
   );
 }
