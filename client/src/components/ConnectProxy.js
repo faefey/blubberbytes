@@ -58,35 +58,27 @@ export default function ConnectProxy() {
     };
 
     useEffect(() => {
-        let interval;
         if (checked) {
-            interval = setInterval(() => {
+            const interval = setInterval(() => {
                 const now = new Date();
                 const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 
                 const scaleFactor = (usageRate + maxUsers) * 0.75;
                 const newBandwidthValue = Math.random() * scaleFactor;
 
-                setBandwidthData(prevData => {
-                    const updatedLabels = [...prevData.labels, timeLabel].slice(-20);
-                    const updatedData = [...(prevData.datasets[0]?.data || []), newBandwidthValue].slice(-20);
-
-                    const usageRateLine = new Array(updatedLabels.length).fill(usageRate);
-                    const maxUsersLine = new Array(updatedLabels.length).fill(maxUsers);
-
-                    return {
-                        labels: updatedLabels,
+                setBandwidthData(prevData => ({
+                    labels: [...prevData.labels, timeLabel].slice(-20),
                         datasets: [
                             {
                                 label: 'Bandwidth Usage Over Time',
-                                data: updatedData,
+                            data: [...(prevData.datasets[0]?.data || []), newBandwidthValue].slice(-20),
                                 borderColor: 'rgba(153, 102, 255, 0.6)',
                                 fill: false,
                                 tension: 0.4,
                             },
                             {
                                 label: 'Usage Rate',
-                                data: usageRateLine,
+                            data: [...(prevData.datasets[1]?.data || []), usageRate].slice(-20),
                                 borderColor: 'rgba(54, 162, 235, 0.6)',
                                 borderDash: [5, 5],
                                 fill: false,
@@ -94,16 +86,16 @@ export default function ConnectProxy() {
                             },
                             {
                                 label: 'Max Users',
-                                data: maxUsersLine,
+                            data: [...(prevData.datasets[2]?.data || []), maxUsers].slice(-20),
                                 borderColor: 'rgba(255, 99, 132, 0.6)',
                                 borderDash: [10, 5],
                                 fill: false,
                                 tension: 0.4,
                             },
                         ],
-                    };
-                });
+                }));
             }, 1000);
+            return () => clearInterval(interval);
         } else {
             setBandwidthData({
                 labels: [],
@@ -118,11 +110,7 @@ export default function ConnectProxy() {
                 ],
             });
         }
-
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [checked, maxUsers, usageRate]);
+    }, [checked, usageRate, maxUsers]);
 
     const chartOptions = {
         responsive: true,
