@@ -21,7 +21,7 @@ func main() {
 		log.Println(err)
 		return
 	}
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 10)
 
 	btc.GetBlockCount(btcd)
 	btc.GetBalance(btcwallet)
