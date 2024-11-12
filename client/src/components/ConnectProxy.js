@@ -118,34 +118,18 @@ export default function ConnectProxy() {
         scales: { y: { beginAtZero: true } }
     };
 
-    const tooltipMessage = !checked ? "Checking this will cause you to be disconnected from any proxy you are using." 
-        : "Unchecking this will cause you to stop being a proxy.";
-
     return (
         <div>
             <Tooltip id="proxy-switch-tooltip" />
             <h2>Proxy Connections</h2>
             <FormControlLabel
-                control={<Switch checked={checked} 
-                                 onChange={handleChange} 
-                                 data-tooltip-id="proxy-switch-tooltip"
-                                 data-tooltip-content={tooltipMessage}
-                                 data-tooltip-place="top"/>}
-                label={checked ? <label>Be A Proxy</label> : <label>Use A Proxy</label>}
+                control={<Switch checked={checked} onChange={handleChange} />}
+                label={checked ? 'Be A Proxy' : 'Use A Proxy'}
             />
-            {checked && (
+            {checked ? (
                 <>
-                    <SubmissionForm title={"Usage rate: "}
-                        variable={usageRate}
-                        setVariable={setUsageRate}
-                        unit={true}
-                        allowDecimals={true} />
-
-                    <SubmissionForm title={"Max users: "}
-                        variable={maxUsers}
-                        setVariable={setMaxUsers}
-                        allowDecimals={false} />
-
+                    <SubmissionForm title={"Usage rate: "} variable={usageRate} setVariable={setUsageRate} unit allowDecimals />
+                    <SubmissionForm title={"Max users: "} variable={maxUsers} setVariable={setMaxUsers} allowDecimals={false} />
                     <div className="chart">
                         <div className="chart-header">
                             <h3>Bandwidth</h3>
@@ -153,8 +137,7 @@ export default function ConnectProxy() {
                         <Line data={bandwidthData} options={chartOptions} />
                     </div>
                 </>
-            )}
-            {!checked && (
+            ) : (
                 <div>
                     <div className="chart-header">
                         <h3>Available Proxies</h3>
@@ -162,6 +145,15 @@ export default function ConnectProxy() {
                             <Fresh />
                         </IconButton>
                     </div>
+                    <ProxyTable proxies={displayedProxies} selectedProxy={selectedProxy} setSelectedProxy={setSelectedProxy} />
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ProxyTable({ proxies, selectedProxy, setSelectedProxy }) {
+    return (
                     <table className="table-container">
                         <thead>
                             <tr>
@@ -174,39 +166,23 @@ export default function ConnectProxy() {
                             </tr>
                         </thead>
                         <tbody>
-                            {displayedProxies.map(proxy => (
-                                <tr key={proxy.id}
-                                    className={`proxy-row ${selectedProxy === proxy.id
-                                        ? 'selected' : ''}`}
-                                    onMouseEnter={(e) =>
-                                        e.currentTarget.classList.add('hover')}
-                                    onMouseLeave={(e) =>
-                                        e.currentTarget.classList.remove('hover')}
-                                >
+                {proxies.map(proxy => (
+                    <tr key={proxy.id} className={`proxy-row ${selectedProxy?.id === proxy.id ? 'selected' : ''}`}>
                                     <td>{proxy.node}</td>
                                     <td>{proxy.ip}</td>
                                     <td>{proxy.location}</td>
                                     <td>{proxy.latency}</td>
                                     <td>{proxy.price}</td>
                                     <td>
-                                        <div className="switch-container">
                                             <Switch
-                                                checked={selectedProxy === proxy.id}
-                                                onChange={() =>
-                                                    setSelectedProxy((prevProxy) =>
-                                                        prevProxy === proxy.id ? null : proxy.id
-                                                    )
-                                                }
+                                checked={selectedProxy?.id === proxy.id}
+                                onChange={() => setSelectedProxy(selectedProxy?.id === proxy.id ? null : proxy)}
                                             />
-                                        </div>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
-            )}
-        </div>
     );
 }
 
