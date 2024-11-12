@@ -41,10 +41,8 @@ export default function ConnectProxy() {
     }, [selectedProxy]);
 
     const handleChange = (event) => {
-        const newChecked = event.target.checked;
-        setChecked(newChecked);
-
-        if (newChecked) {
+        setChecked(event.target.checked);
+        if (!event.target.checked) {
             setSelectedProxy(null);
             setUsageRate(0);
             setMaxUsers(0);
@@ -68,31 +66,31 @@ export default function ConnectProxy() {
 
                 setBandwidthData(prevData => ({
                     labels: [...prevData.labels, timeLabel].slice(-20),
-                        datasets: [
-                            {
-                                label: 'Bandwidth Usage Over Time',
+                    datasets: [
+                        {
+                            label: 'Bandwidth Usage Over Time',
                             data: [...(prevData.datasets[0]?.data || []), newBandwidthValue].slice(-20),
-                                borderColor: 'rgba(153, 102, 255, 0.6)',
-                                fill: false,
-                                tension: 0.4,
-                            },
-                            {
-                                label: 'Usage Rate',
+                            borderColor: 'rgba(153, 102, 255, 0.6)',
+                            fill: false,
+                            tension: 0.4,
+                        },
+                        {
+                            label: 'Usage Rate',
                             data: [...(prevData.datasets[1]?.data || []), usageRate].slice(-20),
-                                borderColor: 'rgba(54, 162, 235, 0.6)',
-                                borderDash: [5, 5],
-                                fill: false,
-                                tension: 0.4,
-                            },
-                            {
-                                label: 'Max Users',
+                            borderColor: 'rgba(54, 162, 235, 0.6)',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4,
+                        },
+                        {
+                            label: 'Max Users',
                             data: [...(prevData.datasets[2]?.data || []), maxUsers].slice(-20),
-                                borderColor: 'rgba(255, 99, 132, 0.6)',
-                                borderDash: [10, 5],
-                                fill: false,
-                                tension: 0.4,
-                            },
-                        ],
+                            borderColor: 'rgba(255, 99, 132, 0.6)',
+                            borderDash: [10, 5],
+                            fill: false,
+                            tension: 0.4,
+                        },
+                    ],
                 }));
             }, 1000);
             return () => clearInterval(interval);
@@ -154,77 +152,52 @@ export default function ConnectProxy() {
 
 function ProxyTable({ proxies, selectedProxy, setSelectedProxy }) {
     return (
-                    <table className="table-container">
-                        <thead>
-                            <tr>
-                                <th>Node</th>
-                                <th>IP Address</th>
-                                <th>Location</th>
-                                <th>Latency</th>
-                                <th>Price (OC/MB)</th>
-                                <th>Connect</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+        <table className="table-container">
+            <thead>
+                <tr>
+                    <th>Node</th>
+                    <th>IP Address</th>
+                    <th>Location</th>
+                    <th>Latency</th>
+                    <th>Price (OC/MB)</th>
+                    <th>Connect</th>
+                </tr>
+            </thead>
+            <tbody>
                 {proxies.map(proxy => (
                     <tr key={proxy.id} className={`proxy-row ${selectedProxy?.id === proxy.id ? 'selected' : ''}`}>
-                                    <td>{proxy.node}</td>
-                                    <td>{proxy.ip}</td>
-                                    <td>{proxy.location}</td>
-                                    <td>{proxy.latency}</td>
-                                    <td>{proxy.price}</td>
-                                    <td>
-                                            <Switch
+                        <td>{proxy.node}</td>
+                        <td>{proxy.ip}</td>
+                        <td>{proxy.location}</td>
+                        <td>{proxy.latency}</td>
+                        <td>{proxy.price}</td>
+                        <td>
+                            <Switch
                                 checked={selectedProxy?.id === proxy.id}
                                 onChange={() => setSelectedProxy(selectedProxy?.id === proxy.id ? null : proxy)}
-                                            />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            />
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     );
 }
 
-function SubmissionForm({ title, variable, setVariable,
-    unit = false, allowDecimals = true }) {
+function SubmissionForm({ title, variable, setVariable, unit = false, allowDecimals = true }) {
     const [inputValue, setInputValue] = useState(variable.toString());
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [popupMessage, setPopupMessage] = useState("");
-    const [showPopup, setShowPopup] = useState(false);
-
-    const unitOfMeasure = (title === "Usage rate: ") ? "OC/MB" : "users";
-
-    const handleKeyDown = (event) => {
-        if (event.key === "Enter") {
-            const newValue = event.target.value;
-            setInputValue(newValue);
-
-            const parsedValue = allowDecimals ? parseFloat(newValue) : parseInt(newValue, 10);
-
-            // setPopupMessage("Are you sure you want to change " + title + " " + variable + " to " + parsedValue + "?");
-            if (!isNaN(parsedValue) && parsedValue > 0 &&
-                (allowDecimals || Number.isInteger(parsedValue))) {
-                    setShowPopup(true);
-            }
-        }
-    };
-
-    const popupYes = () => {
-        const parsedValue = allowDecimals ? parseFloat(inputValue) : parseInt(inputValue, 10);
-        if (!isNaN(parsedValue) && parsedValue > 0 &&
-        (allowDecimals || Number.isInteger(parsedValue))) {
-            setVariable(parsedValue);
-        
-        setShowPopup(false);
-    }
-
-    }
 
     const handleChange = (event) => {
         event.preventDefault();
+        const newValue = event.target.value;
+        setInputValue(newValue);
 
-        setInputValue(event.target.value);
+        const parsedValue = allowDecimals ? parseFloat(newValue) : parseInt(newValue, 10);
+
+        if (!isNaN(parsedValue) && parsedValue > 0 &&
+            (allowDecimals || Number.isInteger(parsedValue))) {
+            setVariable(parsedValue);
+        }
     }
 
     const isValid = !isNaN(parseFloat(inputValue)) && parseFloat(inputValue) > 0 &&
@@ -236,37 +209,26 @@ function SubmissionForm({ title, variable, setVariable,
                 <label className="text-container">{title}</label>
                 <div className="non-title-container">
                     <div>
-                    <span style={{ position: "relative" }}>
-                        <input
-                            className="input-box"
-                            name="variable"
-                            type="text"
-                            placeholder={variable}
-                            value={inputValue}
-                            autoComplete="off"
-                            onChange={(showPopup && isValid && inputValue != variable) ? null : handleChange}
-                            onKeyDown={handleKeyDown}
-                        />
-                        {(showPopup && isValid && inputValue != variable) && <div className="mini-popup">
-                                        <b className="skinny-h3">Confirm change:</b>
-                                        <div>
-                                            <b>{variable} to {inputValue} {unitOfMeasure}</b>
-                                        </div>
-                                        <div className="submission-buttons">
-                                            <button onClick={popupYes}>Yes</button>
-                                            <button onClick={() => setShowPopup(false)}>No</button>
-                                        </div>
-                                      </div>}
-                    </span>
-                    {unit && <span className="unit">OC/MB</span>}
+                        <span style={{ position: "relative" }}>
+                            <input
+                                className="input-box"
+                                name="variable"
+                                type="text"
+                                placeholder={variable}
+                                value={inputValue}
+                                autoComplete="off"
+                                onChange={handleChange}
+                            />
+                        </span>
+                        {unit && <span className="unit">OC/MB</span>}
                     </div>
                     {!isValid ? (
                         <div className="error-message">
                             <Cross style={{ fill: 'red' }} />
                             <span>
                                 {allowDecimals
-                                    ? "Please input a rational number greater than zero."
-                                    : "Please input a whole number greater than zero."}
+                                    ? "please input a rational number greater than zero."
+                                    : "please input a whole number greater than zero."}
                             </span>
                         </div>
                     ) : (
