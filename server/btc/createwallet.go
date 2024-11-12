@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
+	"path/filepath"
 	"time"
 
 	"github.com/btcsuite/btcd/chaincfg"
@@ -35,7 +36,7 @@ func createWallet(walletDir string, net string) {
 		netParams = &chaincfg.TestNet3Params
 	}
 
-	loader := wallet.NewLoader(netParams, walletDir+"\\"+net, true, 10*time.Second, 250)
+	loader := wallet.NewLoader(netParams, filepath.Join(walletDir, net), true, 10*time.Second, 250)
 
 	pubPassphraseString := "public"
 	pubPassphrase := []byte(pubPassphraseString)
