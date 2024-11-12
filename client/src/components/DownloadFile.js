@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
@@ -19,15 +19,24 @@ import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
 export default function DownloadPopup({addFile}) {
     const [fileData, setFileData] = useState('');
     const [peerData, setPeerData] = useState(['', 'XXX']);
+    const [currHash, setCurrHash] = useState('');
     const [hashError, setHashError] = useState('');
     const [peerError, setPeerError] = useState('');
     const inputRef = useRef(null);
     
+    const [confPage, setConfPage] = useState(false);
+
     const [showButton, setShowButton] = useState(false);
     const [onPeerTable, setOnPeerTable] = useState(true);
 
     const [currEntries, setCurrEntries] = useState(0);
     const numRows = 5;
+
+    useEffect(() => {
+        if (inputRef.current) {
+          inputRef.current.value = currHash;
+        }
+      }, [confPage]);
 
     //Where file is to be downloaded
     const inputData = (event, close) => {
@@ -54,6 +63,7 @@ export default function DownloadPopup({addFile}) {
         setPeerData(['', 'XXX']);
         
         const hash = inputRef.current.value;
+        setCurrHash(hash);
 
         if (hash === "")
             setHashError("Please input a hash value.");
@@ -134,7 +144,7 @@ export default function DownloadPopup({addFile}) {
             {(close) => (
             <div id="popup-border">
                 <button className="ecks-button" onClick= {() => close()}><EcksButton /></button>
-                <form onSubmit={(event) => inputData(event, close)}>
+                { !confPage && (<form onSubmit={(event) => inputData(event, close)}>
                     <div id="label-div">
                         <label><h3><span className="required">*</span>File hash:</h3></label>
                         <div id="file-input-container">
@@ -227,12 +237,26 @@ export default function DownloadPopup({addFile}) {
                         {(showButton && !onPeerTable)&& (<button className="host-button" onClick={handleTransitionToData}>{onPeerTable ? "Next Page" : "Back"}</button>)}
                         {(hashError === '' && fileData !== '' && !onPeerTable) &&
 
-                        <button className="host-button trans-peer-button" type="submit" onClick={handleDownload}>
+                        <button className="host-button trans-peer-button" type="submit" onClick={() => setConfPage(true)}>
                             Download File
                         </button>}
                     </div>
 
-                </form>
+                </form>) }
+                {confPage && (<div>
+                                  <h3>Confirm download?</h3>
+                                  <h3>Wallet change: {500} to {500 - peerData[1]} OC</h3>
+                                  <div> 
+                                    <button className="host-button"
+                                            onClick={() => { handleDownload(); setConfPage(false); close(); }}>
+                                                Yes
+                                    </button>
+                                    <button className="host-button"
+                                            onClick={() => { setConfPage(false);}}>
+                                                No
+                                    </button>
+                                  </div>
+                              </div>)}
             </div>
             )}
         </Popup>

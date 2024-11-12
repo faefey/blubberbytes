@@ -3,6 +3,7 @@ import '../stylesheets/selectedFileMenu.css';
 import TableContext from './TableContext';
 import React, { useContext } from 'react';
 import InfoPopup from './InfoPopup.js';
+import { ConfirmationPopup } from './ConfirmationPopup.js';
 
 import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
@@ -107,39 +108,55 @@ function FileFilters({ filters, setFilters }) {
 function FileActions({ selectedFiles, addFile, removeFiles, data }) {
   const { setSelectedFiles } = useContext(TableContext);
 
+  const downloadOnClick = () => {
+    const link = document.createElement('a');
+    link.href = 'samplefiles/file1.txt';
+    link.download = 'file1.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  const shareOnClick = (addFile, selectedFiles, data) => {
+    const hash = '77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f0';
+    const url = `http://localhost:3001/${hash}`;
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        alert('Saved to clipboard');
+      })
+      .catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+    addFile('Sharing', data[selectedFiles[0] - 1], data[selectedFiles[0] - 1].price);   
+  }
+
+  const deleteOnClick = (removeFiles, selectedFiles) => removeFiles(selectedFiles);
+
+  const confirmationInfo = data.filter(file => selectedFiles.includes(file.id));
+  const endingWords = confirmationInfo.length === 1 ? "this file?" : "these files?";
+
   return (
     <div id="fileactions">
       <Close className="icon" onClick={() => setSelectedFiles([])} />
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
-      <Download
-        className="icon"
-        onClick={() => {
-          const link = document.createElement('a');
-          link.href = 'samplefiles/file1.txt';
-          link.download = 'file1.txt';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }}
-      />
-      <Delete className="icon" onClick={() => removeFiles(selectedFiles)} />
-      <Share
-        className="icon"
-        onClick={() => {
-          const hash = '77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f0';
-          const url = `http://localhost:3001/${hash}`;
-          navigator.clipboard.writeText(url)
-            .then(() => {
-              alert('Saved to clipboard');
-            })
-            .catch(err => {
-              console.error('Failed to copy: ', err);
-            });
-          addFile('Sharing', data[selectedFiles[0] - 1], data[selectedFiles[0] - 1].price);
-        }}
-      />      
-              {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />} 
+
+      <ConfirmationPopup trigger={<Download className="icon"/>} 
+                         action={() => downloadOnClick()}
+                         fileInfo={confirmationInfo}
+                         message={"Are you sure you want to download " + endingWords}
+                         monetaryInfo={true}/>
+      <ConfirmationPopup trigger={<Delete className="icon"/>} 
+                         action={() => deleteOnClick(removeFiles, selectedFiles)}
+                         fileInfo={confirmationInfo}
+                         message={"Are you sure you want to delete " + endingWords}/> 
+      <ConfirmationPopup trigger={<Share className="icon"/>} 
+                         action={() => shareOnClick(addFile, selectedFiles, data)}
+                         fileInfo={confirmationInfo}
+                         message={"Are you sure you want to share " + endingWords}/>
+   
+      {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />} 
                                                          fileInfo={data.filter(file => file.id === selectedFiles[0])}/>)}
+              {selectedFiles.length > 1 && (<Info className="grayedout" />)}
     </div>
   );
 }

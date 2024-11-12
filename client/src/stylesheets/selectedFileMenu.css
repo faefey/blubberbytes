@@ -44,3 +44,7 @@
 #fileactions .icon:hover {
   background-color: rgb(143, 212, 249);
 }
+
+.grayedout {
+  opacity: 0.5;
+}

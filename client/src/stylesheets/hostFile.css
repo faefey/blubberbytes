@@ -189,3 +189,39 @@
     background-color: white;
     border-radius: 8px;
 }
+
+#confirmation-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.increase-size {
+    padding: 15px;
+}
+
+.center-the-top {
+    text-align: center;
+}
+
+.table-containing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.teehpad {
+    padding-right: 40px;
+    padding-left: 40px;
+}
+
+.confirmation-info-pad {
+    padding-right: 40px;
+}
+
+.confirmation-info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

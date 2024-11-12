@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Switch, FormControlLabel, IconButton } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import '../stylesheets/UserAccount.css';
+import { Tooltip } from 'react-tooltip';
 
 import fakeProxies from '../data/fakeProxies.json';
 import { ReactComponent as Cross } from '../icons/close.svg';
@@ -151,11 +152,19 @@ export default function ConnectProxy() {
         scales: { y: { beginAtZero: true } }
     };
 
+    const tooltipMessage = !checked ? "Checking this will cause you to be disconnected from any proxy you are using." 
+        : "Unchecking this will cause you to stop being a proxy.";
+
     return (
         <div>
+            <Tooltip id="proxy-switch-tooltip" />
             <h2>Proxy Connections</h2>
             <FormControlLabel
-                control={<Switch checked={checked} onChange={handleChange} />}
+                control={<Switch checked={checked} 
+                                 onChange={handleChange} 
+                                 data-tooltip-id="proxy-switch-tooltip"
+                                 data-tooltip-content={tooltipMessage}
+                                 data-tooltip-place="top"/>}
                 label={checked ? <label>Be A Proxy</label> : <label>Use A Proxy</label>}
             />
             {checked && (
@@ -238,18 +247,43 @@ export default function ConnectProxy() {
 function SubmissionForm({ title, variable, setVariable,
     unit = false, allowDecimals = true }) {
     const [inputValue, setInputValue] = useState(variable.toString());
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("");
+    const [showPopup, setShowPopup] = useState(false);
 
-    const handleInputChange = (event) => {
-        const newValue = event.target.value;
-        setInputValue(newValue);
+    const unitOfMeasure = (title === "Usage rate: ") ? "OC/MB" : "users";
 
-        const parsedValue = allowDecimals ? parseFloat(newValue) : parseInt(newValue, 10);
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+            const newValue = event.target.value;
+            setInputValue(newValue);
 
-        if (!isNaN(parsedValue) && parsedValue > 0 &&
-            (allowDecimals || Number.isInteger(parsedValue))) {
-            setVariable(parsedValue);
+            const parsedValue = allowDecimals ? parseFloat(newValue) : parseInt(newValue, 10);
+
+            // setPopupMessage("Are you sure you want to change " + title + " " + variable + " to " + parsedValue + "?");
+            if (!isNaN(parsedValue) && parsedValue > 0 &&
+                (allowDecimals || Number.isInteger(parsedValue))) {
+                    setShowPopup(true);
+            }
         }
     };
+
+    const popupYes = () => {
+        const parsedValue = allowDecimals ? parseFloat(inputValue) : parseInt(inputValue, 10);
+        if (!isNaN(parsedValue) && parsedValue > 0 &&
+        (allowDecimals || Number.isInteger(parsedValue))) {
+            setVariable(parsedValue);
+        
+        setShowPopup(false);
+    }
+
+    }
+
+    const handleChange = (event) => {
+        event.preventDefault();
+
+        setInputValue(event.target.value);
+    }
 
     const isValid = !isNaN(parseFloat(inputValue)) && parseFloat(inputValue) > 0 &&
         (allowDecimals || Number.isInteger(parseFloat(inputValue)));
@@ -260,6 +294,7 @@ function SubmissionForm({ title, variable, setVariable,
                 <label className="text-container">{title}</label>
                 <div className="non-title-container">
                     <div>
+                    <span style={{ position: "relative" }}>
                         <input
                             className="input-box"
                             name="variable"
@@ -267,17 +302,29 @@ function SubmissionForm({ title, variable, setVariable,
                             placeholder={variable}
                             value={inputValue}
                             autoComplete="off"
-                            onChange={handleInputChange}
+                            onChange={(showPopup && isValid && inputValue != variable) ? null : handleChange}
+                            onKeyDown={handleKeyDown}
                         />
-                        {unit && <span className="unit">OC/MB</span>}
+                        {(showPopup && isValid && inputValue != variable) && <div className="mini-popup">
+                                        <b className="skinny-h3">Confirm change:</b>
+                                        <div>
+                                            <b>{variable} to {inputValue} {unitOfMeasure}</b>
+                                        </div>
+                                        <div className="submission-buttons">
+                                            <button onClick={popupYes}>Yes</button>
+                                            <button onClick={() => setShowPopup(false)}>No</button>
+                                        </div>
+                                      </div>}
+                    </span>
+                    {unit && <span className="unit">OC/MB</span>}
                     </div>
                     {!isValid ? (
                         <div className="error-message">
                             <Cross style={{ fill: 'red' }} />
                             <span>
                                 {allowDecimals
-                                    ? "please input a rational number greater than zero."
-                                    : "please input a whole number greater than zero."}
+                                    ? "Please input a rational number greater than zero."
+                                    : "Please input a whole number greater than zero."}
                             </span>
                         </div>
                     ) : (
