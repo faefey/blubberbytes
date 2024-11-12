@@ -1,6 +1,8 @@
 package btc
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"log"
 	"time"
 
@@ -8,6 +10,20 @@ import (
 	"github.com/btcsuite/btcwallet/wallet"
 	_ "github.com/btcsuite/btcwallet/walletdb/bdb"
 )
+
+// Function for generating the seed for the wallet
+func generateSeed(length int) []byte {
+	seed := make([]byte, length)
+	rand.Read(seed)
+	return seed
+}
+
+// Function for generating the private passphrase for the wallet
+func generatePrivatePassphrase(length int) string {
+	passphrase := make([]byte, length)
+	rand.Read(passphrase)
+	return base64.StdEncoding.EncodeToString(passphrase)
+}
 
 func createWallet(walletDir string, net string) {
 	//Choose which network parameters to use based on net
