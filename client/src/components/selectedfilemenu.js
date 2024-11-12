@@ -11,13 +11,13 @@ import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({addFile, removeFiles, data}) {
+export default function SelectedFileMenu({addFile, removeFiles}) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
   return selectedFiles.length === 0 ? (
     <FileFilters filters={filters} setFilters={setFilters} />
   ) : (
-    <FileActions selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles} data={data}/>
+    <FileActions selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles}/>
   );
 }
 
@@ -105,7 +105,7 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
-function FileActions({ selectedFiles, addFile, removeFiles, data }) {
+function FileActions({ selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
 
   const downloadOnClick = () => {
@@ -117,8 +117,9 @@ function FileActions({ selectedFiles, addFile, removeFiles, data }) {
     document.body.removeChild(link);
   }
 
-  const shareOnClick = (addFile, selectedFiles, data) => {
-    const hash = '77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f0';
+  const shareOnClick = (addFile, selectedFiles) => {
+    const selectedFile = selectedFiles[0];
+    const hash = selectedFile.hash;
     const url = `http://localhost:3001/${hash}`;
     navigator.clipboard.writeText(url)
       .then(() => {
@@ -127,12 +128,12 @@ function FileActions({ selectedFiles, addFile, removeFiles, data }) {
       .catch(err => {
         console.error('Failed to copy: ', err);
       });
-    addFile('Sharing', data[selectedFiles[0] - 1], data[selectedFiles[0] - 1].price);   
+    addFile('Sharing', selectedFile, selectedFile.price);
   }
 
   const deleteOnClick = (removeFiles, selectedFiles) => removeFiles(selectedFiles);
 
-  const confirmationInfo = data.filter(file => selectedFiles.includes(file.id));
+  const confirmationInfo = selectedFiles; //changed from selectedFiles.filter(file => selectedFiles.includes(file.id));
   const endingWords = confirmationInfo.length === 1 ? "this file?" : "these files?";
 
   return (
@@ -150,13 +151,13 @@ function FileActions({ selectedFiles, addFile, removeFiles, data }) {
                          fileInfo={confirmationInfo}
                          message={"Are you sure you want to delete " + endingWords}/> 
       <ConfirmationPopup trigger={<Share className="icon"/>} 
-                         action={() => shareOnClick(addFile, selectedFiles, data)}
+                         action={() => shareOnClick(addFile, selectedFiles)}
                          fileInfo={confirmationInfo}
                          message={"Are you sure you want to share " + endingWords}/>
-   
-      {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />} 
-                                                         fileInfo={data.filter(file => file.id === selectedFiles[0])}/>)}
-              {selectedFiles.length > 1 && (<Info className="grayedout" />)}
+
+      {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
+          fileInfo={[selectedFiles[0]]}/>)}
+      {selectedFiles.length > 1 && (<Info className="grayedout" />)}
     </div>
   );
 }
