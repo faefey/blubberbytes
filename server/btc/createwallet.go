@@ -3,6 +3,7 @@ package btc
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"log"
 	"time"
 
@@ -12,11 +13,11 @@ import (
 )
 
 // Function for generating the seed for the wallet
-func generateSeed(length int) []byte {
-	seed := make([]byte, length)
-	rand.Read(seed)
-	return seed
-}
+// func generateSeed(length int) []byte {
+// 	seed := make([]byte, length)
+// 	rand.Read(seed)
+// 	return seed
+// }
 
 // Function for generating the private passphrase for the wallet
 func generatePrivatePassphrase(length int) string {
@@ -36,16 +37,20 @@ func createWallet(walletDir string, net string) {
 
 	loader := wallet.NewLoader(netParams, walletDir+"\\"+net, true, 10*time.Second, 250)
 
-	pubPassphraseString := "public_passphrase"
+	pubPassphraseString := "public"
 	pubPassphrase := []byte(pubPassphraseString)
 	privPassphraseString := generatePrivatePassphrase(32)
 
 	privPassphrase := []byte(privPassphraseString)
-	seed := generateSeed(32)
+	//seed := generateSeed(32)
 
-	_, err := loader.CreateNewWallet(pubPassphrase, privPassphrase, seed, time.Now())
+	_, err := loader.CreateNewWallet(pubPassphrase, privPassphrase, nil, time.Now())
 	if err != nil {
 		panic(err)
+	}
+
+	if err := loader.UnloadWallet(); err != nil {
+		fmt.Printf("error unloading wallet: %v", err)
 	}
 
 	log.Println("New wallet successfully created with public passphrase " + pubPassphraseString + " and private " + privPassphraseString)

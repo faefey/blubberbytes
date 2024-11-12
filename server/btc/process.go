@@ -78,7 +78,8 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 	walletDir := btcutil.AppDataDir("btcwallet", false)
 	if _, err := os.Stat(filepath.Join(walletDir, net+"/wallet.db")); errors.Is(err, os.ErrNotExist) {
-		return nil, errors.New("the wallet does not exist, run ./btcwallet/btcwallet --create to initialize and create it")
+		createWallet(walletDir, net)
+		//return nil, errors.New("the wallet does not exist, run ./btcwallet/btcwallet --create to initialize and create it")
 	}
 
 	netCmd := ""
