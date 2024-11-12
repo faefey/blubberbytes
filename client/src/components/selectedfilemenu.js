@@ -107,7 +107,6 @@ function FileFilters({ filters, setFilters }) {
 }
 
 function FileActions({ selectedFiles, addFile, removeFiles }) {
-function FileActions({ selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
 
   const downloadOnClick = () => {
