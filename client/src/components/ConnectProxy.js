@@ -9,6 +9,15 @@ import { ReactComponent as Cross } from '../icons/close.svg';
 import { ReactComponent as Check } from '../icons/check.svg';
 import { ReactComponent as Fresh } from '../icons/refresh.svg';
 
+function shuffleArray(array) {
+    let shuffled = array.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
 export default function ConnectProxy() {
     const [checked, setChecked] = useState(false);
     const [usageRate, setUsageRate] = useState(0);
@@ -17,6 +26,19 @@ export default function ConnectProxy() {
     const [selectedProxy, setSelectedProxy] = useState(null);
     const [displayedProxies, setDisplayedProxies] = useState([]);
 
+    useEffect(() => {
+        const shuffledProxies = shuffleArray(fakeProxies).slice(0, 5);
+        setDisplayedProxies(shuffledProxies);
+    }, []);
+
+    useEffect(() => {
+        if (selectedProxy) {
+            setDisplayedProxies(prevProxies => {
+                const filteredProxies = prevProxies.filter(proxy => proxy.id !== selectedProxy.id);
+                return [selectedProxy, ...filteredProxies];
+            });
+        }
+    }, [selectedProxy]);
 
     const handleChange = (event) => {
         const newChecked = event.target.checked;
@@ -30,18 +52,9 @@ export default function ConnectProxy() {
     };
 
     const handleRefresh = () => {
-        const shuffledProxies = fakeProxies.sort(() => 0.5 - Math.random());
-        setDisplayedProxies(shuffledProxies.slice(0, 5));
-        setSelectedProxy(null);
-    };
-
-    const updateMaxUsers = (event) => {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        const users = formData.get("max-users");
-
-        setMaxUsers(users);
+        const shuffledProxies = shuffleArray(fakeProxies.filter(proxy => proxy.id !== selectedProxy?.id));
+        const updatedProxies = selectedProxy ? [selectedProxy, ...shuffledProxies.slice(0, 4)] : shuffledProxies.slice(0, 5);
+        setDisplayedProxies(updatedProxies);
     };
 
     useEffect(() => {
