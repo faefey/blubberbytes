@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"context"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"server/database"
 	"strconv"
 	"strings"
 
@@ -191,7 +193,7 @@ func provideKey(ctx context.Context, dht *dht.IpfsDHT, key string) error {
 	return nil
 }
 
-func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host) {
+func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.DB) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("User Input \n ")
 	for {
@@ -206,6 +208,87 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host) {
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "FIND_FILE_BY_HASH":
+			if len(args) < 2 {
+				fmt.Println("Expected file hash")
+				continue
+			}
+			fileHash := args[1]
+
+			// Retrieve file metadata from the database by file hash
+			file, err := database.FindFileMetadataByHash(db, fileHash)
+			if err != nil {
+				fmt.Printf("Error finding file by hash: %v\n", err)
+				continue
+			}
+			if file != nil {
+				fmt.Printf("File found:\nID: %d\nFile Size: %d\nExtension: %s\nFile Name: %s\nFile Price: %.2f\nFile Hash: %s\n",
+					file.ID, file.FileSize, file.Extension, file.FileName, file.FilePrice, file.FileHash)
+			} else {
+				fmt.Println("No file found with the given hash.")
+			}
+		case "DELETE_FILE_BY_HASH":
+			if len(args) < 2 {
+				fmt.Println("Expected file hash")
+				continue
+			}
+			fileHash := args[1]
+
+			// Delete file metadata from the database by file hash
+			database.DeleteFileMetadataByHash(db, fileHash)
+
+		case "ADD_FILE":
+			if len(args) < 2 {
+				fmt.Println("Expected file path")
+				continue
+			}
+			filePath := args[1]
+
+			// Get file information
+			fileInfo, err := os.Stat(filePath)
+			if err != nil {
+				fmt.Printf("Error accessing file: %v\n", err)
+				continue
+			}
+
+			// Generate a unique hash for the file content
+			fileHash, err := hashFileContent(filePath)
+			if err != nil {
+				fmt.Printf("Error generating file hash: %v\n", err)
+				continue
+			}
+
+			fileSize := fileInfo.Size()
+			fileName := fileInfo.Name()
+			filePrice := 9.99 // Sample price; you can adjust as needed
+
+			// Store file metadata in the database
+			fileID, err := database.AddFileMetadata(db, fileSize, filepath.Ext(filePath), fileName, filePrice, fileHash)
+			if err != nil {
+				fmt.Printf("Error adding file metadata: %v\n", err)
+				continue
+			}
+			fmt.Printf("File metadata added successfully with ID: %d\n", fileID)
+
+		case "DELETE_FILE":
+			if len(args) < 2 {
+				fmt.Println("Expected file ID")
+				continue
+			}
+			fileID, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil {
+				fmt.Println("Invalid file ID")
+				continue
+			}
+
+			// Delete file metadata from the database
+			err = database.DeleteFileMetadata(db, fileID)
+			if err != nil {
+				fmt.Printf("Error deleting file metadata with ID %d: %v\n", fileID, err)
+				continue
+			}
+			fmt.Printf("File metadata with ID %d deleted successfully.\n", fileID)
+
 		case "SEND_MESSAGE":
 			if len(args) < 3 {
 				fmt.Println("Expected target peer ID and message")

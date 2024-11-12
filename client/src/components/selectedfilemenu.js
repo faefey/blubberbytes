@@ -21,7 +21,6 @@ export default function SelectedFileMenu({addFile, removeFiles}) {
   );
 }
 
-
 function FileFilters({ filters, setFilters }) {
   function clearFilters() {
     setFilters({
@@ -32,6 +31,8 @@ function FileFilters({ filters, setFilters }) {
       price: '',
     });
   }
+
+
 
   return (
     <div id="filefilters">
@@ -105,6 +106,7 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
+function FileActions({ selectedFiles, addFile, removeFiles }) {
 function FileActions({ selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
 

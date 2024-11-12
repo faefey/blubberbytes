@@ -4,6 +4,7 @@ build/
 
 # Server Side
 walletaddress.txt
+data.db
 
 # Hidden Files
 .DS_Store

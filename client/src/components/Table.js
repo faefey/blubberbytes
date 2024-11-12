@@ -1,3 +1,4 @@
+// Table.js
 import React, { useState, useEffect } from "react";
 import "../stylesheets/table.css";
 import TableContext from './TableContext';
@@ -57,19 +58,19 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
   return (
     <tbody>
       {tableData.map((data) => {
-        const isSelected = selectedRows.includes(data.id);
+        const isSelected = selectedRows.some((file) => file.hash === data.hash);
         return (
           <tr
-            key={data.id}
+            key={data.hash}
             className={isSelected ? "selected" : ""}
-            onClick={() => onSelectRow(data.id)}
+            onClick={() => onSelectRow(data)}
           >
             <td onClick={(e) => e.stopPropagation()}>
               <img
                 src={isSelected ? checkboxOn : checkboxOff}
                 alt={isSelected ? "Row Selected" : "Row Unselected"}
                 className="custom-checkbox"
-                onClick={() => onSelectRow(data.id)}
+                onClick={() => onSelectRow(data)}
               />
             </td>
             {columns.map(({ accessor }) => {
@@ -83,10 +84,8 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
   );
 };
 
-
 // Main Table component
 const Table = ({ caption, data, columns, addFile, removeFiles }) => {
-  // Move filters and selectedFiles state here
   const [filters, setFilters] = useState({
     type: '',
     size: '',
@@ -98,9 +97,8 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [tableData, handleSorting] = useSortableTable(data, columns, filters);
-  // Add useEffect to clear selected files when data changes
+
   useEffect(() => {
-    // Clear selected files when the data changes 
     setSelectedFiles([]);
     setFilters({
       type: '',
@@ -109,14 +107,13 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
       downloads: '',
       price: '',
     });
-
   }, [data]);
 
-  const onSelectRow = (id) => {
+  const onSelectRow = (file) => {
     setSelectedFiles((prevSelectedFiles) =>
-      prevSelectedFiles.includes(id)
-        ? prevSelectedFiles.filter((rowId) => rowId !== id)
-        : [...prevSelectedFiles, id]
+      prevSelectedFiles.some((selectedFile) => selectedFile.hash === file.hash)
+        ? prevSelectedFiles.filter((selectedFile) => selectedFile.hash !== file.hash)
+        : [...prevSelectedFiles, file]
     );
   };
 
@@ -124,13 +121,12 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
     if (selectedFiles.length === tableData.length) {
       setSelectedFiles([]); // Deselect all
     } else {
-      setSelectedFiles(tableData.map((row) => row.id)); // Select all
+      setSelectedFiles([...tableData]); // Select all
     }
   };
 
   const selectAll = selectedFiles.length === tableData.length && tableData.length > 0;
 
-  // Define context value
   const contextValue = {
     filters,
     setFilters,
@@ -140,8 +136,7 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
 
   return (
     <TableContext.Provider value={contextValue}>
-      {}
-      <SelectedFileMenu addFile={addFile} removeFiles={removeFiles} data={data}/>
+      <SelectedFileMenu addFile={addFile} removeFiles={removeFiles} data={data} />
       <table className="table">
         <caption>{caption}</caption>
         <TableHead
@@ -168,7 +163,7 @@ function getDefaultSorting(defaultTableData, columns) {
   const sorted = [...defaultTableData].sort((a, b) => {
     const filterColumn = columns.filter((column) => column.sortbyOrder);
 
-    let { accessor = "id", sortbyOrder = "asc" } = Object.assign(
+    let { accessor = "FileName", sortbyOrder = "asc" } = Object.assign(
       {},
       ...filterColumn
     );

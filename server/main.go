@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start("simnet")
+	btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start("simnet", false)
 	if err != nil {
 		log.Println(err)
 		return
@@ -26,11 +26,20 @@ func main() {
 	btc.GetBlockCount(btcd)
 	btc.GetBalance(btcwallet)
 
-	btc.ShutdownClients(btcd, btcwallet)
+	btc.ShutdownClient(btcd)
+	btc.ShutdownClient(btcwallet)
 
-	btc.InterruptProcesses(btcdCmd, btcwalletCmd)
+	btc.InterruptCmd(btcwalletCmd)
+	btc.InterruptCmd(btcdCmd)
 
-	// p2p.P2P()
+	// db, err := database.SetupDatabase("./data.db")
+	// if err != nil {
+	// 	log.Println("Error setting up database:", err)
+	// 	return
+	// }
+	// defer db.Close()
+
+	// p2p.P2P(db)
 	// gateway()
 	// server()
 }

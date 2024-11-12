@@ -4,43 +4,51 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/btcsuite/btcd/btcutil"
 )
 
 // Start the btcd process.
 func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
-	if net == "mainnet" {
-		net = ""
-	} else {
-		net = "--" + net
+	netCmd := ""
+	if net != "mainnet" {
+		netCmd = "--" + net
 	}
 
-	var cmd *exec.Cmd
-	if miningaddr == "" {
-		cmd = exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", "-a", "130.245.173.221:8333", net)
-	} else {
-		cmd = exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", "-a", "130.245.173.221:8333", net, "--miningaddr="+miningaddr)
+	publicNode := "130.245.173.221:8333"
+	if net == "testnet" {
+		publicNode = "130.245.173.221:18333"
 	}
 
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
+	miningaddrCmd := ""
+	if miningaddr != "" {
+		miningaddrCmd = "--miningaddr=" + miningaddr
 	}
+
+	cmd := exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", netCmd, "-a", publicNode, miningaddrCmd)
+
+	cmd.SysProcAttr = sysProcAttr
 
 	cmdStdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
 	}
-	defer cmdStdout.Close()
 
 	scanner := bufio.NewScanner(cmdStdout)
+
+	defer func() {
+		go func() {
+			for scanner.Scan() {
+				if debug {
+					fmt.Println(scanner.Text())
+				}
+			}
+		}()
+	}()
 
 	err = cmd.Start()
 	if err != nil {
@@ -52,7 +60,7 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 			fmt.Println(scanner.Text())
 		}
 
-		if net == "" {
+		if net == "mainnet" {
 			if strings.Contains(scanner.Text(), "Syncing to block height") {
 				return cmd, nil
 			}
@@ -73,25 +81,31 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 		return nil, errors.New("the wallet does not exist, run ./btcwallet/btcwallet --create to initialize and create it")
 	}
 
-	if net == "mainnet" {
-		net = ""
-	} else {
-		net = "--" + net
+	netCmd := ""
+	if net != "mainnet" {
+		netCmd = "--" + net
 	}
 
-	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./conf/btcwallet.conf", net)
+	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./conf/btcwallet.conf", netCmd)
 
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
-	}
+	cmd.SysProcAttr = sysProcAttr
 
 	cmdStdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
 	}
-	defer cmdStdout.Close()
 
 	scanner := bufio.NewScanner(cmdStdout)
+
+	defer func() {
+		go func() {
+			for scanner.Scan() {
+				if debug {
+					fmt.Println(scanner.Text())
+				}
+			}
+		}()
+	}()
 
 	err = cmd.Start()
 	if err != nil {
@@ -117,45 +131,4 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 	}
 
 	return nil, errors.New("failed to start btcwallet")
-}
-
-// Interrupt exec.Cmd processes.
-func InterruptProcesses(cmds ...*exec.Cmd) {
-	for _, cmd := range cmds {
-		if runtime.GOOS == "windows" {
-			err := sendCtrlBreak(cmd.Process.Pid)
-			if err != nil {
-				log.Println(err)
-			}
-		} else {
-			err := cmd.Process.Signal(os.Interrupt)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-
-		err := cmd.Wait()
-		if err != nil {
-			log.Println(err)
-		}
-	}
-}
-
-func sendCtrlBreak(pid int) error {
-	d, err := syscall.LoadDLL("kernel32.dll")
-	if err != nil {
-		return err
-	}
-
-	p, err := d.FindProc("GenerateConsoleCtrlEvent")
-	if err != nil {
-		return err
-	}
-
-	r, _, err := p.Call(syscall.CTRL_BREAK_EVENT, uintptr(pid))
-	if r == 0 {
-		return err
-	}
-
-	return nil
 }

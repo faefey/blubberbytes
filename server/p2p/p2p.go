@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -14,7 +15,7 @@ var (
 	globalCtx           context.Context
 )
 
-func P2P() {
+func P2P(db *sql.DB) {
 	fmt.Print("Enter your student ID: ")
 	_, err := fmt.Scanln(&node_id)
 	if err != nil {
@@ -38,7 +39,7 @@ func P2P() {
 	connectToPeer(node, bootstrap_node_addr) // connect to bootstrap node
 	go handlePeerExchange(node)
 	go receiveDataFromPeer(node, "D:/blubberbytes/cse416-dht-go-main/") // Ensures a folder path is used
-	go handleInput(ctx, dht, node)
+	go handleInput(ctx, dht, node, db)                                  // Pass db connection to handleInput
 
 	defer node.Close()
 
