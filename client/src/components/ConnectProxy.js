@@ -17,37 +17,6 @@ export default function ConnectProxy() {
     const [selectedProxy, setSelectedProxy] = useState(null);
     const [displayedProxies, setDisplayedProxies] = useState([]);
 
-    useEffect(() => {
-        const savedChecked = JSON.parse(localStorage.getItem('proxySwitchChecked'));
-        const savedUsageRate = parseFloat(localStorage.getItem('usageRate')) || 0;
-        const savedMaxUsers = parseInt(localStorage.getItem('maxUsers'), 10) || 0;
-        const savedSelectedProxy = JSON.parse(localStorage.getItem('selectedProxy'));
-        const savedDisplayedProxies = JSON.parse(localStorage.getItem('displayedProxies')) || [];
-
-        if (savedChecked) {
-            setChecked(savedChecked);
-            if (savedUsageRate > 0) setUsageRate(savedUsageRate);
-            if (savedMaxUsers > 0) setMaxUsers(savedMaxUsers);
-        }
-        if (savedSelectedProxy) setSelectedProxy(savedSelectedProxy);
-        if (savedDisplayedProxies.length > 0) setDisplayedProxies(savedDisplayedProxies);
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('proxySwitchChecked', JSON.stringify(checked));
-        if (checked) {
-            localStorage.setItem('usageRate', usageRate);
-            localStorage.setItem('maxUsers', maxUsers);
-        }
-    }, [checked, usageRate, maxUsers]);
-
-    useEffect(() => {
-        localStorage.setItem('selectedProxy', JSON.stringify(selectedProxy));
-    }, [selectedProxy]);
-
-    useEffect(() => {
-        localStorage.setItem('displayedProxies', JSON.stringify(displayedProxies));
-    }, [displayedProxies]);
 
     const handleChange = (event) => {
         const newChecked = event.target.checked;
@@ -55,12 +24,8 @@ export default function ConnectProxy() {
 
         if (newChecked) {
             setSelectedProxy(null);
-            localStorage.removeItem('selectedProxy');
-        } else {
             setUsageRate(0);
             setMaxUsers(0);
-            localStorage.removeItem('usageRate');
-            localStorage.removeItem('maxUsers');
         }
     };
 
