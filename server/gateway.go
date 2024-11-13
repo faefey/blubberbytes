@@ -81,9 +81,9 @@ func gateway() {
 }
 
 func main() {
-	addFile("hash098765", "files/dog.jpg", time.Hour, 2) // 2 --> access limit 
+	addFile("hash098765", "files/dog.jpg", time.Hour, 2) // 2 --> access limit
 	fileMapping.RLock()
-	fmt.Println("File mapping after adding file:", fileMapping.m)
+	//fmt.Println("File mapping after adding file:", fileMapping.m)
 	fileMapping.RUnlock()
 
 	gateway()
