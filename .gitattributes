@@ -1,2 +1,2 @@
-server/btcd/* linguist-vendored
-server/btcwallet/* linguist-vendored
+server/btcd/** linguist-vendored
+server/btcwallet/** linguist-vendored
