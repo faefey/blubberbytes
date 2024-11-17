@@ -1,0 +1,72 @@
+[
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f1",
+    "FileName": "COD",
+    "FileSize": "2 GB",
+    "sizeInGB": 2,
+    "DateListed": "2023-10-01",
+    "type": "media",
+    "downloads": 150,
+    "price": 1.99
+  },
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f2",
+    "FileName": "Fortnite",
+    "FileSize": "5.5 GB",
+    "sizeInGB": 5.5,
+    "DateListed": "2023-09-20",
+    "type": "media",
+    "downloads": 2500,
+    "price": 2.99
+  },
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f3",
+    "FileName": "Battlefield",
+    "FileSize": "40 GB",
+    "sizeInGB": 40,
+    "DateListed": "2024-10-01",
+    "type": "document",
+    "downloads": 10,
+    "price": 100
+  },
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f4",
+    "FileName": "Minecraft",
+    "FileSize": "1.5 GB",
+    "sizeInGB": 1.5,
+    "DateListed": "2023-11-15",
+    "type": "media",
+    "downloads": 3000,
+    "price": 1.49
+  },
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f5",
+    "FileName": "PhotoshopCC",
+    "FileSize": "3.8 GB",
+    "sizeInGB": 3.8,
+    "DateListed": "2024-01-05",
+    "type": "media",
+    "downloads": 800,
+    "price": 19.99
+  },
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f6",
+    "FileName": "OfficeBundle",
+    "FileSize": "4.2 GB",
+    "sizeInGB": 4.2,
+    "DateListed": "2024-02-20",
+    "type": "document",
+    "downloads": 1200,
+    "price": 29.99
+  },
+  {
+    "hash": "77bb1a1edf01f6d2fdfc3903210f33d5ea8c1171dd3b2597fabdc36d694902f7",
+    "FileName": "GTA6",
+    "FileSize": "80 GB",
+    "sizeInGB": 80,
+    "DateListed": "2024-09-17",
+    "type": "media",
+    "downloads": 5000,
+    "price": 59.99
+  }
+]
