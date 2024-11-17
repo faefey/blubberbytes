@@ -150,11 +150,13 @@ function FileActions({ selectedFiles, addFile, removeFiles }) {
       <ConfirmationPopup trigger={<Delete className="icon"/>} 
                          action={() => deleteOnClick(removeFiles, selectedFiles)}
                          fileInfo={confirmationInfo}
-                         message={"Are you sure you want to delete " + endingWords}/> 
+                         message={"Are you sure you want to delete " + endingWords}
+                         actionMessage={"Delete"}/> 
       <ConfirmationPopup trigger={<Share className="icon"/>} 
                          action={() => shareOnClick(addFile, selectedFiles)}
                          fileInfo={confirmationInfo}
-                         message={"Are you sure you want to share " + endingWords}/>
+                         message={"Are you sure you want to share " + endingWords}
+                         actionMessage={"Share"}/>
 
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
           fileInfo={[selectedFiles[0]]}/>)}

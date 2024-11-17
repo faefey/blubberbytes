@@ -4,9 +4,13 @@ import Popup from 'reactjs-popup';
 import '../stylesheets/hostFile.css';
 import { ReactComponent as EcksButton } from '../icons/close.svg';
 
-export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryInfo=false}) {
+import Receipt from './Receipt.js';
+import { ProgressBar } from './ProgressComponents.js';
+
+export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryInfo=false, actionMessage=""}) {
 
     console.log(fileInfo);
+    console.log(monetaryInfo);
     const total_price = fileInfo.reduce((acc, file) => acc + Number(file.price), 0);
 
     return (<>{(<Popup trigger={trigger}
@@ -15,8 +19,7 @@ export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryI
                     {(close) => (
                     <>
                     <button className="ecks-button ecks-button-info" onClick= {() => close()}><EcksButton /></button>
-                    <h3 className="center-the-top">{message}</h3>
-                    <div className="table-containing">
+                    {/* {(!monetaryInfo) && (<div className="table-containing">
                         <table className = "peer-table">
                                 <tbody>
                                     <th className="teehpad teeh">Name</th>
@@ -29,23 +32,16 @@ export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryI
                                     })}
                                 </tbody>
                         </table>
-                    </div>
+                    </div>)} */}
+                    {!monetaryInfo && <Receipt balance={500} 
+                                               files={fileInfo} 
+                                               headerMessage={actionMessage + " Info"}
+                                               actionMessage={actionMessage}
+                                               monetaryInfo={false}/>}
                     {monetaryInfo && 
-                        (<div className="table-containing">
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <td className="confirmation-info-pad"><b>Total Price: </b></td>
-                                        <td>{total_price} OC</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="confirmation-info-pad"><b>Change in Wallet Balance: </b></td>
-                                        <td>500 to {500 - total_price} OC</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>)
+                        (<Receipt balance={500} files={fileInfo}/>)
                     }
+                    <h3 className="center-the-top">{message}</h3>
                     <div id = "confirmation-buttons">
                         <button className="increase-size host-button"
                                 onClick={() => {action(); close();}}>Yes</button>

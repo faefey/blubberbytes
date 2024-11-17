@@ -1,0 +1,39 @@
+.rece {
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    background-color: white;
+  }
+  
+  .rece-header {
+    text-align: center;
+    margin: 0 0 20px;
+    border-bottom: 2px solid black;
+    padding-bottom: 10px;
+  }
+  
+  .rece-sect {
+    margin-bottom: 15px;
+  }
+  
+  .rece-subheader {
+    margin-bottom: 10px;
+  }
+  
+  .rece-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+  }
+  
+  .rece-amount {
+    font-weight: bold;
+    color: darkslategray;
+  }
+  
+  .rece-divider {
+    border: none;
+    border-top: 1px dashed lightgray;
+    margin: 15px 0;
+  }

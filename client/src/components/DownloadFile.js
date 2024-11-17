@@ -3,9 +3,12 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
 import { Tooltip } from 'react-tooltip';
+import Receipt from './Receipt.js';
 
 import FakeFileData from '../data/fakeFileData.json';
 import samplePeers from '../data/samplePeers.json';
+
+import { ProgressBar } from './ProgressComponents.js';
 
 import { ReactComponent as EcksButton } from '../icons/close.svg';
 
@@ -31,6 +34,24 @@ export default function DownloadPopup({addFile}) {
 
     const [currEntries, setCurrEntries] = useState(0);
     const numRows = 5;
+
+    const [loading, setLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    const handleProgressSimulation = () => {
+        return new Promise((resolve) => {
+          const interval = setInterval(() => {
+            setProgress((prevProgress) => {
+              if (prevProgress >= 100) {
+                clearInterval(interval);
+                resolve();
+                return 100;
+              }
+              return prevProgress + 2;
+            });
+          }, 300); 
+        });
+      };
 
     useEffect(() => {
         if (inputRef.current) {
@@ -139,7 +160,7 @@ export default function DownloadPopup({addFile}) {
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
-                onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError(""); setShowButton(false);}}
+                onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError(""); setShowButton(false); setConfPage(false);}}
                 closeOnDocumentClick={false} modal>
             {(close) => (
             <div id="popup-border">
@@ -243,20 +264,21 @@ export default function DownloadPopup({addFile}) {
                     </div>
 
                 </form>) }
-                {confPage && (<div>
-                                  <h3>Confirm download?</h3>
-                                  <h3>Wallet change: {500} to {500 - peerData[1]} OC</h3>
-                                  <div> 
-                                    <button className="host-button"
-                                            onClick={() => { handleDownload(); setConfPage(false); close(); }}>
-                                                Yes
-                                    </button>
-                                    <button className="host-button"
-                                            onClick={() => { setConfPage(false);}}>
-                                                No
-                                    </button>
-                                  </div>
-                              </div>)}
+                {confPage && (<>
+                                <Receipt balance={500} files={[{price : peerData[1], FileName : fileData.name}]} newBalance={480}/>
+                                {!loading && <h3 style={{textAlign: "center"}}>Would you like to confirm this transaction?</h3>}
+                                {!loading && <div className="confirmation-buttons">
+                                <button className="host-button"
+                                      onClick={async () => { setLoading(true); await handleProgressSimulation(); handleDownload(); setLoading(false); setConfPage(false); close(); }}>
+                                            Yes
+                                </button>
+                                <button className="host-button"
+                                      onClick={() => { setConfPage(false);}}>
+                                            No
+                                </button>       
+                                </div>}
+                                {loading && <ProgressBar progress={progress} message={"Downloading files..."} />}                
+                              </>)}
             </div>
             )}
         </Popup>

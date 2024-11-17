@@ -25,5 +25,5 @@ func hashFile(filePath string) (string, error) {
 
 	hash := hex.EncodeToString(h.Sum(nil))
 	fmt.Println("Hash of file at " + filePath + ": " + hash)
-	return hex.EncodeToString(h.Sum(nil)), nil
+	return hash, nil
 }

@@ -9,6 +9,8 @@ import { ReactComponent as Cross } from '../icons/close.svg';
 import { ReactComponent as Check } from '../icons/check.svg';
 import { ReactComponent as Fresh } from '../icons/refresh.svg';
 
+import { LoadingSpinner } from "./ProgressComponents.js";
+
 function shuffleArray(array) {
     let shuffled = array.slice();
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -25,6 +27,9 @@ export default function ConnectProxy() {
     const [bandwidthData, setBandwidthData] = useState({ labels: [], datasets: [] });
     const [selectedProxy, setSelectedProxy] = useState(null);
     const [displayedProxies, setDisplayedProxies] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     useEffect(() => {
         const shuffledProxies = shuffleArray(fakeProxies).slice(0, 5);
@@ -49,10 +54,13 @@ export default function ConnectProxy() {
         }
     };
 
-    const handleRefresh = () => {
+    const handleRefresh = async () => {
+        setLoading(true);
+        await sleep(1000);
         const shuffledProxies = shuffleArray(fakeProxies.filter(proxy => proxy.id !== selectedProxy?.id));
         const updatedProxies = selectedProxy ? [selectedProxy, ...shuffledProxies.slice(0, 4)] : shuffledProxies.slice(0, 5);
         setDisplayedProxies(updatedProxies);
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -143,7 +151,8 @@ export default function ConnectProxy() {
                             <Fresh />
                         </IconButton>
                     </div>
-                    <ProxyTable proxies={displayedProxies} selectedProxy={selectedProxy} setSelectedProxy={setSelectedProxy} />
+                    {!loading && <ProxyTable proxies={displayedProxies} selectedProxy={selectedProxy} setSelectedProxy={setSelectedProxy} />}
+                    {loading && <LoadingSpinner message="Reloading Proxy Table..." />}
                 </div>
             )}
         </div>

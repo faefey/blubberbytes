@@ -80,7 +80,7 @@
     border-radius: 8px; 
     padding: 16px; 
     background-color: white; 
-    margin: 20px; 
+    margin: 20px auto; 
 }
 
 .file-info {
@@ -100,9 +100,22 @@
     color: #007bff; 
 }
 
+.file-price-t {
+    border-bottom: 1px solid #ccc; 
+    padding-top: 8px;
+    font-size: 1.2em; 
+    color: #007bff;   
+}
+
 .meta-elem {
     display: flex;
     justify-content: space-between;
+}
+
+.meta-elem-s {
+    padding-top: 15px;
+    display: flex;
+    justify-content: space-between;  
 }
 
 .peer-table {
@@ -224,4 +237,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.confirmation-buttons {
+    display: flex;
+    justify-content: space-evenly;
 }
