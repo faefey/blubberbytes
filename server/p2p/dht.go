@@ -208,11 +208,28 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
-		case "FIND_FILE_BY_HASH":
+		case "GENERATE_LINK":
 			if len(args) < 2 {
-				fmt.Println("Expected file hash")
+				fmt.Println("Usage: GENERATE_LINK <file_hash>")
 				continue
 			}
+
+			fileHash := args[1]
+
+			// Generate a shareable link for the file using the hash
+			link, err := GenerateLink(db, node, fileHash)
+			if err != nil {
+				fmt.Printf("Error generating link for file hash %s: %v\n", fileHash, err)
+				continue
+			}
+
+			fmt.Printf("Generated Link: %s\n", link)
+		case "FIND_FILE_BY_HASH":
+			if len(args) < 2 {
+				fmt.Println("Usage: FIND_FILE_BY_HASH <file_hash>")
+				continue
+			}
+
 			fileHash := args[1]
 
 			// Retrieve file metadata from the database by file hash
@@ -221,11 +238,28 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				fmt.Printf("Error finding file by hash: %v\n", err)
 				continue
 			}
-			if file != nil {
-				fmt.Printf("File found:\nID: %d\nFile Size: %d\nExtension: %s\nFile Name: %s\nFile Price: %.2f\nFile Hash: %s\n",
-					file.ID, file.FileSize, file.Extension, file.FileName, file.FilePrice, file.FileHash)
-			} else {
+
+			if file == nil {
 				fmt.Println("No file found with the given hash.")
+			} else {
+				fmt.Printf("File found:\n")
+				fmt.Printf("ID: %d\n", file.ID)
+				fmt.Printf("File Size: %d bytes\n", file.FileSize)
+				fmt.Printf("Extension: %s\n", file.Extension)
+				fmt.Printf("File Name: %s\n", file.FileName)
+				fmt.Printf("File Price: $%.2f\n", file.FilePrice)
+				fmt.Printf("File Hash: %s\n", file.FileHash)
+				fmt.Printf("File Path: %s\n", file.Path)
+
+				// Display associated passwords, if any
+				if len(file.Passwords) > 0 {
+					fmt.Println("Passwords:")
+					for i, password := range file.Passwords {
+						fmt.Printf("  %d. %s\n", i+1, password)
+					}
+				} else {
+					fmt.Println("No passwords associated with this file.")
+				}
 			}
 		case "DELETE_FILE_BY_HASH":
 			if len(args) < 2 {
@@ -263,7 +297,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			filePrice := 9.99 // Sample price; you can adjust as needed
 
 			// Store file metadata in the database
-			fileID, err := database.AddFileMetadata(db, fileSize, filepath.Ext(filePath), fileName, filePrice, fileHash)
+			fileID, err := database.AddFileMetadata(db, fileSize, filepath.Ext(filePath), fileName, filePrice, fileHash, filePath)
 			if err != nil {
 				fmt.Printf("Error adding file metadata: %v\n", err)
 				continue
@@ -297,7 +331,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			targetPeerID := args[1]
 			message := strings.Join(args[2:], " ")
 			fmt.Printf("Sending message to peer %s: %s\n", targetPeerID, message)
-			sendDataToPeer(node, targetPeerID, "", message)
+			sendDataToPeer(node, targetPeerID, "", message, "", "", "")
 
 		case "SEND_FILE":
 			if len(args) < 3 {
@@ -307,7 +341,18 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			targetPeerID := args[1]
 			filePath := args[2]
 			fmt.Printf("Sending file to peer %s: %s\n", targetPeerID, filePath)
-			sendDataToPeer(node, targetPeerID, filePath, "")
+			sendDataToPeer(node, targetPeerID, filePath, "", "", "", "")
+
+		case "SEND_REQUEST":
+			if len(args) < 4 {
+				fmt.Println("Expected target peer ID, file hash, and password")
+				continue
+			}
+			targetPeerID := args[1]
+			hash := args[2]
+			password := args[3]
+			fmt.Printf("Sending request to peer %s with hash: %s\n", targetPeerID, hash)
+			sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
 
 		case "GET":
 			if len(args) < 2 {

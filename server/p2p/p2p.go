@@ -38,8 +38,8 @@ func P2P(db *sql.DB) {
 	go refreshReservation(node, 10*time.Minute)
 	connectToPeer(node, bootstrap_node_addr) // connect to bootstrap node
 	go handlePeerExchange(node)
-	go receiveDataFromPeer(node, "D:/blubberbytes/cse416-dht-go-main/") // Ensures a folder path is used
-	go handleInput(ctx, dht, node, db)                                  // Pass db connection to handleInput
+	go receiveDataFromPeer(node, db, "D:/blubberbytes/cse416-dht-go-main/") // Ensures a folder path is used
+	go handleInput(ctx, dht, node, db)                                      // Pass db connection to handleInput
 
 	defer node.Close()
 
