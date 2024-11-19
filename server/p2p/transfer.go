@@ -4,17 +4,25 @@ import (
 	"bufio"
 	"context" // for context usage
 	"database/sql"
+	"fmt"
 	"io"
 	"log"           // for logging
 	"os"            // for file operations
 	"path/filepath" // for file path manipulations
 	"server/database"
 	"strings"
+	"sync"
+	"time"
 
 	// Add the necessary packages from libp2p, for example:
 	"github.com/libp2p/go-libp2p/core/host"    // for host.Host
 	"github.com/libp2p/go-libp2p/core/network" // for network.Stream
 	"github.com/libp2p/go-libp2p/core/peer"
+)
+
+var (
+	receivedFileData []byte
+	dataMutex        sync.Mutex
 )
 
 func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
@@ -33,6 +41,9 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			return
 		}
 		header = strings.TrimSpace(header)
+
+		// Log the header to help track the received type of data
+		log.Printf("Received header: %s", header)
 
 		if header == "file" {
 			// Handle file transfer
@@ -72,6 +83,19 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 		} else if header == "request" {
 			// Handle file request
 			handleFileRequest(s, db, node, s.Conn().RemotePeer().String())
+		} else if header == "requested_file" {
+			// Handle requested file transfer
+
+			log.Printf("Handling requested file transfer from peer %s", s.Conn().RemotePeer())
+
+			_, err := receiveRequestedFile(s) // Discard file content since you don't need it
+			if err != nil {
+				log.Printf("Error receiving requested file from peer: %v", err)
+				return
+			}
+
+			// Log the successful receipt of the file
+			log.Printf("Requested file received successfully from peer: %s", s.Conn().RemotePeer())
 		} else {
 			log.Printf("Unknown header type received: %s", header)
 		}
@@ -79,33 +103,40 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 }
 
 func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) {
+	log.Printf("Handling file request from peer %s", targetPeerID)
+
 	reader := bufio.NewReader(s)
 
 	// Read the file hash
 	fileHash, err := reader.ReadString('\n')
 	if err != nil {
-		log.Printf("Error reading file hash from stream: %v", err)
+		log.Printf("Error reading file hash from stream from peer %s: %v", targetPeerID, err)
 		sendDataToPeer(node, targetPeerID, "", "Failed to read file hash", "", "", "")
 		return
 	}
 	fileHash = strings.TrimSpace(fileHash)
+	log.Printf("Received file hash: %s", fileHash)
 
 	// Read the password
 	password, err := reader.ReadString('\n')
 	if err != nil {
-		log.Printf("Error reading password from stream: %v", err)
+		log.Printf("Error reading password from stream from peer %s: %v", targetPeerID, err)
 		sendDataToPeer(node, targetPeerID, "", "Failed to read password", "", "", "")
 		return
 	}
 	password = strings.TrimSpace(password)
+	log.Printf("Received password (masked): %s", password)
 
 	// Retrieve file metadata from the database
+	log.Printf("Searching for file metadata in the database for hash: %s", fileHash)
 	fileMetadata, err := database.FindFileMetadataByHash(db, fileHash)
 	if err != nil || fileMetadata == nil {
-		log.Printf("File not found or error occurred: %v", err)
+		log.Printf("File not found or error occurred while fetching file metadata for hash %s: %v", fileHash, err)
 		sendDataToPeer(node, targetPeerID, "", "File not found", "", "", "")
 		return
 	}
+
+	log.Printf("Found file metadata for file hash: %s", fileHash)
 
 	// Validate the password
 	isPasswordValid := false
@@ -116,30 +147,37 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 		}
 	}
 	if !isPasswordValid {
-		log.Printf("Invalid password for file hash: %s", fileHash)
+		log.Printf("Invalid password provided for file hash: %s", fileHash)
 		sendDataToPeer(node, targetPeerID, "", "Invalid password", "", "", "")
 		return
 	}
 
-	// Use sendDataToPeer to send the file back
-	sendDataToPeer(node, targetPeerID, fileMetadata.Path, "", "", "", "")
+	log.Printf("Password validated successfully for file hash: %s", fileHash)
+
+	// Use sendDataToPeer to send the requested file back
+	log.Printf("Sending requested file back to peer %s from path: %s", targetPeerID, fileMetadata.Path)
+	err = sendRequestedFileToPeer(node, targetPeerID, fileMetadata.Path)
+	if err != nil {
+		log.Printf("Error sending requested file to peer %s: %v", targetPeerID, err)
+		return
+	}
 
 	log.Printf("File sent successfully to peer %s: %s", targetPeerID, fileMetadata.Path)
 }
 
-func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request string, hash string, password string) {
+func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request string, hash string, password string) ([]byte, error) {
 	ctx := context.Background()
 	targetPeerIDParsed, err := peer.Decode(targetPeerID)
 	if err != nil {
 		log.Printf("Failed to decode target peer ID: %v", err)
-		return
+		return nil, err
 	}
 
 	// Open a stream to the target peer
 	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
 	if err != nil {
 		log.Printf("Failed to open stream to %s: %v", targetPeerIDParsed, err)
-		return
+		return nil, err
 	}
 	defer func() {
 		log.Printf("Closing stream to peer %s", targetPeerIDParsed)
@@ -153,24 +191,42 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 		_, err = s.Write([]byte("request\n"))
 		if err != nil {
 			log.Printf("Failed to send request header to peer %s: %v", targetPeerIDParsed, err)
-			return
+			return nil, err
 		}
 
 		// Write hash and password
 		_, err = s.Write([]byte(hash + "\n" + password + "\n"))
 		if err != nil {
 			log.Printf("Failed to send hash or password to peer %s: %v", targetPeerIDParsed, err)
-			return
+			return nil, err
 		}
 
 		log.Printf("File request sent successfully to peer %s", targetPeerIDParsed)
+
+		// Wait for half a second to let the file be received
+		time.Sleep(500 * time.Millisecond)
+
+		// Safely retrieve and clear the global variable
+		dataMutex.Lock() // Lock the mutex for safe access
+		if receivedFileData == nil {
+			log.Printf("No data received after waiting for the requested file")
+			dataMutex.Unlock() // Unlock before returning
+			return nil, nil
+		}
+
+		data := receivedFileData // Save the data to a local variable
+		receivedFileData = nil   // Clear the global variable
+		dataMutex.Unlock()       // Unlock the mutex
+		log.Printf("Returning data from global variable: %d bytes", len(data))
+
+		return data, nil
 	} else if message != "" {
 		// Send a message
 		log.Printf("Sending message to peer %s: %s", targetPeerIDParsed, message)
 		_, err = s.Write([]byte("message\n" + message + "\n"))
 		if err != nil {
 			log.Printf("Failed to send message to peer %s: %v", targetPeerIDParsed, err)
-			return
+			return nil, err
 		}
 		log.Printf("Message sent successfully to peer %s", targetPeerIDParsed)
 
@@ -180,7 +236,7 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 		file, err := os.Open(filePath)
 		if err != nil {
 			log.Printf("Failed to open file: %v", err)
-			return
+			return nil, err
 		}
 		defer file.Close()
 
@@ -188,24 +244,104 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 		_, err = s.Write([]byte("file\n"))
 		if err != nil {
 			log.Printf("Failed to send file header to peer %s: %v", targetPeerIDParsed, err)
-			return
+			return nil, err
 		}
 
 		// Write the file content
 		fileContent, err := io.ReadAll(file)
 		if err != nil {
 			log.Printf("Error reading file content: %v", err)
-			return
+			return nil, err
 		}
 
 		n, err := s.Write(fileContent)
 		if err != nil {
 			log.Printf("Failed to send file content to peer %s: %v", targetPeerIDParsed, err)
-			return
+			return nil, err
 		}
 
 		log.Printf("File sent successfully. Total bytes sent: %d to peer %s", n, targetPeerIDParsed)
 	} else {
 		log.Println("No file, message, or request provided to send.")
+		return nil, fmt.Errorf("no data to send")
 	}
+
+	return nil, nil
+}
+
+// Function to receive a requested file and store it in the global variable
+func receiveRequestedFile(s network.Stream) ([]byte, error) {
+	reader := bufio.NewReader(s)
+
+	// Directly read the file content
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		log.Printf("Error reading requested file data from stream: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Requested file received successfully with %d bytes", len(data))
+
+	// Store data in the global variable
+	dataMutex.Lock()
+	receivedFileData = data
+	dataMutex.Unlock()
+
+	return data, nil
+}
+
+func sendRequestedFileToPeer(node host.Host, targetPeerID, filePath string) error {
+	log.Printf("Preparing to send requested file to peer %s, file: %s", targetPeerID, filePath)
+
+	// Decode the target peer ID
+	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+	if err != nil {
+		log.Printf("Failed to decode target peer ID: %v", err)
+		return err
+	}
+	log.Printf("Successfully decoded target peer ID: %s", targetPeerID)
+
+	// Open a stream to the target peer first
+	ctx := context.Background()
+	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
+	if err != nil {
+		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	defer s.Close()
+	log.Printf("Stream opened successfully to peer %s", targetPeerID)
+
+	// Open the file to send its content
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Printf("Failed to open file %s: %v", filePath, err)
+		return err
+	}
+	defer file.Close()
+	log.Printf("File %s opened successfully", filePath)
+
+	// Write the "requested_file" header
+	_, err = s.Write([]byte("requested_file\n"))
+	if err != nil {
+		log.Printf("Failed to send requested_file header to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Sent 'requested_file' header to peer %s", targetPeerID)
+
+	// Write the file content
+	fileContent, err := io.ReadAll(file)
+	if err != nil {
+		log.Printf("Error reading file content: %v", err)
+		return err
+	}
+
+	n, err := s.Write(fileContent)
+	if err != nil {
+		log.Printf("Failed to send file content to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Sent %d bytes of requested file content to peer %s", n, targetPeerID)
+
+	log.Printf("Requested file sent successfully to peer %s: %s", targetPeerID, filePath)
+	return nil
 }
