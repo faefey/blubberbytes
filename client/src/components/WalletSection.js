@@ -192,7 +192,7 @@ const Wallet = () => {
         </div>
         <div className="label-value-pair">
           <label>Balance:</label>
-          <span>{transactions[0]?.['Running Balance'] || 0} OC</span>
+          <span>{transactions[0]?.['Running Balance'] || 0} ORCA</span>
         </div>
       </div>
       <div className="chart">

@@ -187,7 +187,7 @@ export default function DownloadPopup({addFile}) {
                                               data-tooltip-content={"The first 10 characters of the Peer Id. Hover over to see the full Peer Id."}
                                               data-tooltip-place="top"> ? </span></th>
                                     <th className="teeh">Location</th>
-                                    <th className="teeh">Price (OC)</th>
+                                    <th className="teeh">Price (ORCA)</th>
                                 </tr>
                                 {samplePeers.map((peer, index) => {
                                     if (index >= currEntries * numRows && index < (currEntries + 1) * numRows)
@@ -248,7 +248,7 @@ export default function DownloadPopup({addFile}) {
                             </div>
                             <div className="file-price meta-elem">
                                 <div>Price:</div>
-                                <div><strong>OC{peerData[1]}</strong></div>
+                                <div><strong>ORCA{peerData[1]}</strong></div>
                             </div>
                         </div>)}</>}
 

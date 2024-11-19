@@ -168,7 +168,7 @@ function ProxyTable({ proxies, selectedProxy, setSelectedProxy }) {
                     <th>IP Address</th>
                     <th>Location</th>
                     <th>Latency</th>
-                    <th>Price (OC/MB)</th>
+                    <th>Price (ORCA/MB)</th>
                     <th>Connect</th>
                 </tr>
             </thead>
@@ -229,7 +229,7 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
                                 onChange={handleChange}
                             />
                         </span>
-                        {unit && <span className="unit">OC/MB</span>}
+                        {unit && <span className="unit">ORCA/MB</span>}
                     </div>
                     {!isValid ? (
                         <div className="error-message">

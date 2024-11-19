@@ -11,7 +11,7 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
       {monetaryInfo && (<><div className="rece-sect">
         <div className="rece-row">
           <span>Total Wallet Balance:</span>
-          <span className="rece-amount">OC {balance.toFixed(2)}</span>
+          <span className="rece-amount">ORCA {balance.toFixed(2)}</span>
         </div>
       </div>
 
@@ -23,7 +23,7 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
         {files.map((file, index) => (
             <div key={index} className="rece-row">
                 <span>{file.FileName}</span>
-                <span className="rece-amount">OC {file.price.toFixed(2)}</span>
+                <span className="rece-amount">ORCA {file.price.toFixed(2)}</span>
             </div>
             ))}
       </div>
@@ -33,7 +33,7 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
       <div className="rece-sect">
         <div className="rece-row">
           <span>New Wallet Balance:</span>
-          <span className="rece-amount">OC {newBalance.toFixed(2)}</span>
+          <span className="rece-amount">ORCA {newBalance.toFixed(2)}</span>
         </div>
       </div></>)}
     </div>

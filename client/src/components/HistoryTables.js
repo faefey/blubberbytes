@@ -87,7 +87,7 @@ const Histories = () => {
   const columns = {
     transaction: [
       { header: 'Date', field: 'Date', render: (value) => format(new Date(value), 'MM/dd/yyyy'), width: '15%' },
-      { header: 'Amount (OC)', field: 'Amount', width: '10%' },
+      { header: 'Amount (ORCA)', field: 'Amount', width: '10%' },
       { header: "2nd Party's Wallet ID", field: '2nd Party Wallet ID', width: '75%' },
     ],
     upload: [

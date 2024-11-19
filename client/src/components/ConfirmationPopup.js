@@ -23,7 +23,7 @@ export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryI
                         <table className = "peer-table">
                                 <tbody>
                                     <th className="teehpad teeh">Name</th>
-                                    <th className="teehpad teeh">Price (OC)</th>
+                                    <th className="teehpad teeh">Price (ORCA)</th>
                                     {fileInfo.map((file) => {
                                         return (<tr className = "body-row" key={file.id}>
                                                     <td className="teedee center-the-top">{file.FileName}</td>
