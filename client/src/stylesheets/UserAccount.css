@@ -120,6 +120,7 @@ span {
   width: 100%;
   max-height: calc(100vh - 225px);
   overflow-y: auto;
+  background-color: var(--color-white);
   border-left: 1px solid var(--color-light-gray);
   border-top: 1px solid var(--color-light-gray);
   border-right: 1px solid var(--color-light-gray);
@@ -243,4 +244,23 @@ span {
 .submission-buttons {
   display: flex;
   justify-content: space-between;
+}
+
+.truncated-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.truncated-cell:hover {
+  overflow: auto;
+  white-space: normal;
+  position: relative;
+  z-index: 10;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 5px;
 }

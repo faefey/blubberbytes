@@ -1,65 +1,1402 @@
 [
     {
-        "id": 1,
-        "proxyID": "proxy001",
-        "connectionType": "Outgoing",
-        "targetProxyID": "proxyA123",
-        "connectionDate": "2024-08-15",
-        "status": "Successful",
-        "responseTime": "350 ms"
+        "Connection": {
+            "Start": "2024-09-04 13:21:18",
+            "End": "2024-09-04 19:37:09",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "TIhP1uEz4jaVd0Gj60nA3aN30xaaBHbgC",
+            "Usage Rate": 4.12,
+            "Total Cost": 107.53
+        }
     },
     {
-        "id": 2,
-        "proxyID": "proxy002",
-        "connectionType": "Incoming",
-        "sourceProxyID": "proxyB456",
-        "connectionDate": "2024-09-10",
-        "status": "Failed",
-        "responseTime": "500 ms"
+        "Connection": {
+            "Start": "2024-08-16 08:11:36",
+            "End": "2024-08-16 11:55:55",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "A8q7BOv0fYe1m9Z14I3Vir629U3Sn2Cz7",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.76,
+            "Total Cost": -89.73
+        }
     },
     {
-        "id": 3,
-        "proxyID": "proxy003",
-        "connectionType": "Outgoing",
-        "targetProxyID": "proxyC789",
-        "connectionDate": "2024-10-05",
-        "status": "Successful",
-        "responseTime": "300 ms"
+        "Connection": {
+            "Start": "2024-09-10 11:35:55",
+            "End": "2024-09-10 15:05:03",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "83ihLEZd969B3c8Q7kdo13G3U7xrBZ66y",
+            "Usage Rate": 3.85,
+            "Total Cost": 55.91
+        }
     },
     {
-        "id": 4,
-        "proxyID": "proxy004",
-        "connectionType": "Incoming",
-        "sourceProxyID": "proxyD012",
-        "connectionDate": "2024-07-30",
-        "status": "Pending",
-        "responseTime": "N/A"
+        "Connection": {
+            "Start": "2024-08-18 12:18:42",
+            "End": "2024-08-18 17:44:47",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "QKdV0rgY2IpChOdo3v0R6bF59gRj7v0p6",
+            "Usage Rate": 1.76,
+            "Total Cost": 39.85
+        }
     },
     {
-        "id": 5,
-        "proxyID": "proxy005",
-        "connectionType": "Outgoing",
-        "targetProxyID": "proxyE345",
-        "connectionDate": "2024-09-25",
-        "status": "Successful",
-        "responseTime": "400 ms"
+        "Connection": {
+            "Start": "2024-09-12 09:39:10",
+            "End": "2024-09-12 14:27:22",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "4Uf0IZL5q4DKIt68JXs9zVQ50ME6iCxzk",
+            "Usage Rate": 9.65,
+            "Total Cost": 193.13
+        }
     },
     {
-        "id": 6,
-        "proxyID": "proxy006",
-        "connectionType": "Incoming",
-        "sourceProxyID": "proxyF678",
-        "connectionDate": "2024-10-12",
-        "status": "Failed",
-        "responseTime": "600 ms"
+        "Connection": {
+            "Start": "2024-08-30 16:58:01",
+            "End": "2024-08-30 17:58:43",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "3428q4Wr4qAjbo3Ym1QxR9c3Z8CAeOv8D",
+            "Usage Rate": 0.40,
+            "Total Cost": 1.69
+        }
     },
     {
-        "id": 7,
-        "proxyID": "proxy007",
-        "connectionType": "Outgoing",
-        "targetProxyID": "proxyG901",
-        "connectionDate": "2024-08-22",
-        "status": "Successful",
-        "responseTime": "450 ms"
+        "Connection": {
+            "Start": "2024-08-30 07:16:40",
+            "End": "2024-08-30 08:21:11",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "6x54wdAU1370UliB7x1r1w3t2xSp17p5O",
+            "Usage Rate": 1.53,
+            "Total Cost": 6.85
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-20 18:29:38",
+            "End": "2024-08-20 23:45:14",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "wjJFZyp02UFnhfjLZUElG2Gyq29g4Ow8F",
+            "Source Proxy ID": null,
+            "Usage Rate": 2.35,
+            "Total Cost": -51.5
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-24 14:40:37",
+            "End": "2024-08-24 21:23:56",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "chwrgWx5I6PjMkeFXGcikvRk9Tbr7Z06C",
+            "Source Proxy ID": null,
+            "Usage Rate": 7.03,
+            "Total Cost": -196.9
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-19 12:51:15",
+            "End": "2024-08-19 16:34:41",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "d8LOgu525d5ClyH0gAkKE3O1Cczm3e098",
+            "Usage Rate": 4.64,
+            "Total Cost": 72
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-07 12:00:59",
+            "End": "2024-09-07 15:23:08",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "I7a6xP83q4oL5GehhppAldLb13r01HYbS",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.48,
+            "Total Cost": -62.89
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-06 15:04:34",
+            "End": "2024-09-06 19:18:21",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "9rVGk3fup3PfA0o22p2d6Um47cY5dK8BU",
+            "Usage Rate": 6.05,
+            "Total Cost": 106.62
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-12 06:49:12",
+            "End": "2024-09-12 09:27:13",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "KMqdWL4h56sGgYFa01Mb31OiU5KtBfxYM",
+            "Usage Rate": 1.01,
+            "Total Cost": 11.08
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-01 20:46:30",
+            "End": "2024-09-02 03:51:27",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "RAuMl39jB2DPs4t1u64Z8TrumaCDkB7qc",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.68,
+            "Total Cost": -167.62
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-10 05:20:48",
+            "End": "2024-09-10 10:47:02",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "cjwGV0ZAVK4O7H65o9w2i1wNoG65kSnJJ",
+            "Usage Rate": 5.85,
+            "Total Cost": 132.53
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-10 06:50:35",
+            "End": "2024-09-10 08:09:00",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "I0yIHpZERVWbrujB54mEc3qraxWk5Ix23",
+            "Usage Rate": 2.60,
+            "Total Cost": 14.16
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-29 16:41:53",
+            "End": "2024-08-29 23:36:28",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "3Gp3YV6KYwG0z4nq2y1f69d5ZMpo042uS",
+            "Usage Rate": 2.08,
+            "Total Cost": 59.88
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-02 23:24:44",
+            "End": "2024-09-03 01:54:14",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "1YEt5Pqc98SIDzP6d2Pi922WnYZrIkm8Y",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.34,
+            "Total Cost": -45.06
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-17 13:48:51",
+            "End": "2024-08-17 18:42:32",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "3nD25qn2SEGpy80iT5oQv32bK8pKT5Ffy",
+            "Source Proxy ID": null,
+            "Usage Rate": 1.36,
+            "Total Cost": -27.74
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-26 18:58:23",
+            "End": "2024-08-27 01:45:08",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "hQF7QdbymYZ792XU9e95jLUp43B7A2qJA",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.52,
+            "Total Cost": -127.67
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-28 19:39:06",
+            "End": "2024-08-29 01:57:23",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "itb7E4xe6V9csnRoL9Av43C2xBhg9kNuF",
+            "Usage Rate": 7.77,
+            "Total Cost": 204.12
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-13 17:03:21",
+            "End": "2024-09-13 23:19:49",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "9yg5ZqY9RaCDw8z9MCw2sl2a581z5Os0D",
+            "Source Proxy ID": null,
+            "Usage Rate": 6.15,
+            "Total Cost": -160.78
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-08 17:44:35",
+            "End": "2024-09-08 21:50:12",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "cSiJTmm17kM38D7CHaM5gK5K52coN3obh",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.17,
+            "Total Cost": -71.13
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-30 02:09:10",
+            "End": "2024-08-30 04:51:14",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "jfei036R08656728di6RuffJ9ldAhFoOt",
+            "Usage Rate": 4.81,
+            "Total Cost": 54.13
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-30 03:59:12",
+            "End": "2024-08-30 09:23:43",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "KpG6wNrhsDZkAaRSvRMZmmZqg64LxY125",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.98,
+            "Total Cost": -112.23
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-31 06:34:43",
+            "End": "2024-08-31 09:00:12",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "9jTJh90adN9M6822xxYx5jEwpMNvgGVtS",
+            "Source Proxy ID": null,
+            "Usage Rate": 6.73,
+            "Total Cost": -67.99
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-11 16:54:32",
+            "End": "2024-09-11 22:28:19",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "50x70g33fHABwJ3E279wPz0A44k1975tW",
+            "Source Proxy ID": null,
+            "Usage Rate": 1.73,
+            "Total Cost": -40.1
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-24 02:45:07",
+            "End": "2024-08-24 06:49:36",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "tgtBm7dY202uQq0344071qNV9gqHbI71c",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.24,
+            "Total Cost": -71.99
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-22 14:47:32",
+            "End": "2024-08-22 21:37:40",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "b3GmmT86zvFdS472237Sk27TZe8Ban7jL",
+            "Usage Rate": 8.32,
+            "Total Cost": 236.97
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-24 16:53:25",
+            "End": "2024-08-24 19:45:12",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "lDlTJ4M2UpA66ccJebe7o9a6v1rO9a19g",
+            "Usage Rate": 5.92,
+            "Total Cost": 70.62
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-16 09:57:50",
+            "End": "2024-08-16 13:41:59",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "dq0XOnjg3m10U17n04p8Xmo8bUM307Juo",
+            "Source Proxy ID": null,
+            "Usage Rate": 1.84,
+            "Total Cost": -28.64
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-04 06:23:40",
+            "End": "2024-09-04 10:45:13",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "7xCv27RcInjIta5W3zDY5669RAH9hDEhv",
+            "Usage Rate": 1.07,
+            "Total Cost": 19.43
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-05 03:10:54",
+            "End": "2024-09-05 08:29:27",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "lBHF951V66MZadK52m96K62Abon4FvRVd",
+            "Usage Rate": 6.96,
+            "Total Cost": 153.97
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-05 12:12:54",
+            "End": "2024-09-05 16:07:53",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "5U00w89V627iNCv3epwGFtUi8C7W1gC02",
+            "Usage Rate": 8.57,
+            "Total Cost": 139.85
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-04 08:27:24",
+            "End": "2024-09-04 13:42:06",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "GHu0v89nN1xoucbh7CmlC4P33kBSKxSbg",
+            "Usage Rate": 0.28,
+            "Total Cost": 6.12
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-09 21:16:28",
+            "End": "2024-09-09 23:26:25",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "20nJ2W7BQOsc6s1A97cl0JVyMSKO8Ppgw",
+            "Usage Rate": 3.57,
+            "Total Cost": 32.22
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-31 12:48:08",
+            "End": "2024-08-31 19:51:21",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "JZb6d2B84503cRSpoxQj94929P4410bN2",
+            "Usage Rate": 7.84,
+            "Total Cost": 230.42
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-14 04:31:55",
+            "End": "2024-09-14 11:31:49",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "OpFda6aC6JzLJ3WSAcuis3lv0t6Ueyr1J",
+            "Usage Rate": 3.64,
+            "Total Cost": 106.14
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-11 20:17:26",
+            "End": "2024-09-12 01:37:00",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "8z6uuSluDXgE3z1m4DN572gWaidRQeC2v",
+            "Source Proxy ID": null,
+            "Usage Rate": 0.27,
+            "Total Cost": -5.99
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-30 13:33:39",
+            "End": "2024-08-30 15:47:20",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "rtJEG3819MkQJ7Z3BtQy0miM679P0e0Xk",
+            "Usage Rate": 8.61,
+            "Total Cost": 79.93
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-19 17:27:17",
+            "End": "2024-08-19 20:36:32",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "FvXz22eW450eCZOc4UjcL13i96H5ApGIh",
+            "Source Proxy ID": null,
+            "Usage Rate": 6.35,
+            "Total Cost": -83.45
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-27 14:31:38",
+            "End": "2024-08-27 16:14:08",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "Y138yW4hVu4G819t67AR9fNz6QhP2947T",
+            "Usage Rate": 7.56,
+            "Total Cost": 53.81
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-05 15:27:57",
+            "End": "2024-09-05 20:34:32",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "B0loH2n6BeJ512UrW992sxS73lEHM9i9H",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.92,
+            "Total Cost": -104.75
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-08 09:13:52",
+            "End": "2024-09-08 13:13:48",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "f794AIG3x2qeGf5f8X6ezDkyN14Jj163E",
+            "Source Proxy ID": null,
+            "Usage Rate": 7.37,
+            "Total Cost": -122.8
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-08 01:40:03",
+            "End": "2024-09-08 05:27:30",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "NfAx225SV64owoY7JJ60L9x8h64AIrQBG",
+            "Usage Rate": 6.24,
+            "Total Cost": 98.56
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-09 10:23:54",
+            "End": "2024-09-09 13:13:27",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "1U1kK8ITzEZOF4PWCY61Pw3qpcO5WaUpX",
+            "Source Proxy ID": null,
+            "Usage Rate": 2.18,
+            "Total Cost": -25.67
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-04 12:56:49",
+            "End": "2024-09-04 16:47:15",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "kbqv4Y7DKXzCxFuP485175QQ814J52C57",
+            "Usage Rate": 7.41,
+            "Total Cost": 118.58
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-25 10:40:52",
+            "End": "2024-08-25 17:09:09",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "421Kpna3Ai4DTg8Etrwhpqm5C3GA2Z510",
+            "Source Proxy ID": null,
+            "Usage Rate": 2.88,
+            "Total Cost": -77.66
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-22 18:04:09",
+            "End": "2024-08-22 20:34:53",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "LV1b923zmb245lxX01dQm97KM29i4n9pM",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.58,
+            "Total Cost": -100.28
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-09 03:51:13",
+            "End": "2024-09-09 07:46:27",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "JFgvqpqT4m6Z1HxV4Zq0T8N3F5I9AlY6U",
+            "Usage Rate": 2.41,
+            "Total Cost": 39.37
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-13 01:30:06",
+            "End": "2024-09-13 07:48:32",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "YTmbA742ZmqRmoKJveM9hENbF63J7tk3W",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.87,
+            "Total Cost": -259.38
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-01 06:27:12",
+            "End": "2024-09-01 12:31:30",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "9oxut5z2aao9cmb216qUsb52Ci1eyzPOV",
+            "Usage Rate": 2.56,
+            "Total Cost": 64.76
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-17 09:24:13",
+            "End": "2024-08-17 13:21:34",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "5KuqR36hh6Ih4n9nx3uhxLyXu5L7cp716",
+            "Source Proxy ID": null,
+            "Usage Rate": 3.98,
+            "Total Cost": -65.6
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-16 08:39:20",
+            "End": "2024-08-16 14:12:22",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "xcdYRo6tDGC17OylNtuzAj9Jg9h7nL17C",
+            "Source Proxy ID": null,
+            "Usage Rate": 3.85,
+            "Total Cost": -89.04
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-30 13:21:10",
+            "End": "2024-08-30 20:22:11",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "xo240s5476P6Z88T6flsz82c6CM09YjKY",
+            "Usage Rate": 1.59,
+            "Total Cost": 46.49
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-15 22:25:40",
+            "End": "2024-08-16 01:08:51",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "7MlgWPXDtDhCJ1KUvly4hm473A09r0iPN",
+            "Source Proxy ID": null,
+            "Usage Rate": 3.00,
+            "Total Cost": -34
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-28 05:01:49",
+            "End": "2024-08-28 08:42:24",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "F1A9usb60wWJT8A44bJCnM2n02KZwGNo5",
+            "Source Proxy ID": null,
+            "Usage Rate": 8.77,
+            "Total Cost": -134.34
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-17 05:02:44",
+            "End": "2024-08-17 10:19:07",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "S8F3C131hg0d0JeD63HR67tyoY02YnF7f",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.82,
+            "Total Cost": -127.87
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-04 03:29:14",
+            "End": "2024-09-04 06:23:31",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "V9G6T262ee4ORaE6qHIE2jtlU2279p4Vk",
+            "Usage Rate": 8.70,
+            "Total Cost": 105.3
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-12 00:49:05",
+            "End": "2024-09-12 07:13:31",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "658XkHqFpu31awR050W07mt7XfEH0GybM",
+            "Source Proxy ID": null,
+            "Usage Rate": 3.58,
+            "Total Cost": -95.57
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-30 11:45:16",
+            "End": "2024-08-30 13:44:38",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "C2QjSGmT8WEl0Rp5Zu7MA7c9RKiQV5v03",
+            "Source Proxy ID": null,
+            "Usage Rate": 3.93,
+            "Total Cost": -32.58
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-10 11:23:51",
+            "End": "2024-09-10 18:20:13",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "RA3KD7xx6m64v61Z22rVWZwL1J9E52chO",
+            "Usage Rate": 1.40,
+            "Total Cost": 40.48
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-03 09:28:10",
+            "End": "2024-09-03 17:04:26",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "91b2LBe6hz1p7r697GYllHYxNztZx8F94",
+            "Source Proxy ID": null,
+            "Usage Rate": 2.73,
+            "Total Cost": -86.5
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-01 19:19:09",
+            "End": "2024-09-01 23:12:32",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "78uJbUBw5BSWBI958lxr1F7GtlhZ1157p",
+            "Source Proxy ID": null,
+            "Usage Rate": 0.11,
+            "Total Cost": -1.78
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-07 04:49:50",
+            "End": "2024-09-07 10:49:36",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "8g2hfid9ng8Po3VjiqnRB8C7Godtv5S48",
+            "Usage Rate": 5.71,
+            "Total Cost": 142.66
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-06 10:26:38",
+            "End": "2024-09-06 14:26:25",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "70W9bYe9467f2Mk81PDeDs4Ro2T0OPZC0",
+            "Source Proxy ID": null,
+            "Usage Rate": 1.55,
+            "Total Cost": -25.81
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-31 16:35:44",
+            "End": "2024-08-31 20:10:20",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "443W4nKVzRuWjtQE0mSCcE34ahEI931VF",
+            "Usage Rate": 2.93,
+            "Total Cost": 43.67
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-26 00:44:48",
+            "End": "2024-08-26 04:05:15",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "QZErC6nYh4BlcG0w17FXRv0n20Cr6N36R",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.50,
+            "Total Cost": -132.24
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-15 22:58:59",
+            "End": "2024-08-16 06:10:37",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "l046Nc9lU1Ihd1WRO0pXR3J31yN2P4xFE",
+            "Usage Rate": 0.49,
+            "Total Cost": 14.69
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-06 11:25:01",
+            "End": "2024-09-06 18:11:05",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "g8u5hXb7Tv5Dz86Taj9Jg060rvuKXSQFr",
+            "Source Proxy ID": null,
+            "Usage Rate": 7.20,
+            "Total Cost": -203.03
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-10 15:14:27",
+            "End": "2024-09-10 16:51:34",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "tKtOhTW4e593n3HotV97X4F168xN18652",
+            "Source Proxy ID": null,
+            "Usage Rate": 7.68,
+            "Total Cost": -51.8
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-27 13:30:55",
+            "End": "2024-08-27 14:34:53",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "k8o8vL4ZpZTUMa7r54LZfQ92XC58H065c",
+            "Usage Rate": 1.92,
+            "Total Cost": 8.53
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-13 17:17:16",
+            "End": "2024-09-13 22:37:22",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "X33AesxW13Hfw58YQiZClteWsbGQFnwT8",
+            "Source Proxy ID": null,
+            "Usage Rate": 4.40,
+            "Total Cost": -97.81
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-17 07:26:53",
+            "End": "2024-08-17 11:23:06",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "9DKGJ6Q1rF66qI3SW63HP2j48Jx873wBY",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.51,
+            "Total Cost": -156
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-03 23:14:13",
+            "End": "2024-09-04 02:47:11",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "2p913FL15iT6v9E0vSeSyI80Dloatkqb9",
+            "Usage Rate": 3.84,
+            "Total Cost": 56.79
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-04 13:17:51",
+            "End": "2024-09-04 20:55:19",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "wxITHiov93v8mB5AN2wu29570l0L3q09N",
+            "Source Proxy ID": null,
+            "Usage Rate": 7.34,
+            "Total Cost": -233.18
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-29 21:45:28",
+            "End": "2024-08-30 03:12:10",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "XFH7KwLEiX3Ag5NT171Kzgkj7j23143HW",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.25,
+            "Total Cost": -209.86
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-12 01:34:20",
+            "End": "2024-09-12 04:16:43",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "tcrAB7xlPT27F8OLeByigEgz958E7hxO7",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.70,
+            "Total Cost": -64.28
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-08 20:07:38",
+            "End": "2024-09-09 01:13:39",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "3f4qW23GXIY2834tUXG5u5bjbi9jqfKbY",
+            "Usage Rate": 8.63,
+            "Total Cost": 183.4
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-12 18:12:26",
+            "End": "2024-09-12 20:09:39",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "O1NyQU55D66hVgEIz02CHOL49K965x6t5",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.06,
+            "Total Cost": -73.75
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-09 19:28:41",
+            "End": "2024-09-09 20:38:11",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "i3dMiCoI5hB0rF33qR6COcClqHcA0G2UF",
+            "Usage Rate": 6.94,
+            "Total Cost": 33.5
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-11 16:40:40",
+            "End": "2024-09-11 20:01:47",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "0w7VZfEmdL0XB20IZtTS72w18l2FpbXP4",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.00,
+            "Total Cost": -69.83
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-17 10:08:26",
+            "End": "2024-08-17 13:26:20",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "SHkr1fZHaOkatVQkq59gEkGe7S3F1PX18",
+            "Source Proxy ID": null,
+            "Usage Rate": 7.93,
+            "Total Cost": -108.98
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-27 11:51:09",
+            "End": "2024-08-27 19:12:07",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "Knmr75OKH60Q531t3k0lAQrXbAxkT2jAd",
+            "Usage Rate": 8.49,
+            "Total Cost": 259.99
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-15 12:07:53",
+            "End": "2024-08-15 16:54:48",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "95AAq1Cp4LR4k7z86z1v8a9vZjAD15aKt",
+            "Usage Rate": 3.38,
+            "Total Cost": 67.35
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-30 10:44:48",
+            "End": "2024-08-30 17:53:48",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "gr4Pt9fjwxKFOx6qmrCoi8qD5t0r1L7c2",
+            "Usage Rate": 6.79,
+            "Total Cost": 202.29
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-19 04:43:56",
+            "End": "2024-08-19 06:36:34",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "NzA9PUSAoS657ZX6ZfiaOkaQ844KUd50u",
+            "Usage Rate": 6.30,
+            "Total Cost": 49.28
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-06 02:36:00",
+            "End": "2024-09-06 04:59:38",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "jhdtK1r57IbAVHFc64JoN4PPd5TCSV8hl",
+            "Usage Rate": 1.34,
+            "Total Cost": 13.37
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-24 14:45:41",
+            "End": "2024-08-24 20:30:42",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "uCKY5R3e95NaEopvp8gH02w9Ki44M50jJ",
+            "Source Proxy ID": null,
+            "Usage Rate": 9.91,
+            "Total Cost": -237.44
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-07 08:43:50",
+            "End": "2024-09-07 10:37:33",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "kBHn1M456u4fxNt8cX05v6CQni1t1K8x2",
+            "Usage Rate": 1.12,
+            "Total Cost": 8.84
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-15 09:31:41",
+            "End": "2024-08-15 15:01:43",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "0wcyq9F9UB2qQ94so9s0DP2556x74s5yp",
+            "Source Proxy ID": null,
+            "Usage Rate": 8.84,
+            "Total Cost": -202.6
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-17 01:23:46",
+            "End": "2024-08-17 02:34:45",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "C0KmaCW515XSkHaY0FMDMx7V9g34YB3wU",
+            "Usage Rate": 7.59,
+            "Total Cost": 37.41
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-08 15:36:50",
+            "End": "2024-09-08 16:59:20",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "47R6W9rY4FXgGkczfzmqts9L879HquL58",
+            "Usage Rate": 4.97,
+            "Total Cost": 28.47
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-29 00:24:09",
+            "End": "2024-08-29 02:53:20",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "Tw6jvlAZT98LA6do6xaL117c8kuJGKow7",
+            "Usage Rate": 9.87,
+            "Total Cost": 102.25
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-04 10:31:30",
+            "End": "2024-09-04 16:21:25",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "dW4c10kGXf455SWuGWpX1hOTaU7UZ79JT",
+            "Usage Rate": 2.00,
+            "Total Cost": 48.6
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-22 22:29:20",
+            "End": "2024-08-22 23:56:13",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "DwWI506d1v0iW21D5jQ3OXS2YznvKETIl",
+            "Usage Rate": 4.70,
+            "Total Cost": 28.36
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-23 18:54:08",
+            "End": "2024-08-23 19:57:39",
+            "Type": "Incoming",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "2B97j3tPF3s16v5rW7oZ1eJkK4hYCcBY6",
+            "Usage Rate": 1.04,
+            "Total Cost": 4.59
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-20 23:31:57",
+            "End": "2024-08-21 06:49:44",
+            "Type": "Outgoing",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "4O1kuFQ5Gn3Fe9B1Gk1z3OeL65L7fNi7r",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.26,
+            "Total Cost": -159.91
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-09-07 08:22:56",
+            "End": "2024-09-07 10:07:22",
+            "Type": "Incoming",
+            "Status": "Successful"
+        },
+        "Proxy": {
+            "Target Proxy ID": null,
+            "Source Proxy ID": "310lntSG530iB386E1360OxUdwFSy2ynv",
+            "Usage Rate": 1.16,
+            "Total Cost": 8.41
+        }
+    },
+    {
+        "Connection": {
+            "Start": "2024-08-21 01:23:27",
+            "End": "2024-08-21 05:48:47",
+            "Type": "Outgoing",
+            "Status": "Unsuccessful"
+        },
+        "Proxy": {
+            "Target Proxy ID": "Ys5W08395wAk1zDEVAOV85HjmPRwnW5P4",
+            "Source Proxy ID": null,
+            "Usage Rate": 5.74,
+            "Total Cost": -105.76
+        }
     }
 ]
