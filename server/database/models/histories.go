@@ -2,6 +2,7 @@ package database
 
 // Table for upload history
 type Uploads struct {
+	Id        int64  `json:"id"`
 	Date      string `json:"date"`
 	Name      string `json:"name"`
 	Extension string `json:"extension"`
@@ -11,6 +12,7 @@ type Uploads struct {
 
 // Table for download history
 type Downloads struct {
+	Id        int64   `json:"id"`
 	Date      string  `json:"date"`
 	Name      string  `json:"name"`
 	Extension string  `json:"extension"`
@@ -21,6 +23,7 @@ type Downloads struct {
 
 // Table for transaction history
 type Transactions struct {
+	Id      int64   `json:"id"`
 	Date    string  `json:"date"`
 	Wallet  string  `json:"wallet"`
 	Amount  float64 `json:"amount"`
