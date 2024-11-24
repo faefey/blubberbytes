@@ -7,10 +7,10 @@ import (
 	_ "modernc.org/sqlite" // go get modernc.org/sqlite
 )
 
-// SetupDatabase initializes the SQLite database and creates the FileMetadata table.
+// SetupDatabase initializes the SQLite database with configuration but no tables.
 func SetupDatabase(dbPath string) (*sql.DB, error) {
 	// Open a connection to the SQLite database.
-	db, err := sql.Open("sqlite", dbPath) // Use "sqlite" instead of "sqlite3"
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("error opening database: %v", err)
 	}
@@ -22,30 +22,29 @@ func SetupDatabase(dbPath string) (*sql.DB, error) {
 	}
 
 	// Set a busy timeout
-	_, err = db.Exec("PRAGMA busy_timeout = 5000;") // 5 seconds timeout
+	_, err = db.Exec("PRAGMA busy_timeout = 5000;")
 	if err != nil {
 		return nil, fmt.Errorf("failed to set busy timeout: %v", err)
 	}
 
-	// Create the FileMetadata table.
-	fileMetadataTable := `
-    CREATE TABLE IF NOT EXISTS FileMetadata (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        file_size INTEGER NOT NULL,
-        extension TEXT NOT NULL,
-        file_name TEXT NOT NULL,
-        file_price REAL NOT NULL,
-        file_hash TEXT UNIQUE NOT NULL,
-        passwords TEXT NOT NULL DEFAULT '[]',
-        path TEXT NOT NULL
-    );`
+	fmt.Println("Database setup complete (without tables).")
+	return db, nil
+}
 
-	// Execute the table creation.
-	_, err = db.Exec(fileMetadataTable)
+// CreateNewTables creates all the required tables by calling setup functions.
+func CreateNewTables(db *sql.DB) error {
+	// Create histories tables
+	err := SetupHistoriesTables(db)
 	if err != nil {
-		return nil, fmt.Errorf("error creating FileMetadata table: %v", err)
+		return fmt.Errorf("failed to set up histories tables: %v", err)
 	}
 
-	fmt.Println("FileMetadata table created successfully.")
-	return db, nil
+	// Create files tables
+	err = SetupFilesTables(db)
+	if err != nil {
+		return fmt.Errorf("failed to set up files tables: %v", err)
+	}
+
+	fmt.Println("All new tables created successfully.")
+	return nil
 }
