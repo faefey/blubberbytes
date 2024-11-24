@@ -1,4 +1,3 @@
-// populate.go
 package database
 
 import (
@@ -8,47 +7,120 @@ import (
 	"io/ioutil"
 )
 
+// PopulateDatabase populates the database with data from JSON files.
 func PopulateDatabase(db *sql.DB) error {
-
-	jsonFiles := map[string]string{
-		"Database/tableData1.json": "hosting",
-		"Database/tableData2.json": "sharing",
-		"Database/tableData3.json": "purchased",
-		"Database/tableData4.json": "explore",
+	// Populate Storing table
+	err := populateStoring(db, "database/storing.json")
+	if err != nil {
+		return fmt.Errorf("error populating Storing table: %v", err)
 	}
 
-	for fileName, tableName := range jsonFiles {
-		data, err := loadJSONFile(fileName)
-		if err != nil {
-			return fmt.Errorf("error loading data from %s: %v", fileName, err)
-		}
-
-		for _, file := range data {
-			// Inserting the data into the appropriate tables
-			err := AddFileDataToTable(db, tableName, file)
-			if err != nil {
-				fmt.Printf("Error adding the file data to table %s: %v\n", tableName, err)
-				return err
-			}
-		}
+	// Populate Hosting table
+	err = populateHosting(db, "database/hosting.json")
+	if err != nil {
+		return fmt.Errorf("error populating Hosting table: %v", err)
 	}
 
-	fmt.Println("Database populated successfully :) ")
+	// Populate Sharing table
+	err = populateSharing(db, "database/sharing.json")
+	if err != nil {
+		return fmt.Errorf("error populating Sharing table: %v", err)
+	}
+
+	// Populate Saved table
+	err = populateSaved(db, "database/saved.json")
+	if err != nil {
+		return fmt.Errorf("error populating Saved table: %v", err)
+	}
+
+	fmt.Println("Database populated successfully.")
 	return nil
 }
 
-func loadJSONFile(filePath string) ([]FileData, error) {
-	var data []FileData
-
-	bytes, err := ioutil.ReadFile(filePath)
+func populateStoring(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("error reading file %s: %v", filePath, err)
+		return fmt.Errorf("error reading %s: %v", filePath, err)
 	}
 
-	err = json.Unmarshal(bytes, &data)
+	var storingRecords []Storing
+	err = json.Unmarshal(data, &storingRecords)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling JSON data from %s: %v", filePath, err) // decodes json
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
 	}
 
-	return data, nil
+	for _, record := range storingRecords {
+		err = AddStoring(db, record.Hash, record.Name, record.Extension, record.Path, record.Date, record.Size)
+		if err != nil {
+			return fmt.Errorf("error inserting into Storing: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func populateHosting(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %v", filePath, err)
+	}
+
+	var hostingRecords []Hosting
+	err = json.Unmarshal(data, &hostingRecords)
+	if err != nil {
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
+	}
+
+	for _, record := range hostingRecords {
+		err = AddHosting(db, record.Hash, record.Price)
+		if err != nil {
+			return fmt.Errorf("error inserting into Hosting: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func populateSharing(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %v", filePath, err)
+	}
+
+	var sharingRecords []Sharing
+	err = json.Unmarshal(data, &sharingRecords)
+	if err != nil {
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
+	}
+
+	for _, record := range sharingRecords {
+		err = AddSharing(db, record.Hash, record.Password)
+		if err != nil {
+			return fmt.Errorf("error inserting into Sharing: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func populateSaved(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %v", filePath, err)
+	}
+
+	var savedRecords []Saved
+	err = json.Unmarshal(data, &savedRecords)
+	if err != nil {
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
+	}
+
+	for _, record := range savedRecords {
+		err = AddSaved(db, record.Hash, record.Name, record.Extension, record.Size)
+		if err != nil {
+			return fmt.Errorf("error inserting into Saved: %v", err)
+		}
+	}
+
+	return nil
 }
