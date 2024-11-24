@@ -61,3 +61,25 @@ func FindStoring(db *sql.DB, hash string) (*Storing, error) {
 
 	return &storing, nil
 }
+
+// GetAllStoring retrieves all records from the Storing table.
+func GetAllStoring(db *sql.DB) ([]Storing, error) {
+	query := `SELECT hash, name, extension, size, path, date FROM Storing`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error querying Storing table: %v", err)
+	}
+	defer rows.Close()
+
+	var storingRecords []Storing
+	for rows.Next() {
+		var record Storing
+		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning Storing record: %v", err)
+		}
+		storingRecords = append(storingRecords, record)
+	}
+
+	return storingRecords, nil
+}
