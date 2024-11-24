@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"server/database"
 	"strings"
@@ -72,223 +73,66 @@ func server(db *sql.DB) {
 
 	// http.ListenAndServe(":3000", nil)
 
+	http.HandleFunc("/storing", func(w http.ResponseWriter, r *http.Request) {
+		storingHandler(w, r, db)
+	})
+
 	http.HandleFunc("/hosting", func(w http.ResponseWriter, r *http.Request) {
-		serveDataByCategory(w, db, "hosting")
+		hostingHandler(w, r, db)
 	})
 
 	http.HandleFunc("/sharing", func(w http.ResponseWriter, r *http.Request) {
-		serveDataByCategory(w, db, "sharing")
+		sharingHandler(w, r, db)
 	})
 
-	http.HandleFunc("/purchased", func(w http.ResponseWriter, r *http.Request) {
-		serveDataByCategory(w, db, "purchased")
+	http.HandleFunc("/saved", func(w http.ResponseWriter, r *http.Request) {
+		savedHandler(w, r, db)
 	})
 
-	http.HandleFunc("/explore", func(w http.ResponseWriter, r *http.Request) {
-		serveDataByCategory(w, db, "explore")
-	})
-
-	http.HandleFunc("/delete/hosting", func(w http.ResponseWriter, r *http.Request) {
-		deleteHostingHandler(w, r, db)
-	})
-
-	http.HandleFunc("/delete/sharing", func(w http.ResponseWriter, r *http.Request) {
-		deleteSharingHandler(w, r, db)
-	})
-
-	http.HandleFunc("/downloadFile", func(w http.ResponseWriter, r *http.Request) {
-		downloadFileHandler(w, r, db)
-	})
-
-	http.HandleFunc("/hostingFile", func(w http.ResponseWriter, r *http.Request) {
-		hostingFileHandler(w, r, db)
-	})
-
-	fmt.Println("Server is running on port 3005...")
-	http.ListenAndServe(":3005", nil)
+	fmt.Println("Server is running on port 3000...")
+	log.Fatal(http.ListenAndServe(":3000", nil))
 }
 
-func serveDataByCategory(w http.ResponseWriter, db *sql.DB, category string) {
-	files, err := database.GetFileDataFromTable(db, category)
+func storingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	storingRecords, err := database.GetAllStoring(db)
 	if err != nil {
-		http.Error(w, "Error fetching data", http.StatusInternalServerError)
+		http.Error(w, "Error fetching storing data", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(files)
+	json.NewEncoder(w).Encode(storingRecords)
 }
 
-func deleteHostingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var requestData struct {
-		FileHash string `json:"file_hash"`
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&requestData)
+func hostingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	hostingRecords, err := database.GetAllHosting(db)
 	if err != nil {
-		http.Error(w, "Invalid JSON data !!!!!", http.StatusBadRequest)
-		return
-	}
-
-	if requestData.FileHash == "" {
-		http.Error(w, "File hash is required !!!!!!!", http.StatusBadRequest)
-		return
-	}
-
-	// Delete from the hosting table
-	err = database.DeleteHosting(db, requestData.FileHash)
-	if err != nil {
-		if strings.Contains(err.Error(), "no file found :( ") {
-			http.Error(w, err.Error(), http.StatusNotFound)
-		} else {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		http.Error(w, "Error fetching hosting data", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "File deleted from hosting successfully :) ",
-	})
+	json.NewEncoder(w).Encode(hostingRecords)
 }
 
-func deleteSharingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var requestData struct {
-		FileHash string `json:"file_hash"`
-	}
-
-	err := json.NewDecoder(r.Body).Decode(&requestData)
+func sharingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	sharingRecords, err := database.GetAllSharing(db)
 	if err != nil {
-		http.Error(w, "Invalid JSON data !!!", http.StatusBadRequest)
-		return
-	}
-
-	if requestData.FileHash == "" {
-		http.Error(w, "File hash is required!!!!", http.StatusBadRequest)
-		return
-	}
-
-	// Delete from sharing table
-	err = database.DeleteSharing(db, requestData.FileHash)
-	if err != nil {
-		if strings.Contains(err.Error(), "no file found") {
-			http.Error(w, err.Error(), http.StatusNotFound)
-		} else {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		http.Error(w, "Error fetching sharing data", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "File deleted from sharing successfully :)",
-	})
+	json.NewEncoder(w).Encode(sharingRecords)
 }
 
-func downloadFileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Parse the request body to get the file information
-	var fileData database.FileData
-	err := json.NewDecoder(r.Body).Decode(&fileData)
+func savedHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	savedRecords, err := database.GetAllSaved(db)
 	if err != nil {
-		http.Error(w, "Invalid JSON data !!!!", http.StatusBadRequest)
+		http.Error(w, "Error fetching saved data", http.StatusInternalServerError)
 		return
 	}
 
-	if fileData.Hash == "" {
-		http.Error(w, "File hash is required", http.StatusBadRequest)
-		return
-	}
-
-	// Check if the file already exists in the 'purchased' table
-	exists, err := database.FileExistsInTable(db, "purchased", fileData.Hash)
-	if err != nil {
-		http.Error(w, "Error checking file existence", http.StatusInternalServerError)
-		return
-	}
-
-	if exists {
-		fmt.Println("File already exists in 'purchased' table")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "File already exists in 'purchased' table",
-		})
-		return
-	}
-
-	// File does not exist; insert it into the 'purchased' table
-	err = database.AddFileDataToTable(db, "purchased", fileData)
-	if err != nil {
-		http.Error(w, "Error inserting file into 'purchased' table", http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Println("File added to 'purchased' table successfully")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "File added to 'purchased' table successfully",
-	})
-}
-
-func hostingFileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Parse the request body to get the file information
-	var fileData database.FileData
-	err := json.NewDecoder(r.Body).Decode(&fileData)
-	if err != nil {
-		http.Error(w, "Invalid JSON data !!!!", http.StatusBadRequest)
-		return
-	}
-
-	if fileData.Hash == "" {
-		http.Error(w, "File hash is required", http.StatusBadRequest)
-		return
-	}
-
-	// Check if the file already exists in the 'hosting' table
-	exists, err := database.FileExistsInTable(db, "hosting", fileData.Hash)
-	if err != nil {
-		http.Error(w, "Error checking file existence", http.StatusInternalServerError)
-		return
-	}
-
-	if exists {
-		fmt.Println("File already exists in 'hosting' table")
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "File already exists in 'hosting' table",
-		})
-		return
-	}
-
-	// File does not exist; insert it into the 'hosting' table
-	err = database.AddFileDataToTable(db, "hosting", fileData)
-	if err != nil {
-		http.Error(w, "Error inserting file into 'hosting' table", http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Println("File added to 'hosting' table successfully")
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "File added to 'hosting' table successfully",
-	})
+	json.NewEncoder(w).Encode(savedRecords)
 }
