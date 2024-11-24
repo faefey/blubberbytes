@@ -51,3 +51,26 @@ func FindSaved(db *sql.DB, hash string) (*Saved, error) {
 
 	return &saved, nil
 }
+
+// GetAllSaved retrieves all records from the Saved table.
+func GetAllSaved(db *sql.DB) ([]Saved, error) {
+	query := `SELECT hash, name, extension, size FROM Saved`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error querying Saved table: %v", err)
+	}
+	defer rows.Close()
+
+	var savedRecords []Saved
+	for rows.Next() {
+		var record Saved
+		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning Saved record: %v", err)
+		}
+		savedRecords = append(savedRecords, record)
+	}
+
+	return savedRecords, nil
+}
+
