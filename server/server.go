@@ -7,8 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"server/database"
-	"strings"
+	database "server/database/operations/files"
 )
 
 // Actions:
