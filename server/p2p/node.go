@@ -18,6 +18,13 @@ import (
 	"github.com/multiformats/go-multiaddr"
 )
 
+var (
+	node       host.Host
+	dhtRouting *dht.IpfsDHT
+	globalCtx  context.Context
+	node_id    string
+)
+
 type CustomValidator struct{}
 
 func (v *CustomValidator) Validate(key string, value []byte) error {
@@ -42,6 +49,8 @@ func generatePrivateKeyFromSeed(seed []byte) (crypto.PrivKey, error) {
 
 func createNode() (host.Host, *dht.IpfsDHT, error) {
 	ctx := context.Background()
+	globalCtx = ctx
+
 	seed := []byte(node_id)
 	customAddr, err := multiaddr.NewMultiaddr("/ip4/0.0.0.0/tcp/0")
 	if err != nil {

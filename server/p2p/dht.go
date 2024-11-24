@@ -11,9 +11,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"server/database"
+	database "server/database/repository/files"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ipfs/go-cid"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -233,7 +234,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			fileHash := args[1]
 
 			// Retrieve file metadata from the database by file hash
-			file, err := database.FindFileMetadataByHash(db, fileHash)
+			file, err := database.FindStoring(db, fileHash)
 			if err != nil {
 				fmt.Printf("Error finding file by hash: %v\n", err)
 				continue
@@ -243,33 +244,13 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				fmt.Println("No file found with the given hash.")
 			} else {
 				fmt.Printf("File found:\n")
-				fmt.Printf("ID: %d\n", file.ID)
-				fmt.Printf("File Size: %d bytes\n", file.FileSize)
+				fmt.Printf("Hash: %s\n", file.Hash)
+				fmt.Printf("Name: %s\n", file.Name)
 				fmt.Printf("Extension: %s\n", file.Extension)
-				fmt.Printf("File Name: %s\n", file.FileName)
-				fmt.Printf("File Price: $%.2f\n", file.FilePrice)
-				fmt.Printf("File Hash: %s\n", file.FileHash)
-				fmt.Printf("File Path: %s\n", file.Path)
-
-				// Display associated passwords, if any
-				if len(file.Passwords) > 0 {
-					fmt.Println("Passwords:")
-					for i, password := range file.Passwords {
-						fmt.Printf("  %d. %s\n", i+1, password)
-					}
-				} else {
-					fmt.Println("No passwords associated with this file.")
-				}
+				fmt.Printf("Size: %d bytes\n", file.Size)
+				fmt.Printf("Path: %s\n", file.Path)
+				fmt.Printf("Date: %s\n", file.Date)
 			}
-		case "DELETE_FILE_BY_HASH":
-			if len(args) < 2 {
-				fmt.Println("Expected file hash")
-				continue
-			}
-			fileHash := args[1]
-
-			// Delete file metadata from the database by file hash
-			database.DeleteFileMetadataByHash(db, fileHash)
 
 		case "ADD_FILE":
 			if len(args) < 2 {
@@ -294,34 +275,30 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 
 			fileSize := fileInfo.Size()
 			fileName := fileInfo.Name()
-			filePrice := 9.99 // Sample price; you can adjust as needed
+			fileDate := time.Now().Format("2006-01-02 15:04:05") // Example: Current timestamp
 
-			// Store file metadata in the database
-			fileID, err := database.AddFileMetadata(db, fileSize, filepath.Ext(filePath), fileName, filePrice, fileHash, filePath)
+			// Store file metadata in the Storing table
+			err = database.AddStoring(db, fileHash, fileName, filepath.Ext(filePath), filePath, fileDate, fileSize)
 			if err != nil {
 				fmt.Printf("Error adding file metadata: %v\n", err)
 				continue
 			}
-			fmt.Printf("File metadata added successfully with ID: %d\n", fileID)
+			fmt.Printf("File metadata added successfully with hash: %s\n", fileHash)
 
 		case "DELETE_FILE":
 			if len(args) < 2 {
-				fmt.Println("Expected file ID")
+				fmt.Println("Expected file hash")
 				continue
 			}
-			fileID, err := strconv.ParseInt(args[1], 10, 64)
-			if err != nil {
-				fmt.Println("Invalid file ID")
-				continue
-			}
+			fileHash := args[1]
 
-			// Delete file metadata from the database
-			err = database.DeleteFileMetadata(db, fileID)
+			// Delete file metadata from the Storing table
+			err := database.DeleteStoring(db, fileHash)
 			if err != nil {
-				fmt.Printf("Error deleting file metadata with ID %d: %v\n", fileID, err)
+				fmt.Printf("Error deleting file with hash %s: %v\n", fileHash, err)
 				continue
 			}
-			fmt.Printf("File metadata with ID %d deleted successfully.\n", fileID)
+			fmt.Printf("File with hash %s deleted successfully.\n", fileHash)
 
 		case "SEND_MESSAGE":
 			if len(args) < 3 {

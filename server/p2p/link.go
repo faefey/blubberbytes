@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"server/database"
+	database "server/database/repository/files"
 
 	"github.com/libp2p/go-libp2p/core/host"
 )
@@ -24,7 +24,7 @@ func GenerateLink(db *sql.DB, node host.Host, fileHash string) (string, error) {
 	}
 
 	// Step 3: Add the generated password to the file's password list
-	err = database.AddPasswordToFile(db, fileHash, password)
+	err = database.AddSharing(db, fileHash, password)
 	if err != nil {
 		return "", fmt.Errorf("failed to add password to file hash: %v", err)
 	}

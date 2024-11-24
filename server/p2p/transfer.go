@@ -9,7 +9,7 @@ import (
 	"log"           // for logging
 	"os"            // for file operations
 	"path/filepath" // for file path manipulations
-	"server/database"
+	database "server/database/repository/files"
 	"strings"
 	"sync"
 	"time"
@@ -129,8 +129,8 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 
 	// Retrieve file metadata from the database
 	log.Printf("Searching for file metadata in the database for hash: %s", fileHash)
-	fileMetadata, err := database.FindFileMetadataByHash(db, fileHash)
-	if err != nil || fileMetadata == nil {
+	storing, err := database.FindStoring(db, fileHash)
+	if err != nil || storing == nil {
 		log.Printf("File not found or error occurred while fetching file metadata for hash %s: %v", fileHash, err)
 		sendDataToPeer(node, targetPeerID, "", "File not found", "", "", "")
 		return
@@ -138,15 +138,15 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 
 	log.Printf("Found file metadata for file hash: %s", fileHash)
 
-	// Validate the password
-	isPasswordValid := false
-	for _, p := range fileMetadata.Passwords {
-		if p == password {
-			isPasswordValid = true
-			break
-		}
+	log.Printf("Checking password in the Sharing table for file hash: %s", fileHash)
+	sharing, err := database.FindSharing(db, fileHash)
+	if err != nil || sharing == nil {
+		log.Printf("No password found in the Sharing table for file hash %s: %v", fileHash, err)
+		sendDataToPeer(node, targetPeerID, "", "Password not found", "", "", "")
+		return
 	}
-	if !isPasswordValid {
+	// Validate the password
+	if sharing.Password != password {
 		log.Printf("Invalid password provided for file hash: %s", fileHash)
 		sendDataToPeer(node, targetPeerID, "", "Invalid password", "", "", "")
 		return
@@ -155,14 +155,14 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 	log.Printf("Password validated successfully for file hash: %s", fileHash)
 
 	// Use sendDataToPeer to send the requested file back
-	log.Printf("Sending requested file back to peer %s from path: %s", targetPeerID, fileMetadata.Path)
-	err = sendRequestedFileToPeer(node, targetPeerID, fileMetadata.Path)
+	log.Printf("Sending requested file back to peer %s from path: %s", targetPeerID, storing.Path)
+	err = sendRequestedFileToPeer(node, targetPeerID, storing.Path)
 	if err != nil {
 		log.Printf("Error sending requested file to peer %s: %v", targetPeerID, err)
 		return
 	}
 
-	log.Printf("File sent successfully to peer %s: %s", targetPeerID, fileMetadata.Path)
+	log.Printf("File sent successfully to peer %s: %s", targetPeerID, storing.Path)
 }
 
 func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request string, hash string, password string) ([]byte, error) {
