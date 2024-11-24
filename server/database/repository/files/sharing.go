@@ -49,3 +49,26 @@ func FindSharing(db *sql.DB, hash string) (*Sharing, error) {
 
 	return &sharing, nil
 }
+
+// GetAllSharing retrieves all records from the Sharing table.
+func GetAllSharing(db *sql.DB) ([]Sharing, error) {
+	query := `SELECT hash, password FROM Sharing`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error querying Sharing table: %v", err)
+	}
+	defer rows.Close()
+
+	var sharingRecords []Sharing
+	for rows.Next() {
+		var record Sharing
+		err := rows.Scan(&record.Hash, &record.Password)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning Sharing record: %v", err)
+		}
+		sharingRecords = append(sharingRecords, record)
+	}
+
+	return sharingRecords, nil
+}
+
