@@ -49,3 +49,24 @@ func FindHosting(db *sql.DB, hash string) (*Hosting, error) {
 
 	return &hosting, nil
 }
+// GetAllHosting retrieves all records from the Hosting table.
+func GetAllHosting(db *sql.DB) ([]Hosting, error) {
+	query := `SELECT hash, price FROM Hosting`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error querying Hosting table: %v", err)
+	}
+	defer rows.Close()
+
+	var hostingRecords []Hosting
+	for rows.Next() {
+		var record Hosting
+		err := rows.Scan(&record.Hash, &record.Price)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning Hosting record: %v", err)
+		}
+		hostingRecords = append(hostingRecords, record)
+	}
+
+	return hostingRecords, nil
+}
