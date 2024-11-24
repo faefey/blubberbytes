@@ -1,0 +1,26 @@
+[
+  {
+      "hash": "a1b2c3d4e5f678901234567890abcdef1234567890abcdef1234567890abcd",
+      "name": "Document",
+      "extension": ".pdf",
+      "size": 204800,
+      "path": "/user/files/document.pdf",
+      "date": "2024-11-14"
+  },
+  {
+      "hash": "b2c3d4e5f6a78901234567890abcdef1234567890abcdef1234567890abcde",
+      "name": "Image",
+      "extension": ".png",
+      "size": 512000,
+      "path": "/user/images/image.png",
+      "date": "2024-11-13"
+  },
+  {
+      "hash": "c3d4e5f6a7b8901234567890abcdef1234567890abcdef1234567890abcdef1",
+      "name": "Video",
+      "extension": ".mp4",
+      "size": 104857600,
+      "path": "/user/videos/video.mp4",
+      "date": "2024-11-12"
+  }
+]
