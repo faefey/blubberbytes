@@ -1,4 +1,4 @@
-package database
+package models
 
 // Table for upload history
 type Uploads struct {

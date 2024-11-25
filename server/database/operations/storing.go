@@ -1,19 +1,10 @@
-package database
+package operations
 
 import (
 	"database/sql"
 	"fmt"
+	"server/database/models"
 )
-
-// Table for added files
-type Storing struct {
-	Hash      string `json:"hash"`
-	Name      string `json:"name"`
-	Extension string `json:"extension"`
-	Size      int64  `json:"size"`
-	Path      string `json:"path"`
-	Date      string `json:"date"`
-}
 
 // AddStoring inserts a new record into the Storing table.
 func AddStoring(db *sql.DB, hash, name, extension, path, date string, size int64) error {
@@ -41,8 +32,8 @@ func DeleteStoring(db *sql.DB, hash string) error {
 }
 
 // FindStoring retrieves a record from the Storing table by its hash.
-func FindStoring(db *sql.DB, hash string) (*Storing, error) {
-	var storing Storing
+func FindStoring(db *sql.DB, hash string) (*models.Storing, error) {
+	var storing models.Storing
 	query := `SELECT hash, name, extension, size, path, date FROM Storing WHERE hash = ?`
 	err := db.QueryRow(query, hash).Scan(
 		&storing.Hash,
@@ -63,7 +54,7 @@ func FindStoring(db *sql.DB, hash string) (*Storing, error) {
 }
 
 // GetAllStoring retrieves all records from the Storing table.
-func GetAllStoring(db *sql.DB) ([]Storing, error) {
+func GetAllStoring(db *sql.DB) ([]models.Storing, error) {
 	query := `SELECT hash, name, extension, size, path, date FROM Storing`
 	rows, err := db.Query(query)
 	if err != nil {
@@ -71,9 +62,9 @@ func GetAllStoring(db *sql.DB) ([]Storing, error) {
 	}
 	defer rows.Close()
 
-	var storingRecords []Storing
+	var storingRecords []models.Storing
 	for rows.Next() {
-		var record Storing
+		var record models.Storing
 		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning Storing record: %v", err)

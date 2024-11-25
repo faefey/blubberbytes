@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"server/database/models"
+	"server/database/operations"
 )
 
 // PopulateDatabase populates the database with data from JSON files.
@@ -43,14 +45,14 @@ func populateStoring(db *sql.DB, filePath string) error {
 		return fmt.Errorf("error reading %s: %v", filePath, err)
 	}
 
-	var storingRecords []Storing
+	var storingRecords []models.Storing
 	err = json.Unmarshal(data, &storingRecords)
 	if err != nil {
 		return fmt.Errorf("error parsing %s: %v", filePath, err)
 	}
 
 	for _, record := range storingRecords {
-		err = AddStoring(db, record.Hash, record.Name, record.Extension, record.Path, record.Date, record.Size)
+		err = operations.AddStoring(db, record.Hash, record.Name, record.Extension, record.Path, record.Date, record.Size)
 		if err != nil {
 			return fmt.Errorf("error inserting into Storing: %v", err)
 		}
@@ -65,14 +67,14 @@ func populateHosting(db *sql.DB, filePath string) error {
 		return fmt.Errorf("error reading %s: %v", filePath, err)
 	}
 
-	var hostingRecords []Hosting
+	var hostingRecords []models.Hosting
 	err = json.Unmarshal(data, &hostingRecords)
 	if err != nil {
 		return fmt.Errorf("error parsing %s: %v", filePath, err)
 	}
 
 	for _, record := range hostingRecords {
-		err = AddHosting(db, record.Hash, record.Price)
+		err = operations.AddHosting(db, record.Hash, record.Price)
 		if err != nil {
 			return fmt.Errorf("error inserting into Hosting: %v", err)
 		}
@@ -87,14 +89,14 @@ func populateSharing(db *sql.DB, filePath string) error {
 		return fmt.Errorf("error reading %s: %v", filePath, err)
 	}
 
-	var sharingRecords []Sharing
+	var sharingRecords []models.Sharing
 	err = json.Unmarshal(data, &sharingRecords)
 	if err != nil {
 		return fmt.Errorf("error parsing %s: %v", filePath, err)
 	}
 
 	for _, record := range sharingRecords {
-		err = AddSharing(db, record.Hash, record.Password)
+		err = operations.AddSharing(db, record.Hash, record.Password)
 		if err != nil {
 			return fmt.Errorf("error inserting into Sharing: %v", err)
 		}
@@ -109,14 +111,14 @@ func populateSaved(db *sql.DB, filePath string) error {
 		return fmt.Errorf("error reading %s: %v", filePath, err)
 	}
 
-	var savedRecords []Saved
+	var savedRecords []models.Saved
 	err = json.Unmarshal(data, &savedRecords)
 	if err != nil {
 		return fmt.Errorf("error parsing %s: %v", filePath, err)
 	}
 
 	for _, record := range savedRecords {
-		err = AddSaved(db, record.Hash, record.Name, record.Extension, record.Size)
+		err = operations.AddSaved(db, record.Hash, record.Name, record.Extension, record.Size)
 		if err != nil {
 			return fmt.Errorf("error inserting into Saved: %v", err)
 		}

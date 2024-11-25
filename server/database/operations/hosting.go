@@ -1,15 +1,10 @@
-package database
+package operations
 
 import (
 	"database/sql"
 	"fmt"
+	"server/database/models"
 )
-
-// Join on file hash with Storing table
-type Hosting struct {
-	Hash  string  `json:"hash"`
-	Price float64 `json:"price"`
-}
 
 // AddHosting inserts a new record into the Hosting table.
 func AddHosting(db *sql.DB, hash string, price float64) error {
@@ -36,8 +31,8 @@ func DeleteHosting(db *sql.DB, hash string) error {
 }
 
 // FindHosting retrieves a record from the Hosting table by its hash.
-func FindHosting(db *sql.DB, hash string) (*Hosting, error) {
-	var hosting Hosting
+func FindHosting(db *sql.DB, hash string) (*models.Hosting, error) {
+	var hosting models.Hosting
 	query := `SELECT hash, price FROM Hosting WHERE hash = ?`
 	err := db.QueryRow(query, hash).Scan(&hosting.Hash, &hosting.Price)
 	if err != nil {
@@ -49,8 +44,9 @@ func FindHosting(db *sql.DB, hash string) (*Hosting, error) {
 
 	return &hosting, nil
 }
+
 // GetAllHosting retrieves all records from the Hosting table.
-func GetAllHosting(db *sql.DB) ([]Hosting, error) {
+func GetAllHosting(db *sql.DB) ([]models.Hosting, error) {
 	query := `SELECT hash, price FROM Hosting`
 	rows, err := db.Query(query)
 	if err != nil {
@@ -58,9 +54,9 @@ func GetAllHosting(db *sql.DB) ([]Hosting, error) {
 	}
 	defer rows.Close()
 
-	var hostingRecords []Hosting
+	var hostingRecords []models.Hosting
 	for rows.Next() {
-		var record Hosting
+		var record models.Hosting
 		err := rows.Scan(&record.Hash, &record.Price)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning Hosting record: %v", err)

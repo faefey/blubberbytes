@@ -1,4 +1,4 @@
-package database
+package models
 
 // Table for added files
 type Storing struct {

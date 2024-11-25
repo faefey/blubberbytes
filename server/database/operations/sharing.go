@@ -1,15 +1,10 @@
-package database
+package operations
 
 import (
 	"database/sql"
 	"fmt"
+	"server/database/models"
 )
-
-// Join on file hash with Storing table
-type Sharing struct {
-	Hash     string `json:"hash"`
-	Password string `json:"password"`
-}
 
 // AddSharing inserts a new record into the Sharing table.
 func AddSharing(db *sql.DB, hash, password string) error {
@@ -36,8 +31,8 @@ func DeleteSharing(db *sql.DB, hash string) error {
 }
 
 // FindSharing retrieves a record from the Sharing table by its hash.
-func FindSharing(db *sql.DB, hash string) (*Sharing, error) {
-	var sharing Sharing
+func FindSharing(db *sql.DB, hash string) (*models.Sharing, error) {
+	var sharing models.Sharing
 	query := `SELECT hash, password FROM Sharing WHERE hash = ?`
 	err := db.QueryRow(query, hash).Scan(&sharing.Hash, &sharing.Password)
 	if err != nil {
@@ -51,7 +46,7 @@ func FindSharing(db *sql.DB, hash string) (*Sharing, error) {
 }
 
 // GetAllSharing retrieves all records from the Sharing table.
-func GetAllSharing(db *sql.DB) ([]Sharing, error) {
+func GetAllSharing(db *sql.DB) ([]models.Sharing, error) {
 	query := `SELECT hash, password FROM Sharing`
 	rows, err := db.Query(query)
 	if err != nil {
@@ -59,9 +54,9 @@ func GetAllSharing(db *sql.DB) ([]Sharing, error) {
 	}
 	defer rows.Close()
 
-	var sharingRecords []Sharing
+	var sharingRecords []models.Sharing
 	for rows.Next() {
-		var record Sharing
+		var record models.Sharing
 		err := rows.Scan(&record.Hash, &record.Password)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning Sharing record: %v", err)
@@ -71,4 +66,3 @@ func GetAllSharing(db *sql.DB) ([]Sharing, error) {
 
 	return sharingRecords, nil
 }
-

@@ -1,17 +1,10 @@
-package database
+package operations
 
 import (
 	"database/sql"
 	"fmt"
+	"server/database/models"
 )
-
-// Table for saved files
-type Saved struct {
-	Hash      string `json:"hash"`
-	Name      string `json:"name"`
-	Extension string `json:"extension"`
-	Size      int64  `json:"size"`
-}
 
 // AddSaved inserts a new record into the Saved table.
 func AddSaved(db *sql.DB, hash, name, extension string, size int64) error {
@@ -38,8 +31,8 @@ func DeleteSaved(db *sql.DB, hash string) error {
 }
 
 // FindSaved retrieves a record from the Saved table by its hash.
-func FindSaved(db *sql.DB, hash string) (*Saved, error) {
-	var saved Saved
+func FindSaved(db *sql.DB, hash string) (*models.Saved, error) {
+	var saved models.Saved
 	query := `SELECT hash, name, extension, size FROM Saved WHERE hash = ?`
 	err := db.QueryRow(query, hash).Scan(&saved.Hash, &saved.Name, &saved.Extension, &saved.Size)
 	if err != nil {
@@ -53,7 +46,7 @@ func FindSaved(db *sql.DB, hash string) (*Saved, error) {
 }
 
 // GetAllSaved retrieves all records from the Saved table.
-func GetAllSaved(db *sql.DB) ([]Saved, error) {
+func GetAllSaved(db *sql.DB) ([]models.Saved, error) {
 	query := `SELECT hash, name, extension, size FROM Saved`
 	rows, err := db.Query(query)
 	if err != nil {
@@ -61,9 +54,9 @@ func GetAllSaved(db *sql.DB) ([]Saved, error) {
 	}
 	defer rows.Close()
 
-	var savedRecords []Saved
+	var savedRecords []models.Saved
 	for rows.Next() {
-		var record Saved
+		var record models.Saved
 		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning Saved record: %v", err)
@@ -73,4 +66,3 @@ func GetAllSaved(db *sql.DB) ([]Saved, error) {
 
 	return savedRecords, nil
 }
-

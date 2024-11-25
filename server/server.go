@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	database "server/database/operations/files"
+	"server/database/operations"
 )
 
 // Actions:
@@ -60,6 +60,13 @@ import (
 // 	w.Write([]byte("Managing public links"))
 // }
 
+func cors(w http.ResponseWriter, r *http.Request, db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB)) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+	handler(w, r, db)
+}
+
 func server(db *sql.DB) {
 	// http.HandleFunc("/downloadFileByHash", downloadFileByHash)
 	// http.HandleFunc("/hostFile", hostFile)
@@ -73,19 +80,19 @@ func server(db *sql.DB) {
 	// http.ListenAndServe(":3000", nil)
 
 	http.HandleFunc("/storing", func(w http.ResponseWriter, r *http.Request) {
-		storingHandler(w, r, db)
+		cors(w, r, db, storingHandler)
 	})
 
 	http.HandleFunc("/hosting", func(w http.ResponseWriter, r *http.Request) {
-		hostingHandler(w, r, db)
+		cors(w, r, db, hostingHandler)
 	})
 
 	http.HandleFunc("/sharing", func(w http.ResponseWriter, r *http.Request) {
-		sharingHandler(w, r, db)
+		cors(w, r, db, sharingHandler)
 	})
 
 	http.HandleFunc("/saved", func(w http.ResponseWriter, r *http.Request) {
-		savedHandler(w, r, db)
+		cors(w, r, db, savedHandler)
 	})
 
 	fmt.Println("Server is running on port 3000...")
@@ -93,7 +100,7 @@ func server(db *sql.DB) {
 }
 
 func storingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
-	storingRecords, err := database.GetAllStoring(db)
+	storingRecords, err := operations.GetAllStoring(db)
 	if err != nil {
 		http.Error(w, "Error fetching storing data", http.StatusInternalServerError)
 		return
@@ -104,7 +111,7 @@ func storingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 }
 
 func hostingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
-	hostingRecords, err := database.GetAllHosting(db)
+	hostingRecords, err := operations.GetAllHosting(db)
 	if err != nil {
 		http.Error(w, "Error fetching hosting data", http.StatusInternalServerError)
 		return
@@ -115,7 +122,7 @@ func hostingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 }
 
 func sharingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
-	sharingRecords, err := database.GetAllSharing(db)
+	sharingRecords, err := operations.GetAllSharing(db)
 	if err != nil {
 		http.Error(w, "Error fetching sharing data", http.StatusInternalServerError)
 		return
@@ -126,7 +133,7 @@ func sharingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 }
 
 func savedHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
-	savedRecords, err := database.GetAllSaved(db)
+	savedRecords, err := operations.GetAllSaved(db)
 	if err != nil {
 		http.Error(w, "Error fetching saved data", http.StatusInternalServerError)
 		return
