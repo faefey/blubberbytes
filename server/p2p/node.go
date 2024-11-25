@@ -116,6 +116,7 @@ func createNode() (host.Host, *dht.IpfsDHT, error) {
 			case "12D3KooWQd1K1k8XA9xVEzSAu7HUCodC7LJB6uW5Kw4VwkRdstPE":
 				fmt.Println("Connected to Bootstrap Node")
 			default:
+				addPeerID(peerID)
 				fmt.Println("Connected to peer:", peerID)
 			}
 		},

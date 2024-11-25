@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"
@@ -16,6 +17,11 @@ import (
 	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/client"
 	"github.com/multiformats/go-multiaddr"
+)
+
+var (
+	peerIDList []string
+	listMutex  sync.Mutex // Mutex to ensure thread-safe access
 )
 
 func makeReservation(node host.Host) {
@@ -88,6 +94,7 @@ func connectToPeerUsingRelay(node host.Host, targetPeerID string) {
 		log.Println("Failed to connect to peer through relay: %w", err)
 		return
 	}
+	addPeerID(targetPeerID)
 
 }
 
@@ -106,6 +113,7 @@ func handlePeerExchange(node host.Host) {
 		peerAddr = strings.TrimSpace(peerAddr)
 		var data map[string]interface{}
 		err = json.Unmarshal([]byte(peerAddr), &data)
+
 		if err != nil {
 			fmt.Printf("error unmarshaling JSON: %v", err)
 		}
@@ -122,4 +130,29 @@ func handlePeerExchange(node host.Host) {
 			}
 		}
 	})
+}
+
+func addPeerID(peerID string) {
+	listMutex.Lock()
+	defer listMutex.Unlock()
+
+	// Check if the peerID already exists in the list
+	for _, id := range peerIDList {
+		if id == peerID {
+			return // Peer ID already exists, do nothing
+		}
+	}
+
+	// Add the peerID to the global list
+	peerIDList = append(peerIDList, peerID)
+}
+
+func printPeerList() {
+	listMutex.Lock()
+	defer listMutex.Unlock()
+
+	fmt.Println("Current Peer IDs:")
+	for _, id := range peerIDList {
+		fmt.Println(id)
+	}
 }

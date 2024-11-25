@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"context" // for context usage
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"           // for logging
 	"os"            // for file operations
 	"path/filepath" // for file path manipulations
-	database "server/database/repository/files"
+	"server/database/models"
+	operations "server/database/operations"
 	"strings"
 	"sync"
 	"time"
@@ -21,6 +23,8 @@ import (
 )
 
 var (
+	storing          []models.Storing // Global variable to hold Storing objects
+	storingMutex     sync.Mutex       // Mutex to ensure thread-safe access to the global variable
 	receivedFileData []byte
 	dataMutex        sync.Mutex
 )
@@ -96,10 +100,92 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 
 			// Log the successful receipt of the file
 			log.Printf("Requested file received successfully from peer: %s", s.Conn().RemotePeer())
+		} else if header == "request_all" {
+			log.Printf("Received 'send_all' request from peer: %s", s.Conn().RemotePeer())
+			handleSendAllRequest(s, db, node, s.Conn().RemotePeer().String())
+		} else if header == "requested_storings" {
+			// Handle requested_storings
+			log.Printf("Handling 'requested_storings' from peer: %s", s.Conn().RemotePeer())
+
+			// Read JSON data
+			data, err := io.ReadAll(reader)
+			if err != nil {
+				log.Printf("Error reading 'requested_storings' data: %v", err)
+				return
+			}
+
+			// Parse JSON into a slice of Storing objects
+			var receivedStorings []models.Storing
+			err = json.Unmarshal(data, &receivedStorings)
+			if err != nil {
+				log.Printf("Error unmarshalling 'requested_storings' data: %v", err)
+				return
+			}
+
+			// Safely add the received storings to the global storing list
+			storingMutex.Lock()
+			storing = append(storing, receivedStorings...)
+			storingMutex.Unlock()
+
+			log.Printf("Successfully added %d storings to the global list", len(receivedStorings))
 		} else {
 			log.Printf("Unknown header type received: %s", header)
 		}
 	})
+}
+func handleSendAllRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) ([]models.Storing, error) {
+	log.Printf("Handling 'send_all' request for peer: %s", targetPeerID)
+
+	// Retrieve all storing records from the database
+	storingRecords, err := operations.GetAllStoring(db)
+	if err != nil {
+		log.Printf("Error retrieving storing records: %v", err)
+		return nil, err // Return the error if retrieval fails
+	}
+
+	// Decode the target peer ID
+	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+	if err != nil {
+		log.Printf("Failed to decode target peer ID: %v", err)
+		return nil, err
+	}
+
+	// Open a stream to the target peer
+	ctx := context.Background()
+	stream, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
+	if err != nil {
+		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
+		return nil, err
+	}
+	defer stream.Close()
+	log.Printf("Stream opened successfully to peer %s", targetPeerIDParsed)
+
+	// Send the header to indicate the type of data being sent
+	header := "requested_storings\n"
+	_, err = stream.Write([]byte(header))
+	if err != nil {
+		log.Printf("Error sending header to peer %s: %v", targetPeerIDParsed, err)
+		return nil, err
+	}
+
+	// Serialize the storing records to JSON
+	jsonData, err := json.Marshal(storingRecords)
+	if err != nil {
+		log.Printf("Error serializing storing records to JSON: %v", err)
+		return nil, err // Return the error if serialization fails
+	}
+
+	// Send the JSON data back to the requesting peer
+	_, err = stream.Write(jsonData)
+	if err != nil {
+		log.Printf("Error sending storing records to peer %s: %v", targetPeerIDParsed, err)
+		return nil, err
+	}
+
+	log.Printf("All storing records sent successfully to peer: %s", targetPeerIDParsed)
+
+	// Return the list of storing records
+	return storingRecords, nil
 }
 
 func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) {
@@ -129,7 +215,7 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 
 	// Retrieve file metadata from the database
 	log.Printf("Searching for file metadata in the database for hash: %s", fileHash)
-	storing, err := database.FindStoring(db, fileHash)
+	storing, err := operations.FindStoring(db, fileHash)
 	if err != nil || storing == nil {
 		log.Printf("File not found or error occurred while fetching file metadata for hash %s: %v", fileHash, err)
 		sendDataToPeer(node, targetPeerID, "", "File not found", "", "", "")
@@ -139,7 +225,7 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 	log.Printf("Found file metadata for file hash: %s", fileHash)
 
 	log.Printf("Checking password in the Sharing table for file hash: %s", fileHash)
-	sharing, err := database.FindSharing(db, fileHash)
+	sharing, err := operations.FindSharing(db, fileHash)
 	if err != nil || sharing == nil {
 		log.Printf("No password found in the Sharing table for file hash %s: %v", fileHash, err)
 		sendDataToPeer(node, targetPeerID, "", "Password not found", "", "", "")
@@ -165,19 +251,19 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 	log.Printf("File sent successfully to peer %s: %s", targetPeerID, storing.Path)
 }
 
-func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request string, hash string, password string) ([]byte, error) {
+func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType string, hash string, password string) error {
 	ctx := context.Background()
 	targetPeerIDParsed, err := peer.Decode(targetPeerID)
 	if err != nil {
 		log.Printf("Failed to decode target peer ID: %v", err)
-		return nil, err
+		return err
 	}
 
 	// Open a stream to the target peer
 	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
 	if err != nil {
 		log.Printf("Failed to open stream to %s: %v", targetPeerIDParsed, err)
-		return nil, err
+		return err
 	}
 	defer func() {
 		log.Printf("Closing stream to peer %s", targetPeerIDParsed)
@@ -185,20 +271,20 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 	}()
 
 	// Handle request, message, or file
-	if request == "request" {
+	if dataType == "request" {
 		// Send a file request
 		log.Printf("Sending file request to peer %s with hash: %s", targetPeerIDParsed, hash)
 		_, err = s.Write([]byte("request\n"))
 		if err != nil {
 			log.Printf("Failed to send request header to peer %s: %v", targetPeerIDParsed, err)
-			return nil, err
+			return err
 		}
 
 		// Write hash and password
 		_, err = s.Write([]byte(hash + "\n" + password + "\n"))
 		if err != nil {
 			log.Printf("Failed to send hash or password to peer %s: %v", targetPeerIDParsed, err)
-			return nil, err
+			return err
 		}
 
 		log.Printf("File request sent successfully to peer %s", targetPeerIDParsed)
@@ -206,27 +292,23 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 		// Wait for half a second to let the file be received
 		time.Sleep(500 * time.Millisecond)
 
-		// Safely retrieve and clear the global variable
-		dataMutex.Lock() // Lock the mutex for safe access
-		if receivedFileData == nil {
-			log.Printf("No data received after waiting for the requested file")
-			dataMutex.Unlock() // Unlock before returning
-			return nil, nil
+	} else if dataType == "request_all" {
+		log.Printf("Sending 'request_all' signal to peer %s", targetPeerIDParsed)
+		_, err = s.Write([]byte("request_all\n"))
+		if err != nil {
+			log.Printf("Failed to send 'request_all' signal to peer %s: %v", targetPeerIDParsed, err)
+			return err
 		}
+		log.Printf("'Request all files' signal sent successfully to peer %s", targetPeerIDParsed)
 
-		data := receivedFileData // Save the data to a local variable
-		receivedFileData = nil   // Clear the global variable
-		dataMutex.Unlock()       // Unlock the mutex
-		log.Printf("Returning data from global variable: %d bytes", len(data))
-
-		return data, nil
+		// Wait for half a second to let the file be received
 	} else if message != "" {
 		// Send a message
 		log.Printf("Sending message to peer %s: %s", targetPeerIDParsed, message)
 		_, err = s.Write([]byte("message\n" + message + "\n"))
 		if err != nil {
 			log.Printf("Failed to send message to peer %s: %v", targetPeerIDParsed, err)
-			return nil, err
+			return err
 		}
 		log.Printf("Message sent successfully to peer %s", targetPeerIDParsed)
 
@@ -236,7 +318,7 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 		file, err := os.Open(filePath)
 		if err != nil {
 			log.Printf("Failed to open file: %v", err)
-			return nil, err
+			return err
 		}
 		defer file.Close()
 
@@ -244,29 +326,54 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, request str
 		_, err = s.Write([]byte("file\n"))
 		if err != nil {
 			log.Printf("Failed to send file header to peer %s: %v", targetPeerIDParsed, err)
-			return nil, err
+			return err
 		}
 
 		// Write the file content
 		fileContent, err := io.ReadAll(file)
 		if err != nil {
 			log.Printf("Error reading file content: %v", err)
-			return nil, err
+			return err
 		}
 
 		n, err := s.Write(fileContent)
 		if err != nil {
 			log.Printf("Failed to send file content to peer %s: %v", targetPeerIDParsed, err)
-			return nil, err
+			return err
 		}
 
 		log.Printf("File sent successfully. Total bytes sent: %d to peer %s", n, targetPeerIDParsed)
 	} else {
 		log.Println("No file, message, or request provided to send.")
-		return nil, fmt.Errorf("no data to send")
+		return fmt.Errorf("no data to send")
 	}
 
-	return nil, nil
+	return nil
+}
+
+func sendRequest(node host.Host, targetPeerID, hash, password string) ([]byte, error) {
+	// Call sendDataToPeer to send the request
+	err := sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
+	if err != nil {
+		return nil, err
+	}
+
+	// Wait and retrieve the global variable
+	time.Sleep(500 * time.Millisecond) // Wait for data to be received
+
+	dataMutex.Lock() // Lock the mutex to safely access the global variable
+	defer dataMutex.Unlock()
+
+	if receivedFileData == nil {
+		log.Printf("No data received after waiting for the requested file")
+		return nil, nil
+	}
+
+	data := receivedFileData // Copy the data
+	receivedFileData = nil   // Clear the global variable
+	log.Printf("Returning data from global variable: %d bytes", len(data))
+
+	return data, nil
 }
 
 // Function to receive a requested file and store it in the global variable
@@ -344,4 +451,47 @@ func sendRequestedFileToPeer(node host.Host, targetPeerID, filePath string) erro
 
 	log.Printf("Requested file sent successfully to peer %s: %s", targetPeerID, filePath)
 	return nil
+}
+
+func explore(node host.Host) ([]models.Storing, error) {
+	listMutex.Lock()                           // Lock the mutex for safe access to peerIDList
+	peers := append([]string{}, peerIDList...) // Make a copy to avoid issues with concurrent modifications
+	listMutex.Unlock()
+
+	// Request all files from each peer
+	for _, peerID := range peers {
+		log.Printf("Requesting all files from peer: %s", peerID)
+
+		// Send a generic "request all files" signal to the peer
+		err := sendDataToPeer(node, peerID, "", "", "request_all", "", "")
+		if err != nil {
+			log.Printf("Error requesting all files from peer %s: %v", peerID, err)
+			continue
+		}
+
+		log.Printf("Request sent to peer %s for all files", peerID)
+	}
+
+	// Wait to allow responses to be processed (if needed)
+	time.Sleep(1 * time.Second) // Adjust this delay based on your network latency
+
+	// Lock the global storing list to safely access it
+	storingMutex.Lock()
+	defer storingMutex.Unlock()
+
+	// Make a copy of the storing list
+	storedFiles := append([]models.Storing{}, storing...)
+
+	// Print each file's details
+	log.Printf("Number of stored files: %d", len(storedFiles))
+	for i, file := range storedFiles {
+		log.Printf("File %d: Hash=%s, Name=%s, Extension=%s, Size=%d, Path=%s, Date=%s",
+			i+1, file.Hash, file.Name, file.Extension, file.Size, file.Path, file.Date)
+	}
+
+	// Clear the global storing list
+	storing = []models.Storing{}
+
+	// Return the collected storing records
+	return storedFiles, nil
 }

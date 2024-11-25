@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	database "server/database/repository/files"
+	operations "server/database/operations"
 	"strconv"
 	"strings"
 	"time"
@@ -209,6 +209,25 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "EXPLORE":
+			explore(node)
+		case "DELETE_SHARING":
+			if len(args) < 2 {
+				fmt.Println("Expected file hash")
+				continue
+			}
+			fileHash := args[1]
+
+			// Delete file metadata from the Storing table
+			err := operations.DeleteSharing(db, fileHash)
+			if err != nil {
+				fmt.Printf("Error deleting file with hash %s: %v\n", fileHash, err)
+				continue
+			}
+			fmt.Printf("File with hash %s deleted successfully.\n", fileHash)
+
+		case "PRINT":
+			printPeerList()
 		case "GENERATE_LINK":
 			if len(args) < 2 {
 				fmt.Println("Usage: GENERATE_LINK <file_hash>")
@@ -234,7 +253,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			fileHash := args[1]
 
 			// Retrieve file metadata from the database by file hash
-			file, err := database.FindStoring(db, fileHash)
+			file, err := operations.FindStoring(db, fileHash)
 			if err != nil {
 				fmt.Printf("Error finding file by hash: %v\n", err)
 				continue
@@ -278,7 +297,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			fileDate := time.Now().Format("2006-01-02 15:04:05") // Example: Current timestamp
 
 			// Store file metadata in the Storing table
-			err = database.AddStoring(db, fileHash, fileName, filepath.Ext(filePath), filePath, fileDate, fileSize)
+			err = operations.AddStoring(db, fileHash, fileName, filepath.Ext(filePath), filePath, fileDate, fileSize)
 			if err != nil {
 				fmt.Printf("Error adding file metadata: %v\n", err)
 				continue
@@ -293,7 +312,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			fileHash := args[1]
 
 			// Delete file metadata from the Storing table
-			err := database.DeleteStoring(db, fileHash)
+			err := operations.DeleteStoring(db, fileHash)
 			if err != nil {
 				fmt.Printf("Error deleting file with hash %s: %v\n", fileHash, err)
 				continue
@@ -329,7 +348,16 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			hash := args[2]
 			password := args[3]
 			fmt.Printf("Sending request to peer %s with hash: %s\n", targetPeerID, hash)
-			sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
+			data, err := sendRequest(node, targetPeerID, hash, password)
+			if err != nil {
+				log.Fatalf("Error sending request: %v", err)
+			}
+
+			if data == nil {
+				log.Println("No data received for the request")
+			} else {
+				log.Printf("Received data: %d bytes", len(data))
+			}
 
 		case "GET":
 			if len(args) < 2 {
