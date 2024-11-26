@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	operations "server/database/operations"
+	"server/database/operations"
 
 	"github.com/libp2p/go-libp2p/core/host"
 )
