@@ -10,10 +10,6 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-
-	"crypto/sha256"
-	"io"
-	"os"
 )
 
 // file entry:
@@ -22,23 +18,6 @@ type fileEntry struct {
 	password    string
 	expiration  time.Time
 	accessLimit int
-}
-
-func hashFile(filePath string) (string, error) {
-	fileContent, err := os.Open(filePath)
-	if err != nil {
-		return "Error hashing", err
-	}
-	defer fileContent.Close()
-
-	h := sha256.New()
-	if _, err := io.Copy(h, fileContent); err != nil {
-		return "Error hashing", err
-	}
-
-	hash := hex.EncodeToString(h.Sum(nil))
-	fmt.Println("Hash of file at " + filePath + ": " + hash)
-	return hash, nil
 }
 
 var fileMapping = struct {
@@ -96,7 +75,6 @@ func isInFilesDir(filePath string) bool {
 	return err == nil && !filepath.IsAbs(rel) && !filepath.HasPrefix(rel, "..")
 }
 
-
 // random password:
 func generatePassword() string {
 	bytes := make([]byte, 16)
@@ -129,7 +107,7 @@ func shareFileHandler(w http.ResponseWriter, r *http.Request) {
 	// the link to return:
 	link := fmt.Sprintf("http://localhost:3000/viewfile?address=localhost&hash=%s&password=%s", hash, password)
 
- // to add fule:
+	// to add fule:
 	addFile(hash, filePath, time.Hour, 5)
 
 	fmt.Fprintf(w, "Shareable link: %s\n", link)
@@ -182,6 +160,8 @@ func viewFileHandler(w http.ResponseWriter, r *http.Request) {
 		contentType = "image/png"
 	} else if ext == ".txt" {
 		contentType = "text/plain"
+	} else if ext == ".pdf" {
+		contentType = "application/pdf"
 	}
 
 	// serve the file content:
@@ -206,6 +186,7 @@ func addFile(hash, path string, duration time.Duration, maxAccess int) {
 
 // HTTP server
 func gateway() {
+	addFile("hash098765", "files/dog.jpg", time.Hour, 2) // Example file entry
 	http.HandleFunc("/sharefile", shareFileHandler)
 	http.HandleFunc("/viewfile", viewFileHandler)
 	http.HandleFunc("/hash/", fileHandler)
@@ -213,9 +194,4 @@ func gateway() {
 	if err := http.ListenAndServe(":3000", nil); err != nil {
 		log.Fatalf("Server failed: %s", err)
 	}
-}
-
-func main() {
-	addFile("hash098765", "files/dog.jpg", time.Hour, 2) // Example file entry
-	gateway()
 }
