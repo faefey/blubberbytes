@@ -107,8 +107,8 @@ func server(db *sql.DB) {
 		cors(w, r, db, uploadsHandler)
 	})
 
-	fmt.Println("Server is running on port 3000...")
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	fmt.Println("Server is running on port 3001...")
+	log.Fatal(http.ListenAndServe(":3001", nil))
 }
 
 func storingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {

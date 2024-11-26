@@ -1,5 +1,6 @@
 import React from 'react';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
+import axios from 'axios'
 
 import './stylesheets/App.css';
 
@@ -7,59 +8,64 @@ import Banner from './components/Banner.js';
 import MainContent from './components/mainContent.js'
 import UserAccount from './components/UserAccount.js';
 
-import tableData1 from "./data/tableData1.json";
-import tableData2 from "./data/tableData2.json";
-import tableData3 from "./data/tableData3.json";
-import tableData4 from "./data/tableData4.json";
-
-const initialData = {'Hosting': tableData1, 'Purchased': tableData2, 'Sharing': tableData3, 'Explore': tableData4}
-const columns = [ { label: "File Name", accessor: "FileName", sortable: true }, { label: "File Size", accessor: "FileSize", sortable: true }, { label: "Uploaded Date", accessor: "DateListed", sortable: true }, { label: "Downloads", accessor: "downloads", sortable: true }, { label: "Price", accessor: "price", sortable: true }, { label: "Type", accessor: "type", sortable: true },];
-
 function App() {
-  const [data, setData] = useState(initialData)
   const [currPage, setCurrPage] = useState(0);
   const [currSection, setCurrSection] = useState('Hosting')
-  const [currShownData, setCurrShownData] = useState(data['Hosting'])
+  const [currShownData, setCurrShownData] = useState([])
+
+  useEffect(() => {
+    axios.get('http://localhost:3001/hosting')
+      .then(res => {
+        setCurrShownData(res.data)
+      })
+  }, []);
 
   function backToPrev() {
     setCurrPage(0);
-    setCurrShownData(data[currSection]);
+    setCurrShownData([]);
+    axios.get("localhost:3001/" + currSection)
+      .then(res => {
+        setCurrShownData(res.data)
+      })
   }
 
   function updateShownData(section) {
     setCurrSection(section);
-    setCurrShownData(data[section]);
+    setCurrShownData([]);
+    axios.get("localhost:3001/" + section)
+      .then(res => {
+        setCurrShownData(res.data)
+      })
   }
 
   function addFile(section, file, price) {
     const fileSize = Math.round(file.size / 10000) / 100
     const fileInfo = {
-      id: data[section][data[section].length - 1].id + 1,
-      FileName: file.name || file.FileName,
-      FileSize: fileSize ? fileSize + " MB" : file.FileSize,
-      sizeInGB: fileSize / 1000 || file.sizeInGB,
-      DateListed: section === "Hosting" ? (new Date()).toISOString().slice(0, 10) : file.date || file.DateListed,
-      type: file.type,
-      downloads: section === "Hosting" ? 0 : file.downloads,
+      hash: "12345",
+      name: file.name,
+      size: fileSize,
+      extension: file.type,
+      date: section === "Hosting" ? (new Date()).toISOString().slice(0, 10) : file.date,
       price: price || file.price
     }
-    const newData = [...data[section], fileInfo]
-    setData({...data, [section]: newData})
     setCurrSection(section)
-    setCurrShownData(newData)
+    setCurrShownData([])
+    axios.post("localhost:3001/" + section, fileInfo)
+      .then(res => {
+        alert(res.data)
+        axios.get("localhost:3001/" + section)
+          .then(res => {
+            setCurrShownData(res.data)
+          })
+      })
   }
 
   function removeFiles(files) {
-    const hashesToRemove = new Set(files.map(file => file.hash));
-    const newData = data[currSection].filter(x => !hashesToRemove.has(x["hash"]));
-    setData({ ...data, [currSection]: newData });
-    setCurrShownData(newData);
+    alert("will implement later")
   }
 
-  
   function refreshExplore(e) {
-    const newData = data['Explore'].slice(0, Math.floor(Math.random()*(data['Explore'].length + 1)))
-    setCurrShownData(newData)
+    alert("will implement later")
     e.stopPropagation()
   }
 
@@ -68,13 +74,12 @@ function App() {
 	    <Banner
         currPage={currPage}
         setCurrPage={setCurrPage}
-        origShownData={data[currSection]}
+        origShownData={[]}
         setCurrShownData={setCurrShownData}
       />
 
       {currPage === 0 && 
         <MainContent
-          columns={columns}
           currSection={currSection}
           currShownData={currShownData}
           updateShownData={updateShownData}
