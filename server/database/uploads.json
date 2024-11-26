@@ -1,0 +1,82 @@
+[
+    {
+        "id": 1,
+        "date": "2021-05-28",
+        "hash": "C18MMoSb86r20532V75I1g6d71M3H014Dr1t0u9GgBE86U98f4o43UsL924Y8y",
+        "name": "file_7535",
+        "extension": "TXT",
+        "size": 4264694
+    },
+    {
+        "id": 2,
+        "date": "2021-03-01",
+        "hash": "616N880hM6u4I1000Ego47yfHiX0d57A3q6j3W54c5EnZ71N36m884i81sj8K1",
+        "name": "file_5352",
+        "extension": "MP4",
+        "size": 1307418713
+    },
+    {
+        "id": 3,
+        "date": "2021-11-23",
+        "hash": "342m53J1676TxMs2Cag3xT7Aa322554136tU0BSOJWs48p8jp3738zb7wUJ5vu",
+        "name": "file_3443",
+        "extension": "DOCX",
+        "size": 55989379
+    },
+    {
+        "id": 4,
+        "date": "2022-07-17",
+        "hash": "S69s96DCHc0Up6495Ownr61KK03QHf109FTbS0j4265c121Hd7626pw14P42Kj",
+        "name": "file_6679",
+        "extension": "DOCX",
+        "size": 60572893
+    },
+    {
+        "id": 5,
+        "date": "2023-04-11",
+        "hash": "A1EF900miv06924694q23i93m1e32d1wi3xWhI6L751876O83o8wCV3Hi6A8g1",
+        "name": "file_7547",
+        "extension": "TXT",
+        "size": 2688817
+    },
+    {
+        "id": 6,
+        "date": "2021-05-16",
+        "hash": "c0t6sPGSS5n7Yh65671E365u32vy604je8Z9L0Ox0IK5os62G349mC2FMn2078",
+        "name": "file_5081",
+        "extension": "DOCX",
+        "size": 85817506
+    },
+    {
+        "id": 7,
+        "date": "2020-11-11",
+        "hash": "4o6c7k42uIf98730speR52QFQ8G9r56zDa6o5pO652pA4Fn0kb647wqn2ZlWP7",
+        "name": "file_3204",
+        "extension": "JPEG",
+        "size": 40498872
+    },
+    {
+        "id": 8,
+        "date": "2024-03-06",
+        "hash": "82c6695F07B41U123237N3505X9Dd7El69o04H7NdZ8F4751Zd421Z76a748k2",
+        "name": "file_6816",
+        "extension": "JPEG",
+        "size": 37704943
+    },
+    {
+        "id": 9,
+        "date": "2022-05-14",
+        "hash": "8M806az3C97qj6RGM20145t5SulF17981caA8KK683Iu268YW6r00ve312G07l",
+        "name": "file_7036",
+        "extension": "XLSX",
+        "size": 96506407
+    },
+    {
+        "id": 10,
+        "date": "2021-02-21",
+        "hash": "6avqv59381635BSv99455f8z62e0Mw26R24ozXf5U7GuK60Z76Ygt29O75dI9K",
+        "name": "file_6218",
+        "extension": "PNG",
+        "size": 37429913
+    }
+]

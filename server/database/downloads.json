@@ -1,0 +1,92 @@
+[
+    {
+        "id": 1,
+        "date": "2024-09-22",
+        "hash": "469K3u2V5tV00510737l48W0gx0BSc82C98G6OMm7UF33hjg2rdpdVN9bitYP8",
+        "name": "file_4580",
+        "extension": "PNG",
+        "size": 28298153,
+        "price": 7.07
+    },
+    {
+        "id": 2,
+        "date": "2020-01-13",
+        "hash": "m8s4C024i6m5jde8crt8H91uo50lT08CS21j6B66418WE94K77k8m5H1R9019O",
+        "name": "file_8072",
+        "extension": "PDF",
+        "size": 494377819,
+        "price": 123.59
+    },
+    {
+        "id": 3,
+        "date": "2022-08-04",
+        "hash": "69H0865mV4L5I80g97jZ02oFfhJ2gzB4RS0rUs5Gps5o8MG8715WJ3H4Px854s",
+        "name": "file_8140",
+        "extension": "MP4",
+        "size": 1245127304,
+        "price": 311.28
+    },
+    {
+        "id": 4,
+        "date": "2020-08-22",
+        "hash": "f9h62V0D3z2448MRsb53iXNc9v4e83Zw284901998X2f44N133TmlrUp41x2T8",
+        "name": "file_6196",
+        "extension": "MP4",
+        "size": 1042392244,
+        "price": 260.6
+    },
+    {
+        "id": 5,
+        "date": "2022-06-27",
+        "hash": "1154N28132POB6a76EgZa93a47d8919Rm3z8hPHr79nL448RiD079Z46S86Du6",
+        "name": "file_6586",
+        "extension": "XLSX",
+        "size": 50161403,
+        "price": 12.54
+    },
+    {
+        "id": 6,
+        "date": "2024-03-23",
+        "hash": "Wq380145p1D2E5SF3cCR4740zE9D9buva63B9o49PXy8J2zP3880HSWc3dcq4Z",
+        "name": "file_8739",
+        "extension": "PDF",
+        "size": 454783953,
+        "price": 113.7
+    },
+    {
+        "id": 7,
+        "date": "2023-01-10",
+        "hash": "2HH6aNql5tV3X035TX43V98pJ899K1546xy277xr1nEAw7ABpU3nJ2K1CFt5D4",
+        "name": "file_7371",
+        "extension": "TXT",
+        "size": 6585415,
+        "price": 1.65
+    },
+    {
+        "id": 8,
+        "date": "2022-08-16",
+        "hash": "q7Fm6IfBj4vNX5xwqwFgYSTT9339F38i7xY0JYf4T5Ck9s1x5849e12WU5388Z",
+        "name": "file_6798",
+        "extension": "TXT",
+        "size": 9923757,
+        "price": 2.48
+    },
+    {
+        "id": 9,
+        "date": "2024-12-17",
+        "hash": "xM94d894vs6M4e00Z1N30Y1870yc1X44IN3230BSh24ckGYz2VS9697vYm67UX",
+        "name": "file_3633",
+        "extension": "PDF",
+        "size": 396865548,
+        "price": 99.22
+    },
+    {
+        "id": 10,
+        "date": "2024-04-07",
+        "hash": "92XwSf0Bi41URQKej8gAD69RTP9w5K84S24O492X2qK37Q56rfD4R2x3rHr128",
+        "name": "file_7543",
+        "extension": "DOCX",
+        "size": 77312548,
+        "price": 19.33
+    }
+]

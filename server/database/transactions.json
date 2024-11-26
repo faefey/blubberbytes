@@ -1,0 +1,142 @@
+[
+    {
+        "id": 1,
+        "date": "2024-09-22",
+        "wallet": "W6C4V4i2mu6T9I1w9PL697904Ge181746w",
+        "amount": -7.07,
+        "balance": -160.67
+    },
+    {
+        "id": 2,
+        "date": "2020-01-13",
+        "wallet": "8281zfziEE7Joqg3p1759uYP76BFJtM9wh",
+        "amount": -123.59,
+        "balance": -123.59
+    },
+    {
+        "id": 3,
+        "date": "2022-08-04",
+        "wallet": "957L6004BGO140h8lP27498c04liC6If2f",
+        "amount": -311.28,
+        "balance": -32.5999999999999
+    },
+    {
+        "id": 4,
+        "date": "2020-08-22",
+        "wallet": "14FcY46y3E8O93q6j7P9Pi0j423hqM20h7",
+        "amount": -260.6,
+        "balance": -384.19
+    },
+    {
+        "id": 5,
+        "date": "2022-06-27",
+        "wallet": "Q876MI30BbO9h30f9D3fN2iJ284F20621F",
+        "amount": -12.54,
+        "balance": 254.45
+    },
+    {
+        "id": 6,
+        "date": "2024-03-23",
+        "wallet": "588R6oi2Gr26l1z1rG8B8JTo31129k538z",
+        "amount": -113.7,
+        "balance": -134.27
+    },
+    {
+        "id": 7,
+        "date": "2023-01-10",
+        "wallet": "l48n3sE75O9F37NpVYy27Gdx39QC92irpu",
+        "amount": -1.65,
+        "balance": -36.7299999999999
+    },
+    {
+        "id": 8,
+        "date": "2022-08-16",
+        "wallet": "mQ42712180N92cE99AlE7796I17z1t13ow",
+        "amount": -2.48,
+        "balance": -35.08
+    },
+    {
+        "id": 9,
+        "date": "2024-12-17",
+        "wallet": "iG7s3Gk0C28QJ22itD4vA2e467Aq430OX9",
+        "amount": -99.22,
+        "balance": -259.89
+    },
+    {
+        "id": 10,
+        "date": "2024-04-07",
+        "wallet": "j3498GKko2nmTu6jRbTRgWO69t7y0R15P2",
+        "amount": -19.33,
+        "balance": -153.6
+    },
+    {
+        "id": 11,
+        "date": "2021-05-28",
+        "wallet": "VgP840o0FMArzj2969V10D227A2k6XN37R",
+        "amount": 1.71,
+        "balance": 205.99
+    },
+    {
+        "id": 12,
+        "date": "2021-03-01",
+        "wallet": "e13QYv44S5616318ew6Ucg5Kd01w853TZh",
+        "amount": 522.97,
+        "balance": 169.95
+    },
+    {
+        "id": 13,
+        "date": "2021-11-23",
+        "wallet": "c69w4Q0i4rkRdW08k0f2XJ8d62Mw927r08",
+        "amount": 22.4,
+        "balance": 228.39
+    },
+    {
+        "id": 14,
+        "date": "2022-07-17",
+        "wallet": "D2128S75dJo0W0ET5l22S885WBsuwo9IIb",
+        "amount": 24.23,
+        "balance": 278.68
+    },
+    {
+        "id": 15,
+        "date": "2023-04-11",
+        "wallet": "Gl66Qybl29d175U8l828364xVF8u150QI9",
+        "amount": 1.08,
+        "balance": -35.6499999999999
+    },
+    {
+        "id": 16,
+        "date": "2021-05-16",
+        "wallet": "71XC73EA725FhXgAXR7XFiWa57d877r147",
+        "amount": 34.33,
+        "balance": 204.28
+    },
+    {
+        "id": 17,
+        "date": "2020-11-11",
+        "wallet": "O880u348V6w71M4FDK0f0w9kO32TVX58G4",
+        "amount": 16.2,
+        "balance": -367.99
+    },
+    {
+        "id": 18,
+        "date": "2024-03-06",
+        "wallet": "np1426c38877hAGh22f6GYW0120S1N93w6",
+        "amount": 15.08,
+        "balance": -20.5699999999999
+    },
+    {
+        "id": 19,
+        "date": "2022-05-14",
+        "wallet": "028HY98i3vcOJn3a1z302g183ZqZ01F48w",
+        "amount": 38.6,
+        "balance": 266.99
+    },
+    {
+        "id": 20,
+        "date": "2021-02-21",
+        "wallet": "xDmQ0F9684125F04myYcm040lihYk74z20",
+        "amount": 14.97,
+        "balance": -353.02
+    }
+]

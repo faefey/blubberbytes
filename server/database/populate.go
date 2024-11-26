@@ -35,6 +35,24 @@ func PopulateDatabase(db *sql.DB) error {
 		return fmt.Errorf("error populating Saved table: %v", err)
 	}
 
+	// Populate downloads table
+	err = populateDownloads(db, "database/downloads.json")
+	if err != nil {
+		return fmt.Errorf("error populating downloads table: %v", err)
+	}
+
+	// Populate transactions table
+	err = populateTransactions(db, "database/transactions.json")
+	if err != nil {
+		return fmt.Errorf("error populating Transactions table: %v", err)
+	}
+
+	// Populate uploads table
+	err = populateUploads(db, "database/uploads.json")
+	if err != nil {
+		return fmt.Errorf("error populating Uploads table: %v", err)
+	}
+
 	fmt.Println("Database populated successfully.")
 	return nil
 }
@@ -121,6 +139,72 @@ func populateSaved(db *sql.DB, filePath string) error {
 		err = operations.AddSaved(db, record.Hash, record.Name, record.Extension, record.Size)
 		if err != nil {
 			return fmt.Errorf("error inserting into Saved: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func populateDownloads(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %v", filePath, err)
+	}
+
+	var downloadsRecords []models.Downloads
+	err = json.Unmarshal(data, &downloadsRecords)
+	if err != nil {
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
+	}
+
+	for _, record := range downloadsRecords {
+		err = operations.AddDownloads(db, record.Id, record.Date, record.Hash, record.Name, record.Extension, record.Size, record.Price)
+		if err != nil {
+			return fmt.Errorf("error inserting into Downloads: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func populateTransactions(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %v", filePath, err)
+	}
+
+	var transactionsRecords []models.Transactions
+	err = json.Unmarshal(data, &transactionsRecords)
+	if err != nil {
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
+	}
+
+	for _, record := range transactionsRecords {
+		err = operations.AddTransactions(db, record.Id, record.Date, record.Wallet, record.Amount, record.Balance)
+		if err != nil {
+			return fmt.Errorf("error inserting into Transactions: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func populateUploads(db *sql.DB, filePath string) error {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading %s: %v", filePath, err)
+	}
+
+	var uploadsRecords []models.Uploads
+	err = json.Unmarshal(data, &uploadsRecords)
+	if err != nil {
+		return fmt.Errorf("error parsing %s: %v", filePath, err)
+	}
+
+	for _, record := range uploadsRecords {
+		err = operations.AddUploads(db, record.Id, record.Date, record.Hash, record.Name, record.Extension, record.Size)
+		if err != nil {
+			return fmt.Errorf("error inserting into Uploads: %v", err)
 		}
 	}
 

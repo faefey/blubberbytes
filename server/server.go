@@ -95,6 +95,18 @@ func server(db *sql.DB) {
 		cors(w, r, db, savedHandler)
 	})
 
+	http.HandleFunc("/downloads", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, downloadsHandler)
+	})
+
+	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, transactionsHandler)
+	})
+
+	http.HandleFunc("/uploads", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, uploadsHandler)
+	})
+
 	fmt.Println("Server is running on port 3000...")
 	log.Fatal(http.ListenAndServe(":3000", nil))
 }
@@ -141,4 +153,37 @@ func savedHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(savedRecords)
+}
+
+func downloadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	downloadsRecords, err := operations.GetAllDownloads(db)
+	if err != nil {
+		http.Error(w, "Error fetching hosting data", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(downloadsRecords)
+}
+
+func transactionsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	transactionsRecords, err := operations.GetAllTransactions(db)
+	if err != nil {
+		http.Error(w, "Error fetching sharing data", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(transactionsRecords)
+}
+
+func uploadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	uploadsRecords, err := operations.GetAllUploads(db)
+	if err != nil {
+		http.Error(w, "Error fetching saved data", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(uploadsRecords)
 }
