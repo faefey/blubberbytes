@@ -38,19 +38,19 @@ func PopulateDatabase(db *sql.DB) error {
 	// Populate downloads table
 	err = populateDownloads(db, "database/downloads.json")
 	if err != nil {
-		return fmt.Errorf("error populating downloads table: %v", err)
+		return fmt.Errorf("error populating Download History table: %v", err)
 	}
 
 	// Populate transactions table
 	err = populateTransactions(db, "database/transactions.json")
 	if err != nil {
-		return fmt.Errorf("error populating Transactions table: %v", err)
+		return fmt.Errorf("error populating Transaction History table: %v", err)
 	}
 
 	// Populate uploads table
 	err = populateUploads(db, "database/uploads.json")
 	if err != nil {
-		return fmt.Errorf("error populating Uploads table: %v", err)
+		return fmt.Errorf("error populating Upload History table: %v", err)
 	}
 
 	fmt.Println("Database populated successfully.")
@@ -160,7 +160,7 @@ func populateDownloads(db *sql.DB, filePath string) error {
 	for _, record := range downloadsRecords {
 		err = operations.AddDownloads(db, record.Id, record.Date, record.Hash, record.Name, record.Extension, record.Size, record.Price)
 		if err != nil {
-			return fmt.Errorf("error inserting into Downloads: %v", err)
+			return fmt.Errorf("error inserting into Download History: %v", err)
 		}
 	}
 
@@ -182,7 +182,7 @@ func populateTransactions(db *sql.DB, filePath string) error {
 	for _, record := range transactionsRecords {
 		err = operations.AddTransactions(db, record.Id, record.Date, record.Wallet, record.Amount, record.Balance)
 		if err != nil {
-			return fmt.Errorf("error inserting into Transactions: %v", err)
+			return fmt.Errorf("error inserting into Transaction History: %v", err)
 		}
 	}
 
@@ -204,7 +204,7 @@ func populateUploads(db *sql.DB, filePath string) error {
 	for _, record := range uploadsRecords {
 		err = operations.AddUploads(db, record.Id, record.Date, record.Hash, record.Name, record.Extension, record.Size)
 		if err != nil {
-			return fmt.Errorf("error inserting into Uploads: %v", err)
+			return fmt.Errorf("error inserting into Upload History: %v", err)
 		}
 	}
 

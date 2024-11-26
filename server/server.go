@@ -158,7 +158,7 @@ func savedHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 func downloadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	downloadsRecords, err := operations.GetAllDownloads(db)
 	if err != nil {
-		http.Error(w, "Error fetching hosting data", http.StatusInternalServerError)
+		http.Error(w, "Error fetching download data", http.StatusInternalServerError)
 		return
 	}
 
@@ -169,7 +169,7 @@ func downloadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 func transactionsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	transactionsRecords, err := operations.GetAllTransactions(db)
 	if err != nil {
-		http.Error(w, "Error fetching sharing data", http.StatusInternalServerError)
+		http.Error(w, "Error fetching transaction data", http.StatusInternalServerError)
 		return
 	}
 
@@ -180,7 +180,7 @@ func transactionsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 func uploadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	uploadsRecords, err := operations.GetAllUploads(db)
 	if err != nil {
-		http.Error(w, "Error fetching saved data", http.StatusInternalServerError)
+		http.Error(w, "Error fetching upload data", http.StatusInternalServerError)
 		return
 	}
 
