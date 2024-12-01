@@ -1,6 +1,6 @@
 // Table.js
-import React, { useState, useEffect } from "react";
-import "../stylesheets/table.css";
+import React, { useState, useEffect, useMemo } from 'react';
+import '../stylesheets/table.css';
 import TableContext from './TableContext';
 import SelectedFileMenu from './selectedfilemenu';
 import checkboxOn from '../icons/checkbox_on.svg';
@@ -8,12 +8,12 @@ import checkboxOff from '../icons/checkbox_off.svg';
 
 // TableHead component
 const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
-  const [sortField, setSortField] = useState("");
-  const [order, setOrder] = useState("asc");
+  const [sortField, setSortField] = useState('');
+  const [order, setOrder] = useState('asc');
 
   const handleSortingChange = (accessor) => {
     const sortOrder =
-      accessor === sortField && order === "asc" ? "desc" : "asc";
+      accessor === sortField && order === 'asc' ? 'desc' : 'asc';
     setSortField(accessor);
     setOrder(sortOrder);
     handleSorting(accessor, sortOrder);
@@ -25,19 +25,19 @@ const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
         <th>
           <img
             src={selectAll ? checkboxOn : checkboxOff}
-            alt={selectAll ? "Select All Checked" : "Select All Unchecked"}
+            alt={selectAll ? 'Select All Checked' : 'Select All Unchecked'}
             className="custom-checkbox"
             onClick={onSelectAll}
           />
         </th>
         {columns.map(({ label, accessor, sortable }) => {
           const cl = sortable
-            ? sortField === accessor && order === "asc"
-              ? "up"
-              : sortField === accessor && order === "desc"
-              ? "down"
-              : "default"
-            : "";
+            ? sortField === accessor && order === 'asc'
+              ? 'up'
+              : sortField === accessor && order === 'desc'
+              ? 'down'
+              : 'default'
+            : '';
           return (
             <th
               key={accessor}
@@ -53,7 +53,6 @@ const TableHead = ({ columns, handleSorting, selectAll, onSelectAll }) => {
   );
 };
 
-// TableBody component
 const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
   return (
     <tbody>
@@ -74,7 +73,12 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
               />
             </td>
             {columns.map(({ accessor }) => {
-              const tData = data[accessor] ? data[accessor] : "——";
+              let tData = data[accessor] !== undefined ? data[accessor] : "——";
+
+              if (accessor === "size") {
+                tData = formatSize(tData);
+              }
+
               return <td key={accessor}>{tData}</td>;
             })}
           </tr>
@@ -84,13 +88,55 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
   );
 };
 
+
 // Main Table component
-const Table = ({ caption, data, columns, addFile, removeFiles }) => {
+const Table = ({ currSection, data, addFile, removeFiles }) => {
+  const columns = useMemo(() => {
+    switch (currSection) {
+      case 'Hosting':
+        return [
+          { label: 'Hash', accessor: 'hash', sortable: true },
+          { label: 'Name', accessor: 'name', sortable: true },
+          { label: 'Extension', accessor: 'extension', sortable: true },
+          { label: 'Size', accessor: 'size', sortable: true },
+          { label: 'Price', accessor: 'price', sortable: true },
+          { label: 'Date', accessor: 'date', sortable: true },
+        ];
+      case 'Sharing':
+        return [
+          { label: 'Hash', accessor: 'hash', sortable: true },
+          { label: 'Name', accessor: 'name', sortable: true },
+          { label: 'Extension', accessor: 'extension', sortable: true },
+          { label: 'Size', accessor: 'size', sortable: true },
+          { label: 'Password', accessor: 'password', sortable: false },
+          { label: 'Date', accessor: 'date', sortable: true },
+        ];
+
+
+        case 'Saved':
+          return [
+            { label: 'Hash', accessor: 'hash', sortable: true },
+            { label: 'Name', accessor: 'name', sortable: true },
+            { label: 'Extension', accessor: 'extension', sortable: true },
+            { label: 'Size', accessor: 'size', sortable: true },
+           
+          ];
+
+      default:
+        return [
+          { label: 'Hash', accessor: 'hash', sortable: true },
+          { label: 'Name', accessor: 'name', sortable: true },
+          { label: 'Extension', accessor: 'extension', sortable: true },
+          { label: 'Size', accessor: 'size', sortable: true },
+          { label: 'Date', accessor: 'date', sortable: true },
+        ];
+    }
+  }, [currSection]);
+
   const [filters, setFilters] = useState({
     type: '',
     size: '',
     date: '',
-    downloads: '',
     price: '',
   });
 
@@ -104,7 +150,6 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
       type: '',
       size: '',
       date: '',
-      downloads: '',
       price: '',
     });
   }, [data]);
@@ -112,7 +157,9 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
   const onSelectRow = (file) => {
     setSelectedFiles((prevSelectedFiles) =>
       prevSelectedFiles.some((selectedFile) => selectedFile.hash === file.hash)
-        ? prevSelectedFiles.filter((selectedFile) => selectedFile.hash !== file.hash)
+        ? prevSelectedFiles.filter(
+            (selectedFile) => selectedFile.hash !== file.hash
+          )
         : [...prevSelectedFiles, file]
     );
   };
@@ -125,7 +172,8 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
     }
   };
 
-  const selectAll = selectedFiles.length === tableData.length && tableData.length > 0;
+  const selectAll =
+    selectedFiles.length === tableData.length && tableData.length > 0;
 
   const contextValue = {
     filters,
@@ -136,9 +184,13 @@ const Table = ({ caption, data, columns, addFile, removeFiles }) => {
 
   return (
     <TableContext.Provider value={contextValue}>
-      <SelectedFileMenu addFile={addFile} removeFiles={removeFiles} data={data} />
+      <SelectedFileMenu
+        addFile={addFile}
+        removeFiles={removeFiles}
+        data={data}
+      />
       <table className="table">
-        <caption>{caption}</caption>
+        <caption>{currSection}</caption>
         <TableHead
           columns={columns}
           handleSorting={handleSorting}
@@ -160,25 +212,31 @@ export default Table;
 
 // Sorting and filtering logic
 function getDefaultSorting(defaultTableData, columns) {
+  const filterColumn = columns.filter((column) => column.sortbyOrder);
+
+  let { accessor = columns[0]?.accessor || 'hash', sortbyOrder = 'asc' } =
+    Object.assign({}, ...filterColumn);
+
   const sorted = [...defaultTableData].sort((a, b) => {
-    const filterColumn = columns.filter((column) => column.sortbyOrder);
+    const aValue = a[accessor];
+    const bValue = b[accessor];
 
-    let { accessor = "FileName", sortbyOrder = "asc" } = Object.assign(
-      {},
-      ...filterColumn
-    );
+    // Check for undefined or null
+    if (aValue == null && bValue == null) return 0;
+    if (aValue == null) return 1;
+    if (bValue == null) return -1;
 
-    if (a[accessor] === null) return 1;
-    if (b[accessor] === null) return -1;
-    if (a[accessor] === null && b[accessor] === null) return 0;
+    let comparison = 0;
 
-    const ascending = a[accessor]
-      .toString()
-      .localeCompare(b[accessor].toString(), "en", {
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      comparison = aValue - bValue;
+    } else {
+      comparison = aValue.toString().localeCompare(bValue.toString(), 'en', {
         numeric: true,
       });
+    }
 
-    return sortbyOrder === "asc" ? ascending : -ascending;
+    return sortbyOrder === 'asc' ? comparison : -comparison;
   });
   return sorted;
 }
@@ -195,14 +253,24 @@ const useSortableTable = (data, columns, filters) => {
   const handleSorting = (sortField, sortOrder) => {
     if (sortField) {
       const sorted = [...tableData].sort((a, b) => {
-        if (a[sortField] === null) return 1;
-        if (b[sortField] === null) return -1;
-        if (a[sortField] === null && b[sortField] === null) return 0;
-        return (
-          a[sortField].toString().localeCompare(b[sortField].toString(), "en", {
+        const aValue = a[sortField];
+        const bValue = b[sortField];
+
+        if (aValue == null && bValue == null) return 0;
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+
+        let comparison = 0;
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          comparison = aValue - bValue;
+        } else {
+          comparison = aValue.toString().localeCompare(bValue.toString(), 'en', {
             numeric: true,
-          }) * (sortOrder === "asc" ? 1 : -1)
-        );
+          });
+        }
+
+        return sortOrder === 'asc' ? comparison : -comparison;
       });
       setTableData(sorted);
     }
@@ -215,72 +283,72 @@ function applyFilters(data, filters) {
   return data.filter((item) => {
     let isValid = true;
 
-    // Type filter
-    if (filters.type) {
-      isValid = isValid && item.type === filters.type;
-    }
+
 
     // Size filter
-    if (filters.size) {
-      if (filters.size === "less1gb") {
-        isValid = isValid && item.sizeInGB < 1;
-      } else if (filters.size === "1to5gb") {
-        isValid = isValid && item.sizeInGB >= 1 && item.sizeInGB <= 5;
-      } else if (filters.size === "more5gb") {
-        isValid = isValid && item.sizeInGB > 5;
+    if (filters.size && item.size != null) {
+      const sizeInGB = item.size; // Assuming size is already in GB
+      if (filters.size === 'less1gb') {
+        isValid = isValid && sizeInGB < 1;
+      } else if (filters.size === '1to5gb') {
+        isValid = isValid && sizeInGB >= 1 && sizeInGB <= 5;
+      } else if (filters.size === 'more5gb') {
+        isValid = isValid && sizeInGB > 5;
       }
     }
 
     // Date filter
-    if (filters.date) {
-      const itemDate = new Date(item.DateListed);
+    if (filters.date && item.date) {
+      const itemDate = new Date(item.date);
       const today = new Date();
-      if (filters.date === "today") {
-        isValid =
-          isValid &&
-          itemDate.toDateString() === today.toDateString();
-      } else if (filters.date === "7days") {
+      if (filters.date === 'today') {
+        isValid = isValid && itemDate.toDateString() === today.toDateString();
+      } else if (filters.date === '7days') {
         const lastWeek = new Date();
         lastWeek.setDate(today.getDate() - 7);
         isValid = isValid && itemDate >= lastWeek && itemDate <= today;
-      } else if (filters.date === "30days") {
+      } else if (filters.date === '30days') {
         const lastMonth = new Date();
         lastMonth.setDate(today.getDate() - 30);
         isValid = isValid && itemDate >= lastMonth && itemDate <= today;
-      } else if (filters.date === "6months") {
+      } else if (filters.date === '6months') {
         const lastSixMonths = new Date();
         lastSixMonths.setMonth(today.getMonth() - 6);
         isValid = isValid && itemDate >= lastSixMonths && itemDate <= today;
-      } else if (filters.date === "thisyear") {
+      } else if (filters.date === 'thisyear') {
         isValid = isValid && itemDate.getFullYear() === today.getFullYear();
-      } else if (filters.date === "lastyear") {
+      } else if (filters.date === 'lastyear') {
         isValid =
           isValid && itemDate.getFullYear() === today.getFullYear() - 1;
       }
     }
 
-    // Downloads filter
-    if (filters.downloads) {
-      if (filters.downloads === "less100") {
-        isValid = isValid && item.downloads < 100;
-      } else if (filters.downloads === "100to1000") {
-        isValid = isValid && item.downloads >= 100 && item.downloads <= 1000;
-      } else if (filters.downloads === "more1000") {
-        isValid = isValid && item.downloads > 1000;
-      }
-    }
-
-    // Price filter
-    if (filters.price) {
-      if (filters.price === "less1") {
+    // Price filter (for Hosting)
+    if (filters.price && item.price != null) {
+      if (filters.price === 'less1') {
         isValid = isValid && item.price < 1;
-      } else if (filters.price === "1to2") {
+      } else if (filters.price === '1to2') {
         isValid = isValid && item.price >= 1 && item.price <= 2;
-      } else if (filters.price === "more2") {
+      } else if (filters.price === 'more2') {
         isValid = isValid && item.price > 2;
       }
     }
 
     return isValid;
   });
+}
+
+
+
+
+function formatSize(bytes) {
+  if (bytes >= 1e9) {
+    return (bytes / 1e9).toFixed(2) + ' GB';
+  } else if (bytes >= 1e6) {
+    return (bytes / 1e6).toFixed(2) + ' MB';
+  } else if (bytes >= 1e3) {
+    return (bytes / 1e3).toFixed(2) + ' KB';
+  } else {
+    return bytes + ' B';
+  }
 }
