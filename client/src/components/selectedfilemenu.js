@@ -27,7 +27,6 @@ function FileFilters({ filters, setFilters }) {
       type: '',
       size: '',
       date: '',
-      downloads: '',
       price: '',
     });
   }
@@ -73,18 +72,6 @@ function FileFilters({ filters, setFilters }) {
         <option value="6months">Last 6 months</option>
         <option value="thisyear">This year</option>
         <option value="lastyear">Last year</option>
-      </select>
-
-      <select
-        id="downloadfilter"
-        className="filter"
-        value={filters.downloads}
-        onChange={(e) => setFilters({ ...filters, downloads: e.target.value })}
-      >
-        <option value="" hidden>Downloads</option>
-        <option value="less100">{'<'} 100</option>
-        <option value="100to1000">100 - 1000</option>
-        <option value="more1000">{'>'} 1000</option>
       </select>
 
       <select
