@@ -1,4 +1,3 @@
-// FileManager.js
 import React, { useState, useEffect } from "react";
 import SelectedFileMenu from "./selectedfilemenu";
 import Table from "./Table";
@@ -8,7 +7,6 @@ const FileManager = () => {
   const [filters, setFilters] = useState({
     size: "",
     date: "",
-    downloads: "",
   });
   const [filteredData, setFilteredData] = useState(data);
 
@@ -55,17 +53,7 @@ const FileManager = () => {
         });
       }
 
-      // Apply Downloads Filter
-      if (filters.downloads) {
-        updatedData = updatedData.filter((item) => {
-          const downloads = item.downloads;
-          if (filters.downloads === "less100") return downloads < 100;
-          if (filters.downloads === "100to1000")
-            return downloads >= 100 && downloads <= 1000;
-          if (filters.downloads === "more1000") return downloads > 1000;
-          return true;
-        });
-      }
+
 
       setFilteredData(updatedData);
     };
