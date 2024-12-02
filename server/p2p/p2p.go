@@ -10,7 +10,7 @@ import (
 
 var (
 	relay_node_addr     = "/ip4/130.245.173.221/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
-	bootstrap_node_addr = "/ip4/130.245.173.222/tcp/61000/p2p/12D3KooWQd1K1k8XA9xVEzSAu7HUCodC7LJB6uW5Kw4VwkRdstPE"
+	bootstrap_node_addr = "/ip4/127.0.1.0/tcp/61000/p2p/12D3KooWKLP2W9BDZhSjNkUyChEF6jVhoVbkfztu7o5mbHvQ4XcM"
 )
 
 func P2P(db *sql.DB) {

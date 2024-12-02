@@ -348,7 +348,9 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			hash := args[2]
 			password := args[3]
 			fmt.Printf("Sending request to peer %s with hash: %s\n", targetPeerID, hash)
-			data, err := sendRequest(node, targetPeerID, hash, password)
+
+			// Call the sendRequest function
+			data, ext, err := sendRequest(node, targetPeerID, hash, password)
 			if err != nil {
 				log.Fatalf("Error sending request: %v", err)
 			}
@@ -357,6 +359,13 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				log.Println("No data received for the request")
 			} else {
 				log.Printf("Received data: %d bytes", len(data))
+			}
+
+			// Print the received file extension
+			if ext == "" {
+				log.Println("No file extension received")
+			} else {
+				log.Printf("Received file extension: %s", ext)
 			}
 
 		case "GET":

@@ -26,6 +26,7 @@ var (
 	storing          []models.Storing // Global variable to hold Storing objects
 	storingMutex     sync.Mutex       // Mutex to ensure thread-safe access to the global variable
 	receivedFileData []byte
+	receivedFileExt  string
 	dataMutex        sync.Mutex
 )
 
@@ -128,6 +129,23 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			storingMutex.Unlock()
 
 			log.Printf("Successfully added %d storings to the global list", len(receivedStorings))
+		} else if header == "requested_file_ext" {
+			// Handle file extension
+			log.Printf("Handling file extension transfer from peer: %s", s.Conn().RemotePeer())
+
+			ext, err := reader.ReadString('\n')
+			if err != nil {
+				log.Printf("Error reading file extension from stream: %v", err)
+				return
+			}
+			ext = strings.TrimSpace(ext)
+
+			// Safely store the received extension
+			dataMutex.Lock()
+			receivedFileExt = ext
+			dataMutex.Unlock()
+
+			log.Printf("File extension received and stored: %s", receivedFileExt)
 		} else {
 			log.Printf("Unknown header type received: %s", header)
 		}
@@ -249,6 +267,19 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 	}
 
 	log.Printf("File sent successfully to peer %s: %s", targetPeerID, storing.Path)
+
+	// Send the file extension
+	fileExt := storing.Extension
+	if fileExt == "" {
+		log.Printf("No extension found for file hash: %s", fileHash)
+		fileExt = "unknown"
+	}
+	err = sendRequestedFileExtToPeer(node, targetPeerID, fileExt)
+	if err != nil {
+		log.Printf("Error sending file extension to peer %s: %v", targetPeerID, err)
+		return
+	}
+	log.Printf("File extension sent successfully to peer %s: %s", targetPeerID, fileExt)
 }
 
 func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType string, hash string, password string) error {
@@ -351,29 +382,31 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 	return nil
 }
 
-func sendRequest(node host.Host, targetPeerID, hash, password string) ([]byte, error) {
+func sendRequest(node host.Host, targetPeerID, hash, password string) ([]byte, string, error) {
 	// Call sendDataToPeer to send the request
 	err := sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	// Wait and retrieve the global variable
+	// Wait and retrieve the global variables
 	time.Sleep(500 * time.Millisecond) // Wait for data to be received
 
-	dataMutex.Lock() // Lock the mutex to safely access the global variable
+	dataMutex.Lock() // Lock the mutex to safely access the global variables
 	defer dataMutex.Unlock()
 
-	if receivedFileData == nil {
-		log.Printf("No data received after waiting for the requested file")
-		return nil, nil
+	if receivedFileData == nil || receivedFileExt == "" {
+		log.Printf("No data or file extension received after waiting for the requested file")
+		return nil, "", nil
 	}
 
 	data := receivedFileData // Copy the data
-	receivedFileData = nil   // Clear the global variable
-	log.Printf("Returning data from global variable: %d bytes", len(data))
+	ext := receivedFileExt   // Copy the file extension
+	receivedFileData = nil   // Clear the global variables
+	receivedFileExt = ""
 
-	return data, nil
+	log.Printf("Returning data and extension: %d bytes, ext: %s", len(data), ext)
+	return data, ext, nil
 }
 
 // Function to receive a requested file and store it in the global variable
@@ -450,6 +483,46 @@ func sendRequestedFileToPeer(node host.Host, targetPeerID, filePath string) erro
 	log.Printf("Sent %d bytes of requested file content to peer %s", n, targetPeerID)
 
 	log.Printf("Requested file sent successfully to peer %s: %s", targetPeerID, filePath)
+	return nil
+}
+
+func sendRequestedFileExtToPeer(node host.Host, targetPeerID, fileExt string) error {
+	log.Printf("Preparing to send file extension to peer %s, extension: %s", targetPeerID, fileExt)
+
+	// Decode the target peer ID
+	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+	if err != nil {
+		log.Printf("Failed to decode target peer ID: %v", err)
+		return err
+	}
+	log.Printf("Successfully decoded target peer ID: %s", targetPeerID)
+
+	// Open a stream to the target peer
+	ctx := context.Background()
+	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
+	if err != nil {
+		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	defer s.Close()
+	log.Printf("Stream opened successfully to peer %s", targetPeerID)
+
+	// Write the "requested_file_ext" header
+	_, err = s.Write([]byte("requested_file_ext\n"))
+	if err != nil {
+		log.Printf("Failed to send requested_file_ext header to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Sent 'requested_file_ext' header to peer %s", targetPeerID)
+
+	// Write the file extension
+	_, err = s.Write([]byte(fileExt + "\n"))
+	if err != nil {
+		log.Printf("Failed to send file extension to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Sent file extension to peer %s: %s", targetPeerID, fileExt)
+
 	return nil
 }
 
