@@ -23,7 +23,7 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
         {files.map((file, index) => (
             <div key={index} className="rece-row">
                 <span>{file.FileName}</span>
-                <span className="rece-amount">ORCA {file.price.toFixed(2)}</span>
+                {file.price && <span className="rece-amount">ORCA {file.price.toFixed(2)}</span>}
             </div>
             ))}
       </div>

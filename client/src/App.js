@@ -10,11 +10,11 @@ import UserAccount from './components/UserAccount.js';
 
 function App() {
   const [currPage, setCurrPage] = useState(0);
-  const [currSection, setCurrSection] = useState('Hosting')
+  const [currSection, setCurrSection] = useState('storing')
   const [currShownData, setCurrShownData] = useState([])
 
   useEffect(() => {
-    axios.get('http://localhost:3001/hosting')
+    axios.get('http://localhost:3001/storing')
       .then(res => {
         setCurrShownData(res.data)
       })
@@ -23,7 +23,7 @@ function App() {
   function backToPrev() {
     setCurrPage(0);
     setCurrShownData([]);
-    axios.get("localhost:3001/" + currSection)
+    axios.get("http://localhost:3001/" + currSection)
       .then(res => {
         setCurrShownData(res.data)
       })
@@ -32,28 +32,42 @@ function App() {
   function updateShownData(section) {
     setCurrSection(section);
     setCurrShownData([]);
-    axios.get("localhost:3001/" + section)
+    axios.get("http://localhost:3001/" + section)
       .then(res => {
         setCurrShownData(res.data)
       })
   }
 
-  function addFile(section, file, price) {
-    const fileSize = Math.round(file.size / 10000) / 100
-    const fileInfo = {
-      hash: "12345",
-      name: file.name,
-      size: fileSize,
-      extension: file.type,
-      date: section === "Hosting" ? (new Date()).toISOString().slice(0, 10) : file.date,
-      price: price || file.price
-    }
+  function addFile(section, fileInfo, fileObject=null) {
+    let newFileInfo = null
+    console.log(window.electron.pathForFile(fileObject))
+    if(section === "storing")
+      newFileInfo = {
+        hash: "",
+        name: fileInfo.name,
+        extension: fileInfo.type,
+        size: fileInfo.size,
+        path: window.electron.pathForFile(fileObject),
+        date: (new Date()).toISOString().slice(0, 10)
+      }
+    else if(section === "hosting")
+      newFileInfo = {hash: fileInfo.hash, price: fileInfo.price}
+    else if(section === "sharing")
+      newFileInfo = {hash: fileInfo.hash, password: ""}
+    else
+      newFileInfo = {
+        hash: "",
+        name: fileInfo.name,
+        extension: fileInfo.type,
+        size: fileInfo.size
+      }
+    
     setCurrSection(section)
     setCurrShownData([])
-    axios.post("localhost:3001/" + section, fileInfo)
+
+    axios.post("http://localhost:3001/" + section, newFileInfo)
       .then(res => {
-        alert(res.data)
-        axios.get("localhost:3001/" + section)
+        axios.get("http://localhost:3001/" + section)
           .then(res => {
             setCurrShownData(res.data)
           })
@@ -61,7 +75,16 @@ function App() {
   }
 
   function removeFiles(files) {
-    alert("will implement later")
+    console.log(files)
+    for (const file of files) {
+      axios.post("http://localhost:3001/delete" + currSection, file.hash)
+        .then(res => {
+          axios.get("http://localhost:3001/" + currSection)
+            .then(res => {
+              setCurrShownData(res.data)
+            })
+        })
+    }
   }
 
   function refreshExplore(e) {

@@ -32,7 +32,7 @@ const SideMenu = ({files=true, items, currSection, addFile}) => {
           icon={item.icon}
           onClick={item.onClick}
           extraIcon={item.extraIcon}
-          isActive={currSection === item.label}
+          isActive={currSection === item.label.toLowerCase()}
         />
       ))}
     </div>

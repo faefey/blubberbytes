@@ -5,32 +5,30 @@ import {ReactComponent as Hosting} from '../icons/server.svg'
 import {ReactComponent as Sharing} from '../icons/folder.svg'
 import {ReactComponent as Explore} from '../icons/globe1.svg'
 
-import {ReactComponent as Status} from '../icons/status.svg'
 import {ReactComponent as Refresh} from '../icons/refresh.svg'
 
 export default function MainContent({currSection, currShownData, updateShownData, addFile, removeFiles, refreshExplore}) {
   const fileItems = [
     {
       label: 'Storing', icon: <Hosting />,
-      onClick: () => updateShownData('Storing'),
+      onClick: () => updateShownData('storing'),
     },
     {
       label: 'Hosting', icon: <Hosting />,
-      onClick: () => updateShownData('Hosting'),
-      extraIcon: <Status id="status" className="icon extraicon" />
+      onClick: () => updateShownData('hosting')
     },
     {
       label: 'Sharing', icon: <Sharing />,
-      onClick: () => updateShownData('Sharing')
+      onClick: () => updateShownData('sharing')
     },
     {
       label: 'Explore', icon: <Explore />,
-      onClick: () => updateShownData('Explore'),
+      onClick: () => updateShownData('explore'),
       extraIcon: <Refresh id="refresh" className="icon extraicon" onClick={refreshExplore} />
     },
     {
       label: 'Saved', icon: <Explore />,
-      onClick: () => updateShownData('Saved')
+      onClick: () => updateShownData('saved')
     }
   ];
   
@@ -38,7 +36,7 @@ export default function MainContent({currSection, currShownData, updateShownData
       <div className="maincontent">
         <SideMenu items={fileItems} currSection={currSection} addFile={addFile} />
         <div className="content">
-          <Table data={currShownData} addFile={addFile} removeFiles={removeFiles} />
+          <Table currSection={currSection} data={currShownData} addFile={addFile} removeFiles={removeFiles} />
         </div>
       </div>
   );

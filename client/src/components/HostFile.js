@@ -59,7 +59,7 @@ export default function HostPopup({addFile}) {
         if (currErrors['fileError'] === '' && currErrors['priceError'] === '') {
             setFileName("No file chosen");
             //console.log(fileInputRef.current.files[0]);
-            addFile('Hosting', fileInputRef.current.files[0], filePrice)
+            addFile('storing', fileInputRef.current.files[0], fileInputRef.current.files[0])
             //console.log(`File name:${fileName}\n File price:${filePrice}`);
             close();
         }

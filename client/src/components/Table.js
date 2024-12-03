@@ -187,10 +187,9 @@ const Table = ({ currSection, data, addFile, removeFiles }) => {
       <SelectedFileMenu
         addFile={addFile}
         removeFiles={removeFiles}
-        data={data}
       />
       <table className="table">
-        <caption>{currSection}</caption>
+        <caption></caption>
         <TableHead
           columns={columns}
           handleSorting={handleSorting}
