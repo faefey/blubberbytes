@@ -41,13 +41,13 @@ const UserStatistics = ({backToPrev}) => {
 
   const renderContent = () => {
     switch (currSection) {
-      case 'Statistics':
+      case 'statistics':
         return <Statistics />;
-      case 'History':
+      case 'history':
         return <Histories />;
-      case 'Wallet':
+      case 'wallet':
         return <Wallet />;
-      case 'Proxy':
+      case 'proxy':
         return <Proxy />;
       default:
         return null;
