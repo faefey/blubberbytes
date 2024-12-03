@@ -30,7 +30,7 @@ func GenerateLink(db *sql.DB, node host.Host, fileHash string) (string, error) {
 	}
 
 	// Step 4: Generate the shareable link
-	link := fmt.Sprintf("http://localhost:3000/viewfile?address=%s&hash=%s&password=%s", nodeAddress, fileHash, password)
+	link := fmt.Sprintf("http://localhost:3002/viewfile?address=%s&hash=%s&password=%s", nodeAddress, fileHash, password)
 
 	log.Printf("Generated link: %s", link)
 	return link, nil

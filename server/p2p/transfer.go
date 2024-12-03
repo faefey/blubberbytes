@@ -382,7 +382,7 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 	return nil
 }
 
-func sendRequest(node host.Host, targetPeerID, hash, password string) ([]byte, string, error) {
+func SendRequest(node host.Host, targetPeerID, hash, password string) ([]byte, string, error) {
 	// Call sendDataToPeer to send the request
 	err := sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
 	if err != nil {

@@ -31,10 +31,10 @@ func DeleteHosting(db *sql.DB, hash string) error {
 }
 
 // FindHosting retrieves a record from the Hosting table by its hash.
-func FindHosting(db *sql.DB, hash string) (*models.Hosting, error) {
-	var hosting models.Hosting
-	query := `SELECT hash, price FROM Hosting WHERE hash = ?`
-	err := db.QueryRow(query, hash).Scan(&hosting.Hash, &hosting.Price)
+func FindHosting(db *sql.DB, hash string) (*models.JoinedHosting, error) {
+	var hosting models.JoinedHosting
+	query := `SELECT Storing.*, price FROM Hosting JOIN Storing ON Hosting.hash == Storing.hash WHERE Hosting.hash = ?`
+	err := db.QueryRow(query, hash).Scan(&hosting.Hash, &hosting.Name, &hosting.Extension, &hosting.Size, &hosting.Path, &hosting.Date, &hosting.Price)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // No record found
@@ -46,18 +46,18 @@ func FindHosting(db *sql.DB, hash string) (*models.Hosting, error) {
 }
 
 // GetAllHosting retrieves all records from the Hosting table.
-func GetAllHosting(db *sql.DB) ([]models.Hosting, error) {
-	query := `SELECT hash, price FROM Hosting`
+func GetAllHosting(db *sql.DB) ([]models.JoinedHosting, error) {
+	query := `SELECT Storing.*, price FROM Hosting JOIN Storing ON Hosting.hash == Storing.hash`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("error querying Hosting table: %v", err)
 	}
 	defer rows.Close()
 
-	var hostingRecords []models.Hosting
+	var hostingRecords []models.JoinedHosting
 	for rows.Next() {
-		var record models.Hosting
-		err := rows.Scan(&record.Hash, &record.Price)
+		var record models.JoinedHosting
+		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date, &record.Price)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning Hosting record: %v", err)
 		}

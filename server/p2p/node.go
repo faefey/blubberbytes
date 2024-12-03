@@ -19,7 +19,6 @@ import (
 )
 
 var (
-	node       host.Host
 	dhtRouting *dht.IpfsDHT
 	globalCtx  context.Context
 	node_id    string

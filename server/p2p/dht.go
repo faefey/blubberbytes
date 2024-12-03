@@ -349,8 +349,8 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			password := args[3]
 			fmt.Printf("Sending request to peer %s with hash: %s\n", targetPeerID, hash)
 
-			// Call the sendRequest function
-			data, ext, err := sendRequest(node, targetPeerID, hash, password)
+			// Call the SendRequest function
+			data, ext, err := SendRequest(node, targetPeerID, hash, password)
 			if err != nil {
 				log.Fatalf("Error sending request: %v", err)
 			}

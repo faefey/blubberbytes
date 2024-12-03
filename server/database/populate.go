@@ -12,43 +12,43 @@ import (
 // PopulateDatabase populates the database with data from JSON files.
 func PopulateDatabase(db *sql.DB) error {
 	// Populate Storing table
-	err := populateStoring(db, "database/storing.json")
+	err := populateStoring(db, "database/test_data/storing.json")
 	if err != nil {
 		return fmt.Errorf("error populating Storing table: %v", err)
 	}
 
 	// Populate Hosting table
-	err = populateHosting(db, "database/hosting.json")
+	err = populateHosting(db, "database/test_data/hosting.json")
 	if err != nil {
 		return fmt.Errorf("error populating Hosting table: %v", err)
 	}
 
 	// Populate Sharing table
-	err = populateSharing(db, "database/sharing.json")
+	err = populateSharing(db, "database/test_data/sharing.json")
 	if err != nil {
 		return fmt.Errorf("error populating Sharing table: %v", err)
 	}
 
 	// Populate Saved table
-	err = populateSaved(db, "database/saved.json")
+	err = populateSaved(db, "database/test_data/saved.json")
 	if err != nil {
 		return fmt.Errorf("error populating Saved table: %v", err)
 	}
 
 	// Populate downloads table
-	err = populateDownloads(db, "database/downloads.json")
+	err = populateDownloads(db, "database/test_data/downloads.json")
 	if err != nil {
 		return fmt.Errorf("error populating Download History table: %v", err)
 	}
 
 	// Populate transactions table
-	err = populateTransactions(db, "database/transactions.json")
+	err = populateTransactions(db, "database/test_data/transactions.json")
 	if err != nil {
 		return fmt.Errorf("error populating Transaction History table: %v", err)
 	}
 
 	// Populate uploads table
-	err = populateUploads(db, "database/uploads.json")
+	err = populateUploads(db, "database/test_data/uploads.json")
 	if err != nil {
 		return fmt.Errorf("error populating Upload History table: %v", err)
 	}

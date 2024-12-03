@@ -3,28 +3,66 @@ package main
 import (
 	"log"
 	"os"
+	"os/signal"
 	"server/database"
+	"server/p2p"
+	"server/server"
+	"syscall"
 )
 
 func main() {
+	// Creates a channel to receive signals
+	sigs := make(chan os.Signal, 1)
+
+	// Notifies the channel on signals
+	signal.Notify(sigs, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	// Resets the database
+	err := os.Remove("./database/data.db")
+	if err != nil && !os.IsNotExist(err) {
+		log.Println("Error deleting existing database file:", err)
+		return
+	}
+
+	// Initializes the database
+	db, err := database.SetupDatabase("./database/data.db")
+	if err != nil {
+		log.Println("Error setting up database:", err)
+		return
+	}
+
+	// Creates the tables in the database
+	err = database.CreateNewTables(db)
+	if err != nil {
+		log.Println("Error creating new tables:", err)
+		return
+	}
+
+	// Populates the database
+	err = database.PopulateDatabase(db)
+	if err != nil {
+		log.Println("Error populating database:", err)
+		return
+	}
+
+	// Starts btc-related processes and saves wallet address
 	// btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start("simnet", false)
 	// if err != nil {
 	// 	log.Println(err)
 	// 	return
 	// }
 
-	// btc.GetBlockCount(btcd)
-	// btc.GetBalance(btcwallet)
+	node, dht := p2p.P2PSync()
+	go p2p.P2PAsync(node, dht, db)
+	// go gateway.Gateway(node, db)
+	go server.Server(node, db)
 
-	// _, err = btcwallet.Generate(500)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return
-	// }
-	// time.Sleep(time.Second * 10)
+	// Blocks until a signal is received
+	sig := <-sigs
+	log.Println("Received signal:", sig)
 
-	// btc.GetBlockCount(btcd)
-	// btc.GetBalance(btcwallet)
+	// Performs cleanup or graceful shutdown here
+	log.Println("Performing cleanup...")
 
 	// btc.ShutdownClient(btcd)
 	// btc.ShutdownClient(btcwallet)
@@ -32,35 +70,5 @@ func main() {
 	// btc.InterruptCmd(btcwalletCmd)
 	// btc.InterruptCmd(btcdCmd)
 
-	// for restarting the database comment it if you dont want to but its going to create clash because of unique hash
-	err := os.Remove("./data.db")
-	if err != nil && !os.IsNotExist(err) {
-		log.Println("Error deleting existing database file:", err)
-		return
-	}
-
-	db, err := database.SetupDatabase("./data.db")
-	if err != nil {
-		log.Println("Error setting up database:", err)
-		return
-	}
-	defer db.Close()
-
-	// Creating the new tables
-	err = database.CreateNewTables(db)
-	if err != nil {
-		log.Println("Error creating new tables:", err)
-		return
-	}
-
-	// Populating the database
-	err = database.PopulateDatabase(db)
-	if err != nil {
-		log.Println("Error populating database:", err)
-		return
-	}
-
-	// p2p.P2P(db)
-	// gateway()
-	server(db)
+	db.Close()
 }

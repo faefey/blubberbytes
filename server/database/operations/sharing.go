@@ -31,10 +31,10 @@ func DeleteSharing(db *sql.DB, hash string) error {
 }
 
 // FindSharing retrieves a record from the Sharing table by its hash.
-func FindSharing(db *sql.DB, hash string) (*models.Sharing, error) {
-	var sharing models.Sharing
-	query := `SELECT hash, password FROM Sharing WHERE hash = ?`
-	err := db.QueryRow(query, hash).Scan(&sharing.Hash, &sharing.Password)
+func FindSharing(db *sql.DB, hash string) (*models.JoinedSharing, error) {
+	var sharing models.JoinedSharing
+	query := `SELECT Storing.*, password FROM Sharing JOIN Storing ON Sharing.hash == Storing.hash WHERE Sharing.hash = ?`
+	err := db.QueryRow(query, hash).Scan(&sharing.Hash, &sharing.Name, &sharing.Extension, &sharing.Size, &sharing.Path, &sharing.Date, &sharing.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // No record found
@@ -46,18 +46,18 @@ func FindSharing(db *sql.DB, hash string) (*models.Sharing, error) {
 }
 
 // GetAllSharing retrieves all records from the Sharing table.
-func GetAllSharing(db *sql.DB) ([]models.Sharing, error) {
-	query := `SELECT hash, password FROM Sharing`
+func GetAllSharing(db *sql.DB) ([]models.JoinedSharing, error) {
+	query := `SELECT Storing.*, password FROM Sharing JOIN Storing ON Sharing.hash == Storing.hash`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("error querying Sharing table: %v", err)
 	}
 	defer rows.Close()
 
-	var sharingRecords []models.Sharing
+	var sharingRecords []models.JoinedSharing
 	for rows.Next() {
-		var record models.Sharing
-		err := rows.Scan(&record.Hash, &record.Password)
+		var record models.JoinedSharing
+		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date, &record.Password)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning Sharing record: %v", err)
 		}

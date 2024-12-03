@@ -29,7 +29,7 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 		miningaddrCmd = "--miningaddr=" + miningaddr
 	}
 
-	cmd := exec.Command("./btcd/btcd", "-C", "./conf/btcd.conf", netCmd, "-a", publicNode, miningaddrCmd)
+	cmd := exec.Command("./btcd/btcd", "-C", "./btc/conf/btcd.conf", netCmd, "-a", publicNode, miningaddrCmd)
 
 	cmd.SysProcAttr = sysProcAttr
 
@@ -79,7 +79,6 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 	walletDir := btcutil.AppDataDir("btcwallet", false)
 	if _, err := os.Stat(filepath.Join(walletDir, net+"/wallet.db")); errors.Is(err, os.ErrNotExist) {
 		createWallet(walletDir, net)
-		//return nil, errors.New("the wallet does not exist, run ./btcwallet/btcwallet --create to initialize and create it")
 	}
 
 	netCmd := ""
@@ -87,7 +86,7 @@ func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
 		netCmd = "--" + net
 	}
 
-	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./conf/btcwallet.conf", netCmd)
+	cmd := exec.Command("./btcwallet/btcwallet", "-C", "./btc/conf/btcwallet.conf", netCmd)
 
 	cmd.SysProcAttr = sysProcAttr
 

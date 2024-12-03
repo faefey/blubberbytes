@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	dht "github.com/libp2p/go-libp2p-kad-dht"
+	"github.com/libp2p/go-libp2p/core/host"
 )
 
 var (
@@ -13,7 +16,7 @@ var (
 	bootstrap_node_addr = "/ip4/127.0.1.0/tcp/61000/p2p/12D3KooWKLP2W9BDZhSjNkUyChEF6jVhoVbkfztu7o5mbHvQ4XcM"
 )
 
-func P2P(db *sql.DB) {
+func P2PSync() (host.Host, *dht.IpfsDHT) {
 	fmt.Print("Enter your student ID: ")
 	_, err := fmt.Scanln(&node_id)
 	if err != nil {
@@ -25,6 +28,10 @@ func P2P(db *sql.DB) {
 		log.Fatalf("Failed to create node: %s", err)
 	}
 
+	return node, dht
+}
+
+func P2PAsync(node host.Host, dht *dht.IpfsDHT, db *sql.DB) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	globalCtx = ctx
