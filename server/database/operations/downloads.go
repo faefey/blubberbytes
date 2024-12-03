@@ -26,7 +26,7 @@ func GetAllDownloads(db *sql.DB) ([]models.Downloads, error) {
 	}
 	defer rows.Close()
 
-	var downloadsRecords []models.Downloads
+	downloadsRecords := []models.Downloads{}
 	for rows.Next() {
 		var record models.Downloads
 		err := rows.Scan(&record.Id, &record.Date, &record.Hash, &record.Name, &record.Extension, &record.Size, &record.Price)

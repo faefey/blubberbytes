@@ -26,7 +26,7 @@ func GetAllTransactions(db *sql.DB) ([]models.Transactions, error) {
 	}
 	defer rows.Close()
 
-	var transactionsRecords []models.Transactions
+	transactionsRecords := []models.Transactions{}
 	for rows.Next() {
 		var record models.Transactions
 		err := rows.Scan(&record.Id, &record.Date, &record.Wallet, &record.Amount, &record.Balance)

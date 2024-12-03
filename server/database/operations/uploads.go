@@ -26,7 +26,7 @@ func GetAllUploads(db *sql.DB) ([]models.Uploads, error) {
 	}
 	defer rows.Close()
 
-	var uploadsRecords []models.Uploads
+	uploadsRecords := []models.Uploads{}
 	for rows.Next() {
 		var record models.Uploads
 		err := rows.Scan(&record.Id, &record.Date, &record.Hash, &record.Name, &record.Extension, &record.Size)

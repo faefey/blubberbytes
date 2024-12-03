@@ -54,7 +54,7 @@ func GetAllSharing(db *sql.DB) ([]models.JoinedSharing, error) {
 	}
 	defer rows.Close()
 
-	var sharingRecords []models.JoinedSharing
+	sharingRecords := []models.JoinedSharing{}
 	for rows.Next() {
 		var record models.JoinedSharing
 		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date, &record.Password)

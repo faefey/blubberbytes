@@ -54,7 +54,7 @@ func GetAllSaved(db *sql.DB) ([]models.Saved, error) {
 	}
 	defer rows.Close()
 
-	var savedRecords []models.Saved
+	savedRecords := []models.Saved{}
 	for rows.Next() {
 		var record models.Saved
 		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size)

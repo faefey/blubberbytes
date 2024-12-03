@@ -62,7 +62,7 @@ func GetAllStoring(db *sql.DB) ([]models.Storing, error) {
 	}
 	defer rows.Close()
 
-	var storingRecords []models.Storing
+	storingRecords := []models.Storing{}
 	for rows.Next() {
 		var record models.Storing
 		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date)

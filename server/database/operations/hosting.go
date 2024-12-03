@@ -54,7 +54,7 @@ func GetAllHosting(db *sql.DB) ([]models.JoinedHosting, error) {
 	}
 	defer rows.Close()
 
-	var hostingRecords []models.JoinedHosting
+	hostingRecords := []models.JoinedHosting{}
 	for rows.Next() {
 		var record models.JoinedHosting
 		err := rows.Scan(&record.Hash, &record.Name, &record.Extension, &record.Size, &record.Path, &record.Date, &record.Price)
