@@ -65,7 +65,7 @@ function App() {
     setCurrSection(section)
     setCurrShownData([])
 
-    axios.post("http://localhost:3001/" + section, newFileInfo)
+    axios.post("http://localhost:3001/add" + section, newFileInfo)
       .then(res => {
         axios.get("http://localhost:3001/" + section)
           .then(res => {

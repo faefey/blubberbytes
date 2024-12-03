@@ -93,35 +93,32 @@ const TableBody = ({ tableData, columns, onSelectRow, selectedRows }) => {
 const Table = ({ currSection, data, addFile, removeFiles }) => {
   const columns = useMemo(() => {
     switch (currSection) {
-      case 'Hosting':
+      case 'hosting':
         return [
           { label: 'Hash', accessor: 'hash', sortable: true },
           { label: 'Name', accessor: 'name', sortable: true },
           { label: 'Extension', accessor: 'extension', sortable: true },
           { label: 'Size', accessor: 'size', sortable: true },
+          { label: 'Date', accessor: 'date', sortable: true },
           { label: 'Price', accessor: 'price', sortable: true },
-          { label: 'Date', accessor: 'date', sortable: true },
         ];
-      case 'Sharing':
+      case 'sharing':
         return [
           { label: 'Hash', accessor: 'hash', sortable: true },
           { label: 'Name', accessor: 'name', sortable: true },
           { label: 'Extension', accessor: 'extension', sortable: true },
           { label: 'Size', accessor: 'size', sortable: true },
-          { label: 'Password', accessor: 'password', sortable: false },
           { label: 'Date', accessor: 'date', sortable: true },
+          { label: 'Password', accessor: 'password', sortable: false },
         ];
-
-
-        case 'Saved':
-          return [
-            { label: 'Hash', accessor: 'hash', sortable: true },
-            { label: 'Name', accessor: 'name', sortable: true },
-            { label: 'Extension', accessor: 'extension', sortable: true },
-            { label: 'Size', accessor: 'size', sortable: true },
-           
-          ];
-
+      case 'saved':
+        return [
+          { label: 'Hash', accessor: 'hash', sortable: true },
+          { label: 'Name', accessor: 'name', sortable: true },
+          { label: 'Extension', accessor: 'extension', sortable: true },
+          { label: 'Size', accessor: 'size', sortable: true },
+          
+        ];
       default:
         return [
           { label: 'Hash', accessor: 'hash', sortable: true },
