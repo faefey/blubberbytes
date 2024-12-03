@@ -24,6 +24,7 @@ function App() {
 
   function backToPrev() {
     setCurrPage(0);
+    setOrigShownData([]);
     setCurrShownData([]);
     axios.get("http://localhost:3001/" + currSection)
       .then(res => {
@@ -34,6 +35,7 @@ function App() {
 
   function updateShownData(section) {
     setCurrSection(section);
+    setOrigShownData([]);
     setCurrShownData([]);
     axios.get("http://localhost:3001/" + section)
       .then(res => {
@@ -80,10 +82,9 @@ function App() {
       })
   }
 
-  function removeFiles(files) {
-    console.log(files)
+  async function removeFiles(files) {
     for (const file of files) {
-      axios.post("http://localhost:3001/delete" + currSection, file.hash)
+      await axios.post("http://localhost:3001/delete" + currSection, file.hash)
         .then(res => {})
     }
     axios.get("http://localhost:3001/" + currSection)
