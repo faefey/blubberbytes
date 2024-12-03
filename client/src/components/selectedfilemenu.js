@@ -11,17 +11,17 @@ import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({addFile, removeFiles}) {
+export default function SelectedFileMenu({currSection, addFile, removeFiles}) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
   return selectedFiles.length === 0 ? (
-    <FileFilters filters={filters} setFilters={setFilters} />
+    <FileFilters currSection={currSection} filters={filters} setFilters={setFilters} />
   ) : (
-    <FileActions selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles}/>
+    <FileActions currSection={currSection} selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles}/>
   );
 }
 
-function FileFilters({ filters, setFilters }) {
+function FileFilters({ currSection, filters, setFilters }) {
   function clearFilters() {
     setFilters({
       type: '',
@@ -93,7 +93,7 @@ function FileFilters({ filters, setFilters }) {
   );
 }
 
-function FileActions({ selectedFiles, addFile, removeFiles }) {
+function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
 
   const downloadOnClick = () => {

@@ -182,6 +182,7 @@ const Table = ({ currSection, data, addFile, removeFiles }) => {
   return (
     <TableContext.Provider value={contextValue}>
       <SelectedFileMenu
+        currSection={currSection}
         addFile={addFile}
         removeFiles={removeFiles}
       />
