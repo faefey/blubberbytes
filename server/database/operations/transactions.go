@@ -6,15 +6,15 @@ import (
 	"server/database/models"
 )
 
-func AddTransactions(db *sql.DB, id int64, date, wallet string, amount, balance float64) error {
-	query := `INSERT INTO Transactions (id, date, wallet, amount, balance) 
-	          VALUES (?, ?, ?, ?, ?)`
-	_, err := db.Exec(query, id, date, wallet, amount, balance)
+func AddTransactions(db *sql.DB, date, wallet string, amount, balance float64) error {
+	query := `INSERT INTO Transactions (date, wallet, amount, balance) 
+	          VALUES (?, ?, ?, ?)`
+	_, err := db.Exec(query, date, wallet, amount, balance)
 	if err != nil {
-		return fmt.Errorf("error adding record to Transaction History: %v", err)
+		return fmt.Errorf("error adding record to Transactions: %v", err)
 	}
 
-	fmt.Printf("Record added to Transaction History with id: %d\n", id)
+	fmt.Printf("Record added to Transactions with wallet: %s\n", wallet)
 	return nil
 }
 
@@ -22,7 +22,7 @@ func GetAllTransactions(db *sql.DB) ([]models.Transactions, error) {
 	query := `SELECT id, date, wallet, amount, balance FROM Transactions`
 	rows, err := db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("error querying Transaction History table: %v", err)
+		return nil, fmt.Errorf("error querying Transactions table: %v", err)
 	}
 	defer rows.Close()
 
@@ -31,7 +31,7 @@ func GetAllTransactions(db *sql.DB) ([]models.Transactions, error) {
 		var record models.Transactions
 		err := rows.Scan(&record.Id, &record.Date, &record.Wallet, &record.Amount, &record.Balance)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning Transaction History record: %v", err)
+			return nil, fmt.Errorf("error scanning Transactions record: %v", err)
 		}
 		transactionsRecords = append(transactionsRecords, record)
 	}

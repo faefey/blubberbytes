@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"server/database"
+	"server/gateway"
 	"server/p2p"
 	"server/server"
 	"syscall"
@@ -54,7 +55,7 @@ func main() {
 
 	node, dht := p2p.P2PSync()
 	go p2p.P2PAsync(node, dht, db)
-	// go gateway.Gateway(node, db)
+	go gateway.Gateway(node, db)
 	go server.Server(node, db)
 
 	// Blocks until a signal is received

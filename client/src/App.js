@@ -38,16 +38,16 @@ function App() {
       })
   }
 
-  function addFile(section, fileInfo, fileObject=null) {
+  function addFile(section, fileInfo) {
     let newFileInfo = null
-    console.log(window.electron.pathForFile(fileObject))
+    console.log(window.electron.pathForFile(fileInfo))
     if(section === "storing")
       newFileInfo = {
         hash: "",
         name: fileInfo.name,
         extension: fileInfo.type,
         size: fileInfo.size,
-        path: window.electron.pathForFile(fileObject),
+        path: window.electron.pathForFile(fileInfo),
         date: (new Date()).toISOString().slice(0, 10)
       }
     else if(section === "hosting")

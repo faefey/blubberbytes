@@ -5,17 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"server/server"
 
 	"github.com/libp2p/go-libp2p/core/host"
 )
 
 // HTTP server
 func Gateway(node host.Host, db *sql.DB) {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("GET /viewfile", func(w http.ResponseWriter, r *http.Request) {
-		server.Cors(w)
+	http.HandleFunc("/viewfile", func(w http.ResponseWriter, r *http.Request) {
 		viewFileHandler(w, r, node)
 	})
 

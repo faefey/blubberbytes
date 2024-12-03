@@ -10,150 +10,115 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 )
 
-// Actions:
-// -- download a file by hash
-// -- host a file
-// -- HTTP proxy setup
-// -- view a random neighbor's file
-// -- generate a public HtTP getaway link
-// -- manage active public links
-// --
-
-// To test: http://localhost:3000/downloadFileByHash?hash=hash
-// run server: go run server.go
-
 // handler for downloading a file by hash:
-// func downloadFileByHash(w http.ResponseWriter, r *http.Request) {
-// 	hash := r.URL.Query().Get("hash")
-// 	fmt.Printf("Received download request for hash: %s\n", hash)
-// 	w.Write([]byte("File download reqeust received")) // to send a response back to the frontend
-// }
+func downloadFileByHash(w http.ResponseWriter, r *http.Request) {
+	hash := r.URL.Query().Get("hash")
+	fmt.Printf("Received download request for hash: %s\n", hash)
+	w.Write([]byte("File download reqeust received")) // to send a response back to the frontend
+}
 
-// // handler for hosting a file:
-// func hostFile(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("Received request to host a  file")
-// 	w.Write([]byte("File hosting request received"))
-// }
+// handler for HTTP proxy setup:
+func setupHTTPProxy(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Recieved request to setup HTTP proxy")
+	w.Write([]byte("HTTP proxy setup request received"))
+}
 
-// // handler for HTTP proxy setup:
-// func setupHTTPProxy(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("Recieved request to setup HTTP proxy")
-// 	w.Write([]byte("HTTP proxy setup request received"))
-// }
+// handler for viewing a random neighbor's files:
+func viewRandomNeighborFiles(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Request to view random neighbors files")
+	w.Write([]byte("Random neighbors files displayed"))
+}
 
-// //handler for viewing a random neighbor's files:
-// func viewRandomNeighborFiles(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("Request to view random neighbors files")
-// 	w.Write([]byte("Random neighbors files displayed"))
-// }
-
-// //  handler for generating a public HTTP gateway link:
-// func generatePublicLink(w http.ResponseWriter, r *http.Request) {
-// 	fileHash := r.URL.Query().Get("hash")
-// 	fmt.Printf("Generating public link for file hash: %s\n", fileHash)
-// 	w.Write([]byte("Public link generated"))
-// }
-
-// //  handler for managing active public links:
-// func managePublicLinks(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("Request sent for managing public linsk")
-// 	w.Write([]byte("Managing public links"))
-// }
-
-func Cors(w http.ResponseWriter) {
+func cors(w http.ResponseWriter, r *http.Request, db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB)) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		handler(w, r, db)
+	}
+}
+
+func corsWithNode(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB)) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		handler(w, r, node, db)
+	}
 }
 
 func Server(node host.Host, db *sql.DB) {
-	// mux.HandleFunc("/downloadFileByHash", downloadFileByHash)
-	// mux.HandleFunc("/hostFile", hostFile)
-	// mux.HandleFunc("/setupHTTPProxy", setupHTTPProxy)
-	// mux.HandleFunc("/viewRandomNeighborFiles", viewRandomNeighborFiles)
-	// mux.HandleFunc("/generatePublicLink", generatePublicLink)
-	// mux.HandleFunc("/managePublicLinks", managePublicLinks)
-
-	mux := http.NewServeMux()
+	http.HandleFunc("/downloadFileByHash", downloadFileByHash)
+	http.HandleFunc("/setupHTTPProxy", setupHTTPProxy)
+	http.HandleFunc("/viewRandomNeighborFiles", viewRandomNeighborFiles)
 
 	// GET routes
-	mux.HandleFunc("GET /storing", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.StoringHandler(w, r, db)
+	http.HandleFunc("/storing", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.StoringHandler)
 	})
 
-	mux.HandleFunc("GET /hosting", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.HostingHandler(w, r, db)
+	http.HandleFunc("/hosting", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.HostingHandler)
 	})
 
-	mux.HandleFunc("GET /sharing", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.SharingHandler(w, r, db)
+	http.HandleFunc("/sharing", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.SharingHandler)
 	})
 
-	mux.HandleFunc("GET /saved", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.SavedHandler(w, r, db)
+	http.HandleFunc("/saved", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.SavedHandler)
 	})
 
-	mux.HandleFunc("GET /downloads", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.DownloadsHandler(w, r, db)
+	http.HandleFunc("/downloads", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.DownloadsHandler)
 	})
 
-	mux.HandleFunc("GET /transactions", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.TransactionsHandler(w, r, db)
+	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.TransactionsHandler)
 	})
 
-	mux.HandleFunc("GET /uploads", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.UploadsHandler(w, r, db)
+	http.HandleFunc("/uploads", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.UploadsHandler)
 	})
 
 	// POST routes
-	mux.HandleFunc("POST /addstoring", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.AddStoringHandler(w, r, db)
+	http.HandleFunc("/addstoring", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.AddStoringHandler)
 	})
 
-	mux.HandleFunc("POST /deletestoring", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.DeleteStoringHandler(w, r, db)
+	http.HandleFunc("/deletestoring", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.DeleteStoringHandler)
 	})
 
-	mux.HandleFunc("POST /addhosting", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.AddHostingHandler(w, r, db)
+	http.HandleFunc("/addhosting", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.AddHostingHandler)
 	})
 
-	mux.HandleFunc("POST /deletehosting", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.DeleteHostingHandler(w, r, db)
+	http.HandleFunc("/deletehosting", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.DeleteHostingHandler)
 	})
 
-	mux.HandleFunc("POST /addsharing", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.AddSharingHandler(w, r, node, db)
+	http.HandleFunc("/addsharing", func(w http.ResponseWriter, r *http.Request) {
+		corsWithNode(w, r, node, db, handlers.AddSharingHandler)
 	})
 
-	mux.HandleFunc("POST /deletesharing", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.DeleteSharingHandler(w, r, db)
+	http.HandleFunc("/deletesharing", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.DeleteSharingHandler)
 	})
 
-	mux.HandleFunc("POST /addsaved", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.AddSavedHandler(w, r, db)
+	http.HandleFunc("/addsaved", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.AddSavedHandler)
 	})
 
-	mux.HandleFunc("POST /deletesaved", func(w http.ResponseWriter, r *http.Request) {
-		Cors(w)
-		handlers.DeleteSavedHandler(w, r, db)
+	http.HandleFunc("/deletesaved", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, db, handlers.DeleteSavedHandler)
 	})
 
 	// Run the server
 	fmt.Println("Server is running on port 3001...")
-	log.Fatal(http.ListenAndServe(":3001", mux))
+	log.Fatal(http.ListenAndServe(":3001", nil))
 }

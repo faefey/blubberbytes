@@ -6,12 +6,12 @@ import (
 	"server/database/models"
 )
 
-func AddDownloads(db *sql.DB, id int64, date, hash, name, extension string, size int64, price float64) error {
-	query := `INSERT INTO Downloads (id, date, hash, name, extension, size, price) 
-              VALUES (?, ?, ?, ?, ?, ?, ?)`
-	_, err := db.Exec(query, id, date, hash, name, extension, size, price)
+func AddDownloads(db *sql.DB, date, hash, name, extension string, size int64, price float64) error {
+	query := `INSERT INTO Downloads (date, hash, name, extension, size, price) 
+              VALUES (?, ?, ?, ?, ?, ?)`
+	_, err := db.Exec(query, date, hash, name, extension, size, price)
 	if err != nil {
-		return fmt.Errorf("error adding record to Download History: %v", err)
+		return fmt.Errorf("error adding record to Downloads: %v", err)
 	}
 
 	fmt.Printf("Record added to Downloads with hash: %s\n", hash)
@@ -22,7 +22,7 @@ func GetAllDownloads(db *sql.DB) ([]models.Downloads, error) {
 	query := `SELECT id, date, hash, name, extension, size, price FROM Downloads`
 	rows, err := db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("error querying Download History table: %v", err)
+		return nil, fmt.Errorf("error querying Downloads table: %v", err)
 	}
 	defer rows.Close()
 
@@ -31,7 +31,7 @@ func GetAllDownloads(db *sql.DB) ([]models.Downloads, error) {
 		var record models.Downloads
 		err := rows.Scan(&record.Id, &record.Date, &record.Hash, &record.Name, &record.Extension, &record.Size, &record.Price)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning Download History record: %v", err)
+			return nil, fmt.Errorf("error scanning Downloads record: %v", err)
 		}
 		downloadsRecords = append(downloadsRecords, record)
 	}

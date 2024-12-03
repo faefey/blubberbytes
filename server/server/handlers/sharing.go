@@ -12,8 +12,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 )
 
-// All other sharing handlers are in the gateway folder
-
 func SharingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	sharingRecords, err := operations.GetAllSharing(db)
 	if err != nil {
@@ -25,7 +23,6 @@ func SharingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(sharingRecords)
 }
 
-// /sharefile route:
 func AddSharingHandler(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB) {
 	filePath := r.URL.Query().Get("path")
 	if filePath == "" {
@@ -39,14 +36,17 @@ func AddSharingHandler(w http.ResponseWriter, r *http.Request, node host.Host, d
 		return
 	}
 
-	// the link to return:
 	link, err := p2p.GenerateLink(db, node, hash)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintf(w, "Shareable link: %s\n", link)
+	_, err = fmt.Fprint(w, link)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func DeleteSharingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {

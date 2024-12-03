@@ -40,6 +40,12 @@ func AddStoringHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	err = operations.AddUploads(db, m.Date, hash, m.Name, m.Extension, m.Size)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func DeleteStoringHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
