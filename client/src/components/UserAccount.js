@@ -14,7 +14,7 @@ import { ReactComponent as ProxyIcon } from '../icons/proxy.svg';
 
 const UserStatistics = ({backToPrev}) => {
     // default section is 'Statistics'
-  const [currSection, setCurrSection] = useState('Statistics');
+  const [currSection, setCurrSection] = useState('statistics');
 
   const settingsItems = [
     {
@@ -23,19 +23,19 @@ const UserStatistics = ({backToPrev}) => {
     },
     {
       label: 'Statistics', icon: <PersonIcon />,
-      onClick: () => setCurrSection('Statistics')
+      onClick: () => setCurrSection('statistics')
     },
     {
       label: 'History', icon: <HistoryIcon />,
-      onClick: () => setCurrSection('History')
+      onClick: () => setCurrSection('history')
     },
     {
       label: 'Wallet', icon: <WalletIcon />,
-      onClick: () => setCurrSection('Wallet')
+      onClick: () => setCurrSection('wallet')
     },
     {
       label: 'Proxy', icon: <ProxyIcon />,
-      onClick: () => setCurrSection('Proxy')
+      onClick: () => setCurrSection('proxy')
     }
   ];
 
