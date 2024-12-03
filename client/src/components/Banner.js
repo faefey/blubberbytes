@@ -19,31 +19,38 @@ export default function Banner({currPage, setCurrPage, origShownData, setCurrSho
 
 function SearchBar({origShownData, setCurrShownData}) {
     const [searched, setSearched] = useState(false)
-    const searchTerm = useRef("");
+    const searchBar = useRef(null);
 
-    function searchFiles(searchTerm, fileNames) {
-        let filteredFileNames = new Set();
+    function searchFiles(searchTerm, files) {
+        searchTerm = searchTerm.toLowerCase()
+        let filteredFiles = [];
 
-        for (const fileName of fileNames) {
-            if (fileName.toLowerCase().includes(searchTerm.toLowerCase()))
-                filteredFileNames.add(fileName);
+        for (const file of files) {
+            if (file.name.toLowerCase().includes(searchTerm))
+                filteredFiles.push(file);
+            else if (file.hash === searchTerm)
+                filteredFiles.push(file);
         }
 
         console.log("Searched:", searchTerm)
-        console.log("Filtered:", filteredFileNames)
-        console.log("Original:", fileNames)
+        console.log("Filtered:", filteredFiles)
 
-        return filteredFileNames;
+        return filteredFiles;
     }
 
-    function inputChangeHandler(event) {
-        searchTerm.current = event.target.value;
+    function resetSearch() {
+        searchBar.current.value = ""
+        setSearched(false)
+        setCurrShownData(origShownData)
     }
 
-    function keyPressHandler(event) {
-        if (event.key === "Enter") {
-            const filteredFileNames = searchFiles(searchTerm.current, origShownData.map(file => file['FileName']));
-            setCurrShownData(origShownData.filter(file => filteredFileNames.has(file['FileName'])));
+    function inputChangeHandler() {
+        const searchTerm = searchBar.current.value
+        if (searchTerm === "")
+            resetSearch()
+        else {
+            const filteredFiles = searchFiles(searchTerm, origShownData);
+            setCurrShownData(filteredFiles);
             setSearched(true);
         }
     }
@@ -54,10 +61,10 @@ function SearchBar({origShownData, setCurrShownData}) {
             <input type="text"
                autoComplete="off"
                id="searchbar"
-               placeholder="Search..."
-               onChange={inputChangeHandler}
-               onKeyDown={keyPressHandler} />
-            {searched && <ClearSearch className="icon" onClick={() => {setCurrShownData(origShownData); setSearched(false)}} />}
+               placeholder="Search by name or hash..."
+               ref={searchBar}
+               onChange={inputChangeHandler} />
+            {searched && <ClearSearch className="icon" onClick={resetSearch} />}
         </div>
       );
 }

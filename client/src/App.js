@@ -11,11 +11,13 @@ import UserAccount from './components/UserAccount.js';
 function App() {
   const [currPage, setCurrPage] = useState(0);
   const [currSection, setCurrSection] = useState('storing')
+  const [origShownData, setOrigShownData] = useState([])
   const [currShownData, setCurrShownData] = useState([])
 
   useEffect(() => {
     axios.get('http://localhost:3001/storing')
       .then(res => {
+        setOrigShownData(res.data)
         setCurrShownData(res.data)
       })
   }, []);
@@ -25,6 +27,7 @@ function App() {
     setCurrShownData([]);
     axios.get("http://localhost:3001/" + currSection)
       .then(res => {
+        setOrigShownData(res.data)
         setCurrShownData(res.data)
       })
   }
@@ -34,6 +37,7 @@ function App() {
     setCurrShownData([]);
     axios.get("http://localhost:3001/" + section)
       .then(res => {
+        setOrigShownData(res.data)
         setCurrShownData(res.data)
       })
   }
@@ -63,12 +67,14 @@ function App() {
       }
     
     setCurrSection(section)
+    setOrigShownData([])
     setCurrShownData([])
 
     axios.post("http://localhost:3001/add" + section, newFileInfo)
       .then(res => {
         axios.get("http://localhost:3001/" + section)
           .then(res => {
+            setOrigShownData(res.data)
             setCurrShownData(res.data)
           })
       })
@@ -78,13 +84,13 @@ function App() {
     console.log(files)
     for (const file of files) {
       axios.post("http://localhost:3001/delete" + currSection, file.hash)
-        .then(res => {
-          axios.get("http://localhost:3001/" + currSection)
-            .then(res => {
-              setCurrShownData(res.data)
-            })
-        })
+        .then(res => {})
     }
+    axios.get("http://localhost:3001/" + currSection)
+      .then(res => {
+        setOrigShownData(res.data)
+        setCurrShownData(res.data)
+      })
   }
 
   function refreshExplore(e) {
@@ -97,7 +103,7 @@ function App() {
 	    <Banner
         currPage={currPage}
         setCurrPage={setCurrPage}
-        origShownData={[]}
+        origShownData={origShownData}
         setCurrShownData={setCurrShownData}
       />
 
