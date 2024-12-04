@@ -44,9 +44,8 @@ function App() {
       })
   }
 
-  function addFile(section, fileInfo) {
+  async function addFile(section, fileInfo) {
     let newFileInfo = null
-    console.log(window.electron.pathForFile(fileInfo))
     if(section === "storing")
       newFileInfo = {
         hash: "",
@@ -62,7 +61,7 @@ function App() {
       newFileInfo = {hash: fileInfo.hash, password: ""}
     else
       newFileInfo = {
-        hash: "",
+        hash: fileInfo.hash,
         name: fileInfo.name,
         extension: fileInfo.type,
         size: fileInfo.size
@@ -72,26 +71,21 @@ function App() {
     setOrigShownData([])
     setCurrShownData([])
 
-    axios.post("http://localhost:3001/add" + section, newFileInfo)
-      .then(res => {
-        axios.get("http://localhost:3001/" + section)
-          .then(res => {
-            setOrigShownData(res.data)
-            setCurrShownData(res.data)
-          })
-      })
+    const addRes = await axios.post("http://localhost:3001/add" + section, newFileInfo)
+    const dataRes = await axios.get("http://localhost:3001/" + section)
+    setOrigShownData(dataRes.data)
+    setCurrShownData(dataRes.data)
+    
+    return addRes.data
   }
 
   async function removeFiles(files) {
     for (const file of files) {
       await axios.post("http://localhost:3001/delete" + currSection, file.hash)
-        .then(res => {})
     }
-    axios.get("http://localhost:3001/" + currSection)
-      .then(res => {
-        setOrigShownData(res.data)
-        setCurrShownData(res.data)
-      })
+    const res = await axios.get("http://localhost:3001/" + currSection)
+    setOrigShownData(res.data)
+    setCurrShownData(res.data)
   }
 
   function refreshExplore(e) {

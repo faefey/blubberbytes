@@ -7,8 +7,9 @@ import { ConfirmationPopup } from './ConfirmationPopup.js';
 
 import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
-import { ReactComponent as Delete } from '../icons/delete.svg';
+import { ReactComponent as Host } from '../icons/server.svg'
 import { ReactComponent as Share } from '../icons/share.svg';
+import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
 export default function SelectedFileMenu({currSection, addFile, removeFiles}) {
@@ -30,8 +31,6 @@ function FileFilters({ currSection, filters, setFilters }) {
       price: '',
     });
   }
-
-
 
   return (
     <div id="filefilters">
@@ -105,21 +104,24 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
     document.body.removeChild(link);
   }
 
-  const shareOnClick = (addFile, selectedFiles) => {
+  const hostOnClick = () => {
     const selectedFile = selectedFiles[0];
-    const hash = selectedFile.hash;
-    const url = `http://localhost:3001/${hash}`;
-    navigator.clipboard.writeText(url)
+    addFile('hosting', selectedFile);
+  }
+
+  const shareOnClick = async () => {
+    const selectedFile = selectedFiles[0];
+    const link = await addFile('sharing', selectedFile);
+    navigator.clipboard.writeText(link)
       .then(() => {
         alert('Saved to clipboard');
       })
       .catch(err => {
         console.error('Failed to copy: ', err);
       });
-    addFile('Sharing', selectedFile, selectedFile.price);
   }
 
-  const deleteOnClick = (removeFiles, selectedFiles) => removeFiles(selectedFiles);
+  const deleteOnClick = () => removeFiles(selectedFiles);
 
   const confirmationInfo = selectedFiles; //changed from selectedFiles.filter(file => selectedFiles.includes(file.id));
   const endingWords = confirmationInfo.length === 1 ? "this file?" : "these files?";
@@ -130,20 +132,25 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
 
       <ConfirmationPopup trigger={<Download className="icon"/>} 
-                         action={() => downloadOnClick()}
+                         action={downloadOnClick}
                          fileInfo={confirmationInfo}
                          message={"Are you sure you want to download " + endingWords}
                          monetaryInfo={true}/>
-      <ConfirmationPopup trigger={<Delete className="icon"/>} 
-                         action={() => deleteOnClick(removeFiles, selectedFiles)}
+      <ConfirmationPopup trigger={<Host className="icon"/>} 
+                         action={hostOnClick}
                          fileInfo={confirmationInfo}
-                         message={"Are you sure you want to delete " + endingWords}
-                         actionMessage={"Delete"}/> 
+                         message={"Are you sure you want to host " + endingWords}
+                         actionMessage={"Host"}/>
       <ConfirmationPopup trigger={<Share className="icon"/>} 
-                         action={() => shareOnClick(addFile, selectedFiles)}
+                         action={shareOnClick}
                          fileInfo={confirmationInfo}
                          message={"Are you sure you want to share " + endingWords}
                          actionMessage={"Share"}/>
+      <ConfirmationPopup trigger={<Delete className="icon"/>} 
+                         action={deleteOnClick}
+                         fileInfo={confirmationInfo}
+                         message={"Are you sure you want to delete " + endingWords}
+                         actionMessage={"Delete"}/> 
 
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
           fileInfo={[selectedFiles[0]]}/>)}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"server/database/models"
 	"server/database/operations"
 	"server/p2p"
 
@@ -24,19 +25,15 @@ func SharingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 }
 
 func AddSharingHandler(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB) {
-	filePath := r.URL.Query().Get("path")
-	if filePath == "" {
-		http.Error(w, "File path is required", http.StatusBadRequest)
-		return
-	}
-
-	hash, err := operations.HashFile(filePath)
+	decoder := json.NewDecoder(r.Body)
+	var m models.Sharing
+	err := decoder.Decode(&m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	link, err := p2p.GenerateLink(db, node, hash)
+	link, err := p2p.GenerateLink(db, node, m.Hash)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
