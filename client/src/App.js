@@ -76,7 +76,10 @@ function App() {
     setOrigShownData(dataRes.data)
     setCurrShownData(dataRes.data)
     
-    return addRes.data
+    if(addRes.data.startsWith("http://"))
+      return addRes.data
+    else if(addRes.data !== "")
+      alert(addRes.data)
   }
 
   async function removeFiles(files) {

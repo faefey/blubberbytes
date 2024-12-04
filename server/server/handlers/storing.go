@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"server/database/models"
@@ -35,6 +36,15 @@ func AddStoringHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	record, err := operations.FindStoring(db, hash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	} else if record != nil {
+		fmt.Fprint(w, "The file is already being stored.")
+		return
+	}
+
 	err = operations.AddStoring(db, hash, m.Name, m.Extension, m.Path, m.Date, m.Size)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -56,6 +66,18 @@ func DeleteStoringHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	err = operations.DeleteStoring(db, string(body))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = operations.DeleteHosting(db, string(body))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = operations.DeleteSharing(db, string(body))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

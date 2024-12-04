@@ -27,7 +27,7 @@ func DeleteStoring(db *sql.DB, hash string) error {
 		return fmt.Errorf("error deleting record from Storing with hash %s: %v", hash, err)
 	}
 
-	fmt.Printf("Record with hash %s deleted successfully.\n", hash)
+	fmt.Printf("Record with hash %s deleted successfully from Storing.\n", hash)
 	return nil
 }
 

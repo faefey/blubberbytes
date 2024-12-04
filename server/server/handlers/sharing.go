@@ -33,17 +33,22 @@ func AddSharingHandler(w http.ResponseWriter, r *http.Request, node host.Host, d
 		return
 	}
 
+	record, err := operations.FindSharing(db, m.Hash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	} else if record != nil {
+		fmt.Fprint(w, "The file is already being shared.")
+		return
+	}
+
 	link, err := p2p.GenerateLink(db, node, m.Hash)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	_, err = fmt.Fprint(w, link)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	fmt.Fprint(w, link)
 }
 
 func DeleteSharingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {

@@ -112,13 +112,15 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
   const shareOnClick = async () => {
     const selectedFile = selectedFiles[0];
     const link = await addFile('sharing', selectedFile);
-    navigator.clipboard.writeText(link)
-      .then(() => {
-        alert('Saved to clipboard');
-      })
-      .catch(err => {
-        console.error('Failed to copy: ', err);
-      });
+    if(link) {
+      navigator.clipboard.writeText(link)
+        .then(() => {
+          alert('Saved to clipboard');
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+    }
   }
 
   const deleteOnClick = () => removeFiles(selectedFiles);

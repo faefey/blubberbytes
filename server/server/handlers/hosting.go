@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"server/database/models"
@@ -26,6 +27,15 @@ func AddHostingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := decoder.Decode(&m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	record, err := operations.FindHosting(db, m.Hash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	} else if record != nil {
+		fmt.Fprint(w, "The file is already being hosted.")
 		return
 	}
 
