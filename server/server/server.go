@@ -7,15 +7,9 @@ import (
 	"net/http"
 	"server/server/handlers"
 
+	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/libp2p/go-libp2p/core/host"
 )
-
-// handler for downloading a file by hash:
-func downloadFileByHash(w http.ResponseWriter, r *http.Request) {
-	hash := r.URL.Query().Get("hash")
-	fmt.Printf("Received download request for hash: %s\n", hash)
-	w.Write([]byte("File download reqeust received")) // to send a response back to the frontend
-}
 
 // handler for HTTP proxy setup:
 func setupHTTPProxy(w http.ResponseWriter, r *http.Request) {
@@ -29,93 +23,101 @@ func viewRandomNeighborFiles(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Random neighbors files displayed"))
 }
 
-func cors(w http.ResponseWriter, r *http.Request, db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, db *sql.DB)) {
+func cors(w http.ResponseWriter, r *http.Request, handler func()) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 	} else {
-		handler(w, r, db)
+		handler()
 	}
 }
 
-func corsWithNode(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB, handler func(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB)) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-	} else {
-		handler(w, r, node, db)
-	}
-}
-
-func Server(node host.Host, db *sql.DB) {
-	http.HandleFunc("/downloadFileByHash", downloadFileByHash)
+func Server(node host.Host, btcwallet *rpcclient.Client, db *sql.DB) {
 	http.HandleFunc("/setupHTTPProxy", setupHTTPProxy)
 	http.HandleFunc("/viewRandomNeighborFiles", viewRandomNeighborFiles)
 
 	// GET routes
 	http.HandleFunc("/storing", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.StoringHandler)
+		cors(w, r, func() { handlers.StoringHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/hosting", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.HostingHandler)
+		cors(w, r, func() { handlers.HostingHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/sharing", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.SharingHandler)
+		cors(w, r, func() { handlers.SharingHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/saved", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.SavedHandler)
+		cors(w, r, func() { handlers.SavedHandler(w, r, db) })
 	})
 
-	http.HandleFunc("/downloads", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.DownloadsHandler)
-	})
-
-	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.TransactionsHandler)
+	http.HandleFunc("/statistics", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.StatisticsHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/uploads", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.UploadsHandler)
+		cors(w, r, func() { handlers.UploadsHandler(w, r, db) })
+	})
+
+	http.HandleFunc("/downloads", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.DownloadsHandler(w, r, db) })
+	})
+
+	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.TransactionsHandler(w, r, db) })
+	})
+
+	http.HandleFunc("/wallet", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.WalletHandler(w, r, btcwallet, db) })
 	})
 
 	// POST routes
+	http.HandleFunc("/getproviders", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.GetProvidersHandler(w, r, db) })
+	})
+
+	http.HandleFunc("/requestmetadata", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.RequestMetadataHandler(w, r, db) })
+	})
+
+	http.HandleFunc("/downloadfile", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.DownloadFileHandler(w, r, db) })
+	})
+
 	http.HandleFunc("/addstoring", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.AddStoringHandler)
+		cors(w, r, func() { handlers.AddStoringHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/deletestoring", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.DeleteStoringHandler)
+		cors(w, r, func() { handlers.DeleteStoringHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/addhosting", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.AddHostingHandler)
+		cors(w, r, func() { handlers.AddHostingHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/deletehosting", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.DeleteHostingHandler)
+		cors(w, r, func() { handlers.DeleteHostingHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/addsharing", func(w http.ResponseWriter, r *http.Request) {
-		corsWithNode(w, r, node, db, handlers.AddSharingHandler)
+		cors(w, r, func() { handlers.AddSharingHandler(w, r, node, db) })
 	})
 
 	http.HandleFunc("/deletesharing", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.DeleteSharingHandler)
+		cors(w, r, func() { handlers.DeleteSharingHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/addsaved", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.AddSavedHandler)
+		cors(w, r, func() { handlers.AddSavedHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/deletesaved", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, db, handlers.DeleteSavedHandler)
+		cors(w, r, func() { handlers.DeleteSavedHandler(w, r, db) })
 	})
 
 	// Run the server

@@ -2,6 +2,7 @@ package btc
 
 import (
 	"io"
+	"log"
 	"os"
 	"os/exec"
 
@@ -12,9 +13,10 @@ func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rp
 	init := true
 	file, err := os.Open("walletaddress.txt")
 	if err != nil {
+		log.Println(err.Error())
 		init = false
 	}
-	init = false
+	defer file.Close()
 
 	var btcdCmd, btcwalletCmd *exec.Cmd
 	var btcd, btcwallet *rpcclient.Client

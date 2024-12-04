@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"server/btc"
 	"server/database"
 	"server/gateway"
 	"server/p2p"
@@ -47,16 +48,16 @@ func main() {
 	}
 
 	// Starts btc-related processes and saves wallet address
-	// btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start("simnet", false)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return
-	// }
+	btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start("simnet", false)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	node, dht := p2p.P2PSync()
 	go p2p.P2PAsync(node, dht, db)
 	go gateway.Gateway(node, db)
-	go server.Server(node, db)
+	go server.Server(node, btcwallet, db)
 
 	// Blocks until a signal is received
 	sig := <-sigs
@@ -65,11 +66,11 @@ func main() {
 	// Performs cleanup or graceful shutdown here
 	log.Println("Performing cleanup...")
 
-	// btc.ShutdownClient(btcd)
-	// btc.ShutdownClient(btcwallet)
+	btc.ShutdownClient(btcd)
+	btc.ShutdownClient(btcwallet)
 
-	// btc.InterruptCmd(btcwalletCmd)
-	// btc.InterruptCmd(btcdCmd)
+	btc.InterruptCmd(btcwalletCmd)
+	btc.InterruptCmd(btcdCmd)
 
 	db.Close()
 }
