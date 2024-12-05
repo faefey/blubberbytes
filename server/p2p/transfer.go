@@ -283,6 +283,7 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 }
 
 func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType string, hash string, password string) error {
+	connectToPeerUsingRelay(node, targetPeerID)
 	ctx := context.Background()
 	targetPeerIDParsed, err := peer.Decode(targetPeerID)
 	if err != nil {

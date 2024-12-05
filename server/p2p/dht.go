@@ -375,7 +375,6 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			password := args[3]
 			fmt.Printf("Sending request to peer %s with hash: %s\n", targetPeerID, hash)
 
-			connectToPeerUsingRelay(node, targetPeerID)
 			// Call the SendRequest function
 			data, ext, err := SendRequest(node, targetPeerID, hash, password)
 			if err != nil {
