@@ -32,6 +32,7 @@ func main() {
 		log.Println("Error setting up database:", err)
 		return
 	}
+	defer db.Close()
 
 	// Creates the tables in the database
 	err = database.CreateNewTables(db)
@@ -54,23 +55,24 @@ func main() {
 		return
 	}
 
-	node, dht := p2p.P2PSync()
+	defer func() {
+		btc.ShutdownClient(btcd)
+		btc.ShutdownClient(btcwallet)
+
+		btc.InterruptCmd(btcwalletCmd)
+		btc.InterruptCmd(btcdCmd)
+	}()
+
+	node, dht, err := p2p.P2PSync()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	go p2p.P2PAsync(node, dht, db)
 	go gateway.Gateway(node, db)
 	go server.Server(node, btcwallet, db)
 
 	// Blocks until a signal is received
-	sig := <-sigs
-	log.Println("Received signal:", sig)
-
-	// Performs cleanup or graceful shutdown here
-	log.Println("Performing cleanup...")
-
-	btc.ShutdownClient(btcd)
-	btc.ShutdownClient(btcwallet)
-
-	btc.InterruptCmd(btcwalletCmd)
-	btc.InterruptCmd(btcdCmd)
-
-	db.Close()
+	<-sigs
 }

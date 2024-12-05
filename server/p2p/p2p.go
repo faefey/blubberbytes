@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -13,22 +12,22 @@ import (
 
 var (
 	relay_node_addr     = "/ip4/130.245.173.221/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
-	bootstrap_node_addr = "/ip4/127.0.1.0/tcp/61000/p2p/12D3KooWKLP2W9BDZhSjNkUyChEF6jVhoVbkfztu7o5mbHvQ4XcM"
+	bootstrap_node_addr = "/ip4/130.245.173.222/tcp/61000/p2p/12D3KooWQd1K1k8XA9xVEzSAu7HUCodC7LJB6uW5Kw4VwkRdstPE"
 )
 
-func P2PSync() (host.Host, *dht.IpfsDHT) {
+func P2PSync() (host.Host, *dht.IpfsDHT, error) {
 	fmt.Print("Enter your student ID: ")
 	_, err := fmt.Scanln(&node_id)
 	if err != nil {
-		log.Fatalf("Failed to read student ID: %s", err)
+		return nil, nil, fmt.Errorf("failed to read student ID: %s", err)
 	}
 
 	node, dht, err := createNode()
 	if err != nil {
-		log.Fatalf("Failed to create node: %s", err)
+		return nil, nil, fmt.Errorf("failed to create node: %s", err)
 	}
 
-	return node, dht
+	return node, dht, nil
 }
 
 func P2PAsync(node host.Host, dht *dht.IpfsDHT, db *sql.DB) {
