@@ -209,6 +209,32 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "FIND_SHARING":
+			if len(args) < 2 {
+				fmt.Println("Usage: FIND <hash>")
+				continue
+			}
+			hash := args[1] // Extract the hash from the user input
+			sharing, err := operations.FindSharing(db, hash)
+			if err != nil {
+				fmt.Printf("Error finding sharing record for hash %s: %v\n", hash, err)
+				continue
+			}
+
+			if sharing == nil {
+				fmt.Printf("No record found for hash %s\n", hash)
+			} else {
+				fmt.Printf("Record found:\nHash: %s\nName: %s\nExtension: %s\nSize: %d bytes\nPath: %s\nDate: %s\nPassword: %s\n",
+					sharing.Hash, sharing.Name, sharing.Extension, sharing.Size, sharing.Path, sharing.Date, sharing.Password)
+			}
+
+		case "CONNECT":
+			if len(args) < 2 {
+				fmt.Println("Usage: CONNECT <peerID>")
+				continue
+			}
+			peerID := args[1] // Extract the peerID from user input
+			connectToPeerUsingRelay(node, peerID)
 		case "EXPLORE":
 			explore(node)
 		case "DELETE_SHARING":
@@ -349,6 +375,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			password := args[3]
 			fmt.Printf("Sending request to peer %s with hash: %s\n", targetPeerID, hash)
 
+			connectToPeerUsingRelay(node, targetPeerID)
 			// Call the SendRequest function
 			data, ext, err := SendRequest(node, targetPeerID, hash, password)
 			if err != nil {
