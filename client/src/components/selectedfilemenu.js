@@ -12,15 +12,26 @@ import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({currSection, addFile, removeFiles}) {
+export default function SelectedFileMenu({ currSection, addFile, removeFiles }) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
-  return selectedFiles.length === 0 ? (
-    <FileFilters currSection={currSection} filters={filters} setFilters={setFilters} />
-  ) : (
-    <FileActions currSection={currSection} selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles}/>
+  return (
+    <div id="filemenu">
+      <FileFilters currSection={currSection} filters={filters} setFilters={setFilters} />
+      {selectedFiles.length > 0 && (
+        <div style={{ marginTop: '10px' }}> {}
+          <FileActions
+            currSection={currSection}
+            selectedFiles={selectedFiles}
+            addFile={addFile}
+            removeFiles={removeFiles}
+          />
+        </div>
+      )}
+    </div>
   );
 }
+
 
 function FileFilters({ currSection, filters, setFilters }) {
   function clearFilters() {
@@ -32,8 +43,14 @@ function FileFilters({ currSection, filters, setFilters }) {
     });
   }
 
+  const showPrice = currSection === 'hosting';
+  const showDate = ['hosting', 'storing', 'sharing', 'explore'].includes(currSection.toLowerCase());
+  // type and size are always shown
+  // saved does not show date or price, so no date if currSection === 'saved'
+
   return (
     <div id="filefilters">
+      {/* Type filter (always shown) */}
       <select
         id="typefilter"
         className="filter"
@@ -46,6 +63,7 @@ function FileFilters({ currSection, filters, setFilters }) {
         <option value="other">Other</option>
       </select>
 
+      {/* Size filter (always shown) */}
       <select
         id="sizefilter"
         className="filter"
@@ -53,37 +71,43 @@ function FileFilters({ currSection, filters, setFilters }) {
         onChange={(e) => setFilters({ ...filters, size: e.target.value })}
       >
         <option value="" hidden>Size</option>
+        <option value="less1mb">{'<'} 1 MB</option>
         <option value="less1gb">{'<'} 1 GB</option>
-        <option value="1to5gb">1 - 5 GB</option>
-        <option value="more5gb">{'>'} 5 GB</option>
+        <option value="more1gb">{'>'} 1 GB</option>
       </select>
 
-      <select
-        id="datefilter"
-        className="filter"
-        value={filters.date}
-        onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-      >
-        <option value="" hidden>Date</option>
-        <option value="today">Today</option>
-        <option value="7days">Last 7 days</option>
-        <option value="30days">Last 30 days</option>
-        <option value="6months">Last 6 months</option>
-        <option value="thisyear">This year</option>
-        <option value="lastyear">Last year</option>
-      </select>
+      {/* Date filter (shown for hosting, storing, sharing, explore but NOT saved) */}
+      {showDate && (
+        <select
+          id="datefilter"
+          className="filter"
+          value={filters.date}
+          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+        >
+          <option value="" hidden>Date</option>
+          <option value="today">Today</option>
+          <option value="7days">Last 7 days</option>
+          <option value="30days">Last 30 days</option>
+          <option value="6months">Last 6 months</option>
+          <option value="thisyear">This year</option>
+          <option value="lastyear">Last year</option>
+        </select>
+      )}
 
-      <select
-        id="pricefilter"
-        className="filter"
-        value={filters.price}
-        onChange={(e) => setFilters({ ...filters, price: e.target.value })}
-      >
-        <option value="" hidden>Price</option>
-        <option value="less1">{'<'} 1</option>
-        <option value="1to2">1 - 2</option>
-        <option value="more2">{'>'} 2</option>
-      </select>
+      {/* Price filter (only for hosting) */}
+      {showPrice && (
+        <select
+          id="pricefilter"
+          className="filter"
+          value={filters.price}
+          onChange={(e) => setFilters({ ...filters, price: e.target.value })}
+        >
+          <option value="" hidden>Price</option>
+          <option value="less5">{'<'} 5</option>
+          <option value="5to20">5 - 20</option>
+          <option value="more20">{'>'} 20</option>
+        </select>
+      )}
 
       <button id="clearfilters" className="filter" onClick={clearFilters}>
         Clear Filters
@@ -91,6 +115,7 @@ function FileFilters({ currSection, filters, setFilters }) {
     </div>
   );
 }
+
 
 function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
@@ -112,7 +137,7 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
   const shareOnClick = async () => {
     const selectedFile = selectedFiles[0];
     const link = await addFile('sharing', selectedFile);
-    if(link) {
+    if (link) {
       navigator.clipboard.writeText(link)
         .then(() => {
           alert('Saved to clipboard');
@@ -133,29 +158,29 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
       <Close className="icon" onClick={() => setSelectedFiles([])} />
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
 
-      <ConfirmationPopup trigger={<Download className="icon"/>} 
-                         action={downloadOnClick}
-                         fileInfo={confirmationInfo}
-                         message={"Are you sure you want to download " + endingWords}
-                         monetaryInfo={true}/>
-      <ConfirmationPopup trigger={<Host className="icon"/>} 
-                         action={hostOnClick}
-                         fileInfo={confirmationInfo}
-                         message={"Are you sure you want to host " + endingWords}
-                         actionMessage={"Host"}/>
-      <ConfirmationPopup trigger={<Share className="icon"/>} 
-                         action={shareOnClick}
-                         fileInfo={confirmationInfo}
-                         message={"Are you sure you want to share " + endingWords}
-                         actionMessage={"Share"}/>
-      <ConfirmationPopup trigger={<Delete className="icon"/>} 
-                         action={deleteOnClick}
-                         fileInfo={confirmationInfo}
-                         message={"Are you sure you want to delete " + endingWords}
-                         actionMessage={"Delete"}/> 
+      <ConfirmationPopup trigger={<Download className="icon" />}
+        action={downloadOnClick}
+        fileInfo={confirmationInfo}
+        message={"Are you sure you want to download " + endingWords}
+        monetaryInfo={true} />
+      <ConfirmationPopup trigger={<Host className="icon" />}
+        action={hostOnClick}
+        fileInfo={confirmationInfo}
+        message={"Are you sure you want to host " + endingWords}
+        actionMessage={"Host"} />
+      <ConfirmationPopup trigger={<Share className="icon" />}
+        action={shareOnClick}
+        fileInfo={confirmationInfo}
+        message={"Are you sure you want to share " + endingWords}
+        actionMessage={"Share"} />
+      <ConfirmationPopup trigger={<Delete className="icon" />}
+        action={deleteOnClick}
+        fileInfo={confirmationInfo}
+        message={"Are you sure you want to delete " + endingWords}
+        actionMessage={"Delete"} />
 
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
-          fileInfo={[selectedFiles[0]]}/>)}
+        fileInfo={[selectedFiles[0]]} />)}
       {selectedFiles.length > 1 && (<Info className="grayedout" />)}
     </div>
   );
