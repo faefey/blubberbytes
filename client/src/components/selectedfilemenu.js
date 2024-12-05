@@ -12,23 +12,13 @@ import { ReactComponent as Share } from '../icons/share.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
-export default function SelectedFileMenu({ currSection, addFile, removeFiles }) {
+export default function SelectedFileMenu({currSection, addFile, removeFiles}) {
   const { filters, setFilters, selectedFiles } = useContext(TableContext);
 
-  return (
-    <div id="filemenu">
-      <FileFilters currSection={currSection} filters={filters} setFilters={setFilters} />
-      {selectedFiles.length > 0 && (
-        <div style={{ marginTop: '10px' }}> {}
-          <FileActions
-            currSection={currSection}
-            selectedFiles={selectedFiles}
-            addFile={addFile}
-            removeFiles={removeFiles}
-          />
-        </div>
-      )}
-    </div>
+  return selectedFiles.length === 0 ? (
+    <FileFilters currSection={currSection} filters={filters} setFilters={setFilters} />
+  ) : (
+    <FileActions currSection={currSection} selectedFiles={selectedFiles} addFile={addFile} removeFiles={removeFiles}/>
   );
 }
 
