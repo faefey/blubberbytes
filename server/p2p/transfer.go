@@ -28,6 +28,8 @@ var (
 	receivedFileData []byte
 	receivedFileExt  string
 	receivedFileName string
+	receivedInfo     models.JoinedHosting
+	infoSignal       = make(chan struct{})
 	dataMutex        sync.Mutex
 )
 
@@ -81,6 +83,32 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 
 			log.Printf("File received successfully. Total bytes written: %d to file: %s", n, filePath)
 
+		} else if header == "request_info" {
+			handleInfoRequest(s, db, node)
+		} else if header == "requested_info" {
+			// Handle received info
+			log.Printf("Receiving requested info from peer: %s", s.Conn().RemotePeer())
+
+			// Read JSON data
+			data, err := io.ReadAll(reader)
+			if err != nil {
+				log.Printf("Error reading requested info from peer %s: %v", s.Conn().RemotePeer(), err)
+				return
+			}
+
+			// Parse JSON into JoinedHosting struct
+			var info models.JoinedHosting
+			err = json.Unmarshal(data, &info)
+			if err != nil {
+				log.Printf("Error unmarshaling requested info: %v", err)
+				return
+			}
+
+			// Store the received info globally
+			dataMutex.Lock()
+			receivedInfo = info
+			dataMutex.Unlock()
+			infoSignal <- struct{}{}
 		} else if header == "message" {
 			// Handle message transfer
 			message, err := reader.ReadString('\n')
@@ -404,6 +432,25 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 		log.Printf("'Request all files' signal sent successfully to peer %s", targetPeerIDParsed)
 
 		// Wait for half a second to let the file be received
+	} else if dataType == "request_info" {
+		log.Printf("Requesting file info from peer %s with hash: %s", targetPeerIDParsed, hash)
+
+		// Send "request_info" header
+		_, err = s.Write([]byte("request_info\n"))
+		if err != nil {
+			log.Printf("Failed to send request_info header to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		// Send the file hash
+		_, err = s.Write([]byte(hash + "\n"))
+		if err != nil {
+			log.Printf("Failed to send file hash to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		log.Printf("File info request sent successfully to peer %s", targetPeerIDParsed)
+
 	} else if message != "" {
 		// Send a message
 		log.Printf("Sending message to peer %s: %s", targetPeerIDParsed, message)
@@ -600,6 +647,120 @@ func sendRequestedFileExtToPeer(node host.Host, targetPeerID, fileExt string) er
 	log.Printf("Sent file extension to peer %s: %s", targetPeerID, fileExt)
 
 	return nil
+}
+
+func sendRequestedInfoToPeer(node host.Host, targetPeerID string, fileInfo *models.JoinedHosting) error {
+	log.Printf("Preparing to send requested file info to peer %s", targetPeerID)
+
+	// Decode the target peer ID
+	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+	if err != nil {
+		log.Printf("Failed to decode target peer ID: %v", err)
+		return err
+	}
+	log.Printf("Successfully decoded target peer ID: %s", targetPeerID)
+
+	// Open a stream to the target peer
+	ctx := context.Background()
+	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
+	if err != nil {
+		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	defer s.Close()
+	log.Printf("Stream opened successfully to peer %s", targetPeerID)
+
+	// Write the "requested_info" header
+	_, err = s.Write([]byte("requested_info\n"))
+	if err != nil {
+		log.Printf("Failed to send 'requested_info' header to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Sent 'requested_info' header to peer %s", targetPeerID)
+
+	// Serialize the file information into JSON
+	responseData, err := json.Marshal(fileInfo)
+	if err != nil {
+		log.Printf("Error marshaling file information: %v", err)
+		return err
+	}
+
+	// Send the JSON data
+	_, err = s.Write(responseData)
+	if err != nil {
+		log.Printf("Failed to send file information to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+
+	log.Printf("File information sent successfully to peer %s", targetPeerID)
+	return nil
+}
+
+func handleInfoRequest(s network.Stream, db *sql.DB, node host.Host) {
+	// Create a buffered reader for the stream
+	reader := bufio.NewReader(s)
+
+	// Read the hash from the stream
+	hash, err := reader.ReadString('\n')
+	if err != nil {
+		log.Printf("Error reading hash from peer %s: %v", s.Conn().RemotePeer(), err)
+		_, _ = s.Write([]byte(fmt.Sprintf("error: %v\n", err)))
+		return
+	}
+	hash = strings.TrimSpace(hash)
+	log.Printf("Received file info request for hash: %s from peer: %s", hash, s.Conn().RemotePeer())
+
+	// Query the database for the requested file info
+	joinedHosting, err := GetJoinedHosting(db, hash)
+	if err != nil {
+		log.Printf("Error retrieving file info for hash %s: %v", hash, err)
+		_, _ = s.Write([]byte(fmt.Sprintf("error: %v\n", err)))
+		return
+	}
+
+	// Send the file information back to the requesting peer
+	err = sendRequestedInfoToPeer(node, s.Conn().RemotePeer().String(), joinedHosting)
+	if err != nil {
+		log.Printf("Failed to send requested file info for hash %s to peer %s: %v", hash, s.Conn().RemotePeer(), err)
+		return
+	}
+
+	log.Printf("File info response sent successfully for hash %s to peer %s", hash, s.Conn().RemotePeer())
+}
+
+func GetJoinedHosting(db *sql.DB, hash string) (*models.JoinedHosting, error) {
+	// Query the Storing table
+	storing, err := operations.FindStoring(db, hash)
+	if err != nil {
+		return nil, fmt.Errorf("error finding storing record for hash %s: %v", hash, err)
+	}
+	if storing == nil {
+		return nil, fmt.Errorf("no record found in Storing table for hash %s", hash)
+	}
+
+	// Query the Hosting table
+	hosting, err := operations.FindHosting(db, hash)
+	if err != nil {
+		return nil, fmt.Errorf("error finding hosting record for hash %s: %v", hash, err)
+	}
+
+	// Create the JoinedHosting object
+	joinedHosting := &models.JoinedHosting{
+		Hash:      storing.Hash,
+		Name:      storing.Name,
+		Extension: storing.Extension,
+		Size:      storing.Size,
+		Path:      storing.Path,
+		Date:      storing.Date,
+		Price:     0, // Default to 0 if no hosting data
+	}
+
+	// Add Hosting price if available
+	if hosting != nil {
+		joinedHosting.Price = hosting.Price
+	}
+
+	return joinedHosting, nil
 }
 
 func explore(node host.Host) ([]models.Storing, error) {

@@ -23,6 +23,7 @@ func P2PSync() (host.Host, *dht.IpfsDHT, error) {
 	}
 
 	node, dht, err := createNode()
+	dhtRouting = dht
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create node: %s", err)
 	}

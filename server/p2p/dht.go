@@ -16,10 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ipfs/go-cid"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multibase"
 	"github.com/multiformats/go-multihash"
 )
@@ -177,23 +175,6 @@ func storeFileInDHT(ctx context.Context, dht *dht.IpfsDHT, filePath string, file
 	return nil
 }
 
-func provideKey(ctx context.Context, dht *dht.IpfsDHT, key string) error {
-	data := []byte(key)
-	hash := sha256.Sum256(data)
-	mh, err := multihash.EncodeName(hash[:], "sha2-256")
-	if err != nil {
-		return fmt.Errorf("error encoding multihash: %v", err)
-	}
-	c := cid.NewCidV1(cid.Raw, mh)
-
-	// Start providing the key
-	err = dht.Provide(ctx, c, true)
-	if err != nil {
-		return fmt.Errorf("failed to start providing key: %v", err)
-	}
-	return nil
-}
-
 func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.DB) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("User Input \n ")
@@ -209,6 +190,17 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "REQUEST_FILE_INFO":
+			if len(args) < 3 {
+				fmt.Println("Usage: REQUEST_FILE_INFO <peerID> <file_hash>")
+				continue
+			}
+			targetPeerID := args[1]
+			hash := args[2]
+
+			// Call requestFileInfo function
+			requestFileInfo(node, targetPeerID, hash)
+
 		case "FIND_SHARING":
 			if len(args) < 2 {
 				fmt.Println("Usage: FIND <hash>")
@@ -397,24 +389,21 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				continue
 			}
 			key := args[1]
-			data := []byte(key)
-			hash := sha256.Sum256(data)
-			mh, err := multihash.EncodeName(hash[:], "sha2-256")
-			if err != nil {
-				fmt.Printf("Error encoding multihash: %v\n", err)
-				continue
-			}
-			c := cid.NewCidV1(cid.Raw, mh)
-			providers := dht.FindProvidersAsync(ctx, c, 20)
 
 			fmt.Println("Searching for providers...")
-			for p := range providers {
-				if p.ID == peer.ID("") {
-					break
-				}
-				fmt.Printf("Found provider: %s\n", p.ID.String())
-				for _, addr := range p.Addrs {
-					fmt.Printf(" - Address: %s\n", addr.String())
+			providerIDs, err := getProviderIDs(key)
+			if err != nil {
+				fmt.Printf("Error getting providers: %v\n", err)
+				continue
+			}
+
+			// Print the list of provider IDs
+			if len(providerIDs) == 0 {
+				fmt.Println("No providers found")
+			} else {
+				fmt.Println("Providers found:")
+				for _, id := range providerIDs {
+					fmt.Println(id)
 				}
 			}
 
@@ -441,7 +430,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				continue
 			}
 			key := args[1]
-			provideKey(ctx, dht, key)
+			provideKey(key)
 
 			// New command handling for storing file metadata in DHT with a specified price
 		case "HOST_FILE":
