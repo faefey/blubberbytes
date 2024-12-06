@@ -1,43 +1,28 @@
 package btc
 
 import (
+	"errors"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 
+	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
 func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
-	init := true
-	file, err := os.Open("walletaddress.txt")
-	if err != nil {
-		log.Println(err.Error())
-		init = false
-	}
-	defer file.Close()
+	walletAddrPath := "./btc/walletaddress.txt"
 
-	var btcdCmd, btcwalletCmd *exec.Cmd
-	var btcd, btcwallet *rpcclient.Client
+	if _, err := os.Stat(walletAddrPath); errors.Is(err, os.ErrNotExist) {
+		walletDir := btcutil.AppDataDir("btcwallet", false)
+		createWallet(walletDir, net)
 
-	if init {
-		miningaddr, err := io.ReadAll(file)
+		btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, "", debug)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
 
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, string(miningaddr), debug)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
-	} else {
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, "", debug)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
-
-		miningaddr, err := storeAddress(btcwallet)
+		err = storeAddress(btcwallet, walletAddrPath)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
@@ -47,11 +32,22 @@ func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rp
 
 		InterruptCmd(btcwalletCmd)
 		InterruptCmd(btcdCmd)
+	}
 
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err = startBtc(net, miningaddr.String(), debug)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
+	file, err := os.Open(walletAddrPath)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+	defer file.Close()
+
+	miningaddr, err := io.ReadAll(file)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, string(miningaddr), debug)
+	if err != nil {
+		return nil, nil, nil, nil, err
 	}
 
 	return btcdCmd, btcwalletCmd, btcd, btcwallet, nil

@@ -4,12 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
-
-	"github.com/btcsuite/btcd/btcutil"
 )
 
 // Start the btcd process.
@@ -76,11 +72,6 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 
 // Start the btcwallet process.
 func startBtcwallet(net string, debug bool) (*exec.Cmd, error) {
-	walletDir := btcutil.AppDataDir("btcwallet", false)
-	if _, err := os.Stat(filepath.Join(walletDir, net+"/wallet.db")); errors.Is(err, os.ErrNotExist) {
-		createWallet(walletDir, net)
-	}
-
 	netCmd := ""
 	if net != "mainnet" {
 		netCmd = "--" + net

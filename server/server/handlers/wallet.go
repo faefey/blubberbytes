@@ -18,7 +18,7 @@ func WalletHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.
 		return
 	}
 
-	file, err := os.Open("walletaddress.txt")
+	file, err := os.Open("./btc/walletaddress.txt")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
