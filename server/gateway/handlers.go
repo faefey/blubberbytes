@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"fmt"
 	"net/http"
 	"server/p2p"
 
@@ -19,25 +20,22 @@ func viewFileHandler(w http.ResponseWriter, r *http.Request, node host.Host) {
 	}
 
 	// read file bytes:
-	fileBytes, ext, err := p2p.SendRequest(node, address, hash, password)
+	name, data, ext, err := p2p.SendRequest(node, address, hash, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		// detect file extension:
-		contentType := "application/octet-stream"
-		if ext == ".jpg" || ext == ".jpeg" {
-			contentType = "image/jpeg"
-		} else if ext == ".png" {
-			contentType = "image/png"
-		} else if ext == ".txt" {
-			contentType = "text/plain"
-		} else if ext == ".pdf" {
-			contentType = "application/pdf"
+		// detect file type:
+		var contentType string
+		if ext == "" {
+			contentType = "application/octet-stream"
+		} else {
+			contentType = ext
 		}
 
 		// serve the file content:
 		w.Header().Set("Content-Type", contentType)
-		w.Write(fileBytes)
+		w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", name))
+		w.Write(data)
 	}
 }
