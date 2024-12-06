@@ -28,11 +28,11 @@ func makeReservation(node host.Host) {
 	ctx := globalCtx
 	relayInfo, err := peer.AddrInfoFromString(relay_node_addr)
 	if err != nil {
-		log.Fatalf("Failed to create addrInfo from string representation of relay multiaddr: %v", err)
+		panic(fmt.Sprintf("Failed to create addrInfo from string representation of relay multiaddr: %v", err))
 	}
 	_, err = client.Reserve(ctx, node, *relayInfo)
 	if err != nil {
-		log.Fatalf("Failed to make reservation on relay: %v", err)
+		panic(fmt.Sprintf("Failed to make reservation on relay: %v", err))
 	}
 	fmt.Printf("Reservation successfull \n")
 }

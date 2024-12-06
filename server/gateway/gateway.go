@@ -3,7 +3,6 @@ package gateway
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/libp2p/go-libp2p/core/host"
@@ -17,6 +16,6 @@ func Gateway(node host.Host, db *sql.DB) {
 
 	fmt.Println("Starting server on http://localhost:3002")
 	if err := http.ListenAndServe(":3002", nil); err != nil {
-		log.Fatalf("Server failed: %s", err)
+		panic(fmt.Sprintf("Server failed: %s", err))
 	}
 }

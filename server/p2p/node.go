@@ -57,17 +57,17 @@ func createNode() (host.Host, *dht.IpfsDHT, error) {
 	}
 	privKey, err := generatePrivateKeyFromSeed(seed)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	relayAddr, err := multiaddr.NewMultiaddr(relay_node_addr)
 	if err != nil {
-		log.Fatalf("Failed to create relay multiaddr: %v", err)
+		panic(fmt.Sprintf("Failed to create relay multiaddr: %v", err))
 	}
 
 	// Convert the relay multiaddress to AddrInfo
 	relayInfo, err := peer.AddrInfoFromP2pAddr(relayAddr)
 	if err != nil {
-		log.Fatalf("Failed to create AddrInfo from relay multiaddr: %v", err)
+		panic(fmt.Sprintf("Failed to create AddrInfo from relay multiaddr: %v", err))
 	}
 
 	node, err := libp2p.New(

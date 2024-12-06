@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -33,12 +32,12 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Proxy has been accessed")
 	target, err := url.Parse(r.URL.Scheme + "://" + r.URL.Host)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	//reqb, err := httputil.DumpRequest(r, true)
 	//if err != nil {
-	//	log.Fatal(err)
+	//	panic(err)
 	//}
 	//log.Println(string(reqb))
 

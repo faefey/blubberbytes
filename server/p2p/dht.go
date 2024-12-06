@@ -378,7 +378,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			// Call the SendRequest function
 			data, ext, err := SendRequest(node, targetPeerID, hash, password)
 			if err != nil {
-				log.Fatalf("Error sending request: %v", err)
+				panic(fmt.Sprintf("Error sending request: %v", err))
 			}
 
 			if data == nil {

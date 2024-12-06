@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"server/server/handlers"
 
@@ -122,5 +121,7 @@ func Server(node host.Host, btcwallet *rpcclient.Client, db *sql.DB) {
 
 	// Run the server
 	fmt.Println("Server is running on port 3001...")
-	log.Fatal(http.ListenAndServe(":3001", nil))
+	if err := http.ListenAndServe(":3001", nil); err != nil {
+		panic(fmt.Sprintf("Server failed: %s", err))
+	}
 }

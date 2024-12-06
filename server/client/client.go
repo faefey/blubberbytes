@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,7 +11,7 @@ import (
 func sendRequest(proxy string, requestUrl string) {
 	proxyURL, err := url.Parse(proxy)
 	if err != nil {
-		log.Fatalf("Error parsing proxy URL: %v", err)
+		panic(fmt.Sprintf("Error parsing proxy URL: %v", err))
 	}
 
 	transport := &http.Transport{
@@ -25,7 +24,7 @@ func sendRequest(proxy string, requestUrl string) {
 
 	resp, err := client.Get(requestUrl)
 	if err != nil {
-		log.Fatalf("Error making request: %v", err)
+		panic(fmt.Sprintf("Error making request: %v", err))
 	}
 
 	body, err := io.ReadAll(resp.Body)
