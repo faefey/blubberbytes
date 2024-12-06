@@ -25,7 +25,7 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 		miningaddrCmd = "--miningaddr=" + miningaddr
 	}
 
-	cmd := exec.Command("./btcd/btcd", "-C", "./btc/conf/btcd.conf", netCmd, "-a", publicNode, miningaddrCmd)
+	cmd := exec.Command("./btcd/btcd", "-C", "./btc/conf/btcd.conf", netCmd, "--connect="+publicNode, miningaddrCmd)
 
 	cmd.SysProcAttr = sysProcAttr
 
