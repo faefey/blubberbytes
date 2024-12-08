@@ -3,39 +3,42 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"io"
 	"net/http"
-	"os"
 	"server/database/models"
 
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
-func WalletHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, db *sql.DB) {
-	balance, err := btcwallet.GetBalance("default")
+func WalletHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, miningaddr string, db *sql.DB) {
+	currentBalance, err := btcwallet.GetBalance("*")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	file, err := os.Open("./btc/walletaddress.txt")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
-	miningaddr, err := io.ReadAll(file)
+	pendingBalance, err := btcwallet.GetBalanceMinConf("*", 0)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	wallet := models.Wallet{
-		Address: string(miningaddr),
-		Balance: balance.ToBTC(),
+		Address:        miningaddr,
+		CurrentBalance: currentBalance.ToBTC(),
+		PendingBalance: pendingBalance.ToBTC(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(wallet)
+}
+
+func GenerateHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, db *sql.DB) {
+	block, err := btcwallet.Generate(1)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(block)
 }

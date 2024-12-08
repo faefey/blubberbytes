@@ -41,12 +41,6 @@ func PopulateDatabase(db *sql.DB) error {
 		return fmt.Errorf("error populating Download History table: %v", err)
 	}
 
-	// Populate transactions table
-	err = populateTransactions(db, "database/test_data/transactions.json")
-	if err != nil {
-		return fmt.Errorf("error populating Transaction History table: %v", err)
-	}
-
 	// Populate uploads table
 	err = populateUploads(db, "database/test_data/uploads.json")
 	if err != nil {
@@ -183,28 +177,6 @@ func populateDownloads(db *sql.DB, filePath string) error {
 		err = operations.AddDownloads(db, record.Date, record.Hash, record.Name, record.Extension, record.Size, record.Price)
 		if err != nil {
 			return fmt.Errorf("error inserting into Download History: %v", err)
-		}
-	}
-
-	return nil
-}
-
-func populateTransactions(db *sql.DB, filePath string) error {
-	data, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return fmt.Errorf("error reading %s: %v", filePath, err)
-	}
-
-	var transactionsRecords []models.Transactions
-	err = json.Unmarshal(data, &transactionsRecords)
-	if err != nil {
-		return fmt.Errorf("error parsing %s: %v", filePath, err)
-	}
-
-	for _, record := range transactionsRecords {
-		err = operations.AddTransactions(db, record.Date, record.Wallet, record.Amount, record.Balance)
-		if err != nil {
-			return fmt.Errorf("error inserting into Transaction History: %v", err)
 		}
 	}
 

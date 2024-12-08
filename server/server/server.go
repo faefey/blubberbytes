@@ -33,7 +33,7 @@ func cors(w http.ResponseWriter, r *http.Request, handler func()) {
 	}
 }
 
-func Server(node host.Host, btcwallet *rpcclient.Client, db *sql.DB) {
+func Server(node host.Host, btcwallet *rpcclient.Client, miningaddr string, db *sql.DB) {
 	http.HandleFunc("/setupHTTPProxy", setupHTTPProxy)
 	http.HandleFunc("/viewRandomNeighborFiles", viewRandomNeighborFiles)
 
@@ -67,11 +67,11 @@ func Server(node host.Host, btcwallet *rpcclient.Client, db *sql.DB) {
 	})
 
 	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.TransactionsHandler(w, r, db) })
+		cors(w, r, func() { handlers.TransactionsHandler(w, r, btcwallet, miningaddr, db) })
 	})
 
 	http.HandleFunc("/wallet", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.WalletHandler(w, r, btcwallet, db) })
+		cors(w, r, func() { handlers.WalletHandler(w, r, btcwallet, miningaddr, db) })
 	})
 
 	// POST routes

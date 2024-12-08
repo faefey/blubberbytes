@@ -53,7 +53,7 @@ function App() {
         extension: fileInfo.type,
         size: fileInfo.size,
         path: window.electron.pathForFile(fileInfo),
-        date: (new Date()).toISOString().slice(0, 10)
+        date: (new Date()).toLocaleDateString()
       }
     else if(section === "hosting")
       newFileInfo = {hash: fileInfo.hash, price: fileInfo.price}
