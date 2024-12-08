@@ -199,7 +199,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			hash := args[2]
 
 			// Call requestFileInfo function
-			requestFileInfo(node, targetPeerID, hash)
+			RequestFileInfo(node, targetPeerID, hash)
 
 		case "FIND_SHARING":
 			if len(args) < 2 {
@@ -391,7 +391,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			key := args[1]
 
 			fmt.Println("Searching for providers...")
-			providerIDs, err := getProviderIDs(key)
+			providerIDs, err := GetProviderIDs(key)
 			if err != nil {
 				fmt.Printf("Error getting providers: %v\n", err)
 				continue
@@ -430,7 +430,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				continue
 			}
 			key := args[1]
-			provideKey(key)
+			ProvideKey(key)
 
 			// New command handling for storing file metadata in DHT with a specified price
 		case "HOST_FILE":

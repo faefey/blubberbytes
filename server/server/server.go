@@ -80,7 +80,7 @@ func Server(node host.Host, btcwallet *rpcclient.Client, miningaddr string, db *
 	})
 
 	http.HandleFunc("/requestmetadata", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.RequestMetadataHandler(w, r, db) })
+		cors(w, r, func() { handlers.RequestMetadataHandler(w, r, node, db) })
 	})
 
 	http.HandleFunc("/downloadfile", func(w http.ResponseWriter, r *http.Request) {
