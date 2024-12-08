@@ -13,14 +13,14 @@ import (
 	"github.com/multiformats/go-multihash"
 )
 
-func requestFileInfo(node host.Host, targetPeerID, hash string) (*models.JoinedHosting, error) {
+func RequestFileInfo(node host.Host, targetPeerID, hash string) (models.JoinedHosting, error) {
 	log.Printf("Preparing to request file info from peer %s for hash: %s", targetPeerID, hash)
 
 	// Send the "request_info" command
 	err := sendDataToPeer(node, targetPeerID, "", "", "request_info", hash, "")
 	if err != nil {
 		log.Printf("Failed to request file info from peer %s: %v", targetPeerID, err)
-		return nil, err
+		return models.JoinedHosting{}, err
 	}
 
 	log.Printf("File info request sent successfully to peer %s for hash: %s", targetPeerID, hash)
@@ -36,14 +36,14 @@ func requestFileInfo(node host.Host, targetPeerID, hash string) (*models.JoinedH
 		receivedInfo = models.JoinedHosting{} // Clear the global variable
 		dataMutex.Unlock()
 
-		return &info, nil
+		return info, nil
 	case <-time.After(10 * time.Second): // Timeout
 		log.Println("Timeout: No response received.")
-		return nil, fmt.Errorf("timed out waiting for response from peer %s", targetPeerID)
+		return models.JoinedHosting{}, fmt.Errorf("timed out waiting for response from peer %s", targetPeerID)
 	}
 }
 
-func provideKey(key string) error {
+func ProvideKey(key string) error {
 	// Log the start of the provideKey process
 	log.Printf("Starting to provide key: %s\n", key)
 	dht := dhtRouting
@@ -81,7 +81,7 @@ func provideKey(key string) error {
 	return nil
 }
 
-func getProviderIDs(key string) ([]string, error) {
+func GetProviderIDs(key string) ([]string, error) {
 	// Assign dhtRouting to a local variable for clarity
 	dht := dhtRouting
 
