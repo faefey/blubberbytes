@@ -56,12 +56,12 @@ func startBtcd(net string, miningaddr string, debug bool) (*exec.Cmd, error) {
 			fmt.Println(scanner.Text())
 		}
 
-		if net == "mainnet" {
+		if net == "mainnet" || net == "testnet" {
 			if strings.Contains(scanner.Text(), "Syncing to block height") {
 				return cmd, nil
 			}
 		} else {
-			if strings.Contains(scanner.Text(), "Server listening") {
+			if strings.Contains(scanner.Text(), "RPC server listening") {
 				return cmd, nil
 			}
 		}
