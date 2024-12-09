@@ -4,6 +4,8 @@ import axios from 'axios'
 
 import './stylesheets/App.css';
 
+import NotificationBox from "./components/NotificationBox"; 
+
 import Banner from './components/Banner.js';
 import MainContent from './components/mainContent.js'
 import UserAccount from './components/UserAccount.js';
@@ -66,7 +68,7 @@ function App() {
         extension: fileInfo.type,
         size: fileInfo.size
       }
-    
+
     setCurrSection(section)
     setOrigShownData([])
     setCurrShownData([])
@@ -75,7 +77,7 @@ function App() {
     const dataRes = await axios.get("http://localhost:3001/" + section)
     setOrigShownData(dataRes.data)
     setCurrShownData(dataRes.data)
-    
+
     if(addRes.data.startsWith("http://"))
       return addRes.data
     else if(addRes.data !== "")
@@ -105,7 +107,9 @@ function App() {
         setCurrShownData={setCurrShownData}
       />
 
-      {currPage === 0 && 
+      <NotificationBox />
+
+      {currPage === 0 &&
         <MainContent
           currSection={currSection}
           currShownData={currShownData}
@@ -115,8 +119,8 @@ function App() {
           refreshExplore={refreshExplore}
         />
       }
-      
-      {currPage === 1 && 
+
+      {currPage === 1 &&
         <UserAccount
           backToPrev={backToPrev}
         />

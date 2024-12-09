@@ -8,7 +8,7 @@ import { useState } from 'react';
 import Receipt from './Receipt.js';
 import { ProgressBar } from './ProgressComponents.js';
 
-export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryInfo=false, actionMessage="", addFile=null}) {
+export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryInfo=false, actionMessage="", addFile=null, section=""}) {
     const [priceError, setPriceError] = useState("");
     const total_price = fileInfo.reduce((acc, file) => acc + Number(file.price), 0);
 
@@ -44,7 +44,7 @@ export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryI
                     {(close) => (
                     <>
                     <button className="ecks-button ecks-button-info" onClick= {() => close()}><EcksButton /></button>
-                    {/* {(!monetaryInfo) && (<div className="table-containing">
+                    {/* {(actionMessage === "Delete") && (<div className="table-containing">
                         <table className = "peer-table">
                                 <tbody>
                                     <th className="teehpad teeh">Name</th>
@@ -58,7 +58,7 @@ export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryI
                                 </tbody>
                         </table>
                     </div>)} */}
-                    {!monetaryInfo && <Receipt balance={500} 
+                    {(!monetaryInfo) && <Receipt balance={500} 
                                                files={fileInfo} 
                                                headerMessage={actionMessage + " Info"}
                                                actionMessage={actionMessage}
@@ -89,6 +89,7 @@ export function ConfirmationPopup({trigger, action, fileInfo, message, monetaryI
                 
                                 </form>}
                     <h3 className="center-the-top">{message}</h3>
+                    {(section === "storing") && <h4 className="warning-message">WARNING: These files will stop being hosted and shared.</h4>}
                     <div id = "confirmation-buttons">
                         {actionMessage !== "Host" && 
                                 <button className="increase-size host-button"

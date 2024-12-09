@@ -356,6 +356,25 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			filePath := args[2]
 			fmt.Printf("Sending file to peer %s: %s\n", targetPeerID, filePath)
 			sendDataToPeer(node, targetPeerID, filePath, "", "", "", "")
+		case "SEND_DOWNLOAD_REQUEST":
+			if len(args) < 3 {
+				fmt.Println("Expected target peer ID and file hash")
+				continue
+			}
+			targetPeerID := args[1]
+			hash := args[2]
+
+			// Call the SendDownloadRequest function
+			name, data, ext, err := simply_download(node, targetPeerID, hash)
+			if err != nil {
+				fmt.Printf("Failed to send download request: %v\n", err)
+				continue
+			}
+
+			fmt.Printf("Download request successful:\n")
+			fmt.Printf("File Name: %s\n", name)
+			fmt.Printf("File Extension: %s\n", ext)
+			fmt.Printf("File Data Size: %d bytes\n", len(data))
 
 		case "SEND_REQUEST":
 			if len(args) < 4 {

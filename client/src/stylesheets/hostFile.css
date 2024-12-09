@@ -249,3 +249,7 @@
     align-items: center;
     justify-content: space-between;
 }
+
+.warning-message {
+    color: red;
+}
