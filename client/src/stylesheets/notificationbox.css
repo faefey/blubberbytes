@@ -1,0 +1,49 @@
+.notification-box {
+  position: fixed;
+  width: 320px;
+  height: 100px;
+  padding: 20px;
+  background-color: #CCEBFF;
+  color: black;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-size: 15px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.notification-box.bottom-right {
+  bottom: 50px;
+  right: 50px;
+}
+
+.notification-box .close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border-radius: 5px;
+  background: white;
+  border: black;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.notification-box .close-button:hover {
+  color: #f44336; 
+}
+
+/* fade-in: */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
