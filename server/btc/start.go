@@ -10,7 +10,7 @@ import (
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
-func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
+func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, string, error) {
 	walletAddrPath := "./btc/walletaddress.txt"
 
 	if _, err := os.Stat(walletAddrPath); errors.Is(err, os.ErrNotExist) {
@@ -19,12 +19,12 @@ func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rp
 
 		btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, "", debug)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, "", err
 		}
 
 		err = storeAddress(btcwallet, walletAddrPath)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, "", err
 		}
 
 		ShutdownClient(btcd)
@@ -36,21 +36,21 @@ func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rp
 
 	file, err := os.Open(walletAddrPath)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, "", err
 	}
 	defer file.Close()
 
 	miningaddr, err := io.ReadAll(file)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, "", err
 	}
 
 	btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, string(miningaddr), debug)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, "", err
 	}
 
-	return btcdCmd, btcwalletCmd, btcd, btcwallet, nil
+	return btcdCmd, btcwalletCmd, btcd, btcwallet, string(miningaddr), nil
 }
 
 // Start all btc-related processes.

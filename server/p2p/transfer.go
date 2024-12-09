@@ -23,14 +23,16 @@ import (
 )
 
 var (
-	storing          []models.Storing // Global variable to hold Storing objects
-	storingMutex     sync.Mutex       // Mutex to ensure thread-safe access to the global variable
-	receivedFileData []byte
-	receivedFileExt  string
-	receivedFileName string
-	receivedInfo     models.JoinedHosting
-	infoSignal       = make(chan struct{})
-	dataMutex        sync.Mutex
+	storing            []models.Storing // Global variable to hold Storing objects
+	storingMutex       sync.Mutex       // Mutex to ensure thread-safe access to the global variable
+	receivedFileData   []byte
+	receivedFileExt    string
+	receivedFileName   string
+	receivedInfo       models.JoinedHosting
+	infoSignal         = make(chan struct{})
+	passwordSignalChan = make(chan struct{})
+	hashSignalChan     = make(chan struct{})
+	dataMutex          sync.Mutex
 )
 
 // Channel for signaling when data is ready
@@ -83,6 +85,8 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 
 			log.Printf("File received successfully. Total bytes written: %d to file: %s", n, filePath)
 
+		} else if header == "download_request" {
+			handleDownloadRequest(s, db, node, s.Conn().RemotePeer().String())
 		} else if header == "request_info" {
 			handleInfoRequest(s, db, node)
 		} else if header == "requested_info" {
@@ -116,7 +120,28 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 				log.Printf("Error reading message from stream: %v", err)
 				return
 			}
-			log.Printf("Message received from peer %s: %s", s.Conn().RemotePeer(), strings.TrimSpace(message))
+
+			// Trim the message to avoid unnecessary whitespaces or newlines
+			message = strings.TrimSpace(message)
+
+			// Handle specific messages
+			switch message {
+			case "Invalid password":
+				log.Println("Received 'Invalid password' message from peer.")
+				signalChan <- struct{}{}
+				passwordSignalChan <- struct{}{} // Notify the password signal channel
+				return
+
+			case "File not found":
+				log.Println("Received 'File not found' message from peer.")
+				signalChan <- struct{}{}
+				hashSignalChan <- struct{}{} // Notify the file signal channel
+				return
+
+			default:
+				log.Printf("Received unknown message from peer: %s", message)
+				return
+			}
 		} else if header == "request" {
 			// Handle file request
 			handleFileRequest(s, db, node, s.Conn().RemotePeer().String())
@@ -177,7 +202,6 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 
 			log.Printf("File extension received and stored: %s", receivedFileExt)
 
-			log.Println("RespondToRequest: Response sent")
 		} else if header == "requested_file_name" {
 			// Handle file name transfer
 			log.Printf("Handling file name transfer from peer: %s", s.Conn().RemotePeer())
@@ -195,13 +219,71 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			dataMutex.Unlock()
 
 			log.Printf("File name received and stored: %s", receivedFileName)
-
-			log.Println("RespondToRequest: File name response handled")
 		} else {
 			log.Printf("Unknown header type received: %s", header)
 		}
 	})
 }
+
+func handleDownloadRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) {
+	log.Printf("Handling download request from peer %s", targetPeerID)
+
+	reader := bufio.NewReader(s)
+
+	// Read the file hash
+	fileHash, err := reader.ReadString('\n')
+	if err != nil {
+		log.Printf("Error reading file hash from stream from peer %s: %v", targetPeerID, err)
+		sendDataToPeer(node, targetPeerID, "", "File not found", "message", "", "")
+		return
+	}
+	fileHash = strings.TrimSpace(fileHash)
+	log.Printf("Received file hash: %s", fileHash)
+
+	// Retrieve file metadata from the database
+	log.Printf("Searching for file metadata in the database for hash: %s", fileHash)
+	storing, err := operations.FindStoring(db, fileHash)
+	if err != nil || storing == nil {
+		log.Printf("File not found or error occurred while fetching file metadata for hash %s: %v", fileHash, err)
+		sendDataToPeer(node, targetPeerID, "", "File not found", "message", "", "")
+		return
+	}
+
+	log.Printf("Found file metadata for file hash: %s", fileHash)
+
+	// Send the file name
+	fileName := storing.Name
+	err = sendRequestedFileNameToPeer(node, targetPeerID, fileName)
+	if err != nil {
+		log.Printf("Error sending file name to peer %s: %v", targetPeerID, err)
+		return
+	}
+	log.Printf("File name sent successfully to peer %s: %s", targetPeerID, fileName)
+
+	// Send the file extension
+	fileExt := storing.Extension
+	if fileExt == "" {
+		log.Printf("No extension found for file hash: %s", fileHash)
+		fileExt = "unknown"
+	}
+	err = sendRequestedFileExtToPeer(node, targetPeerID, fileExt)
+	if err != nil {
+		log.Printf("Error sending file extension to peer %s: %v", targetPeerID, err)
+		return
+	}
+	log.Printf("File extension sent successfully to peer %s: %s", targetPeerID, fileExt)
+
+	// Use sendDataToPeer to send the requested file back
+	log.Printf("Sending requested file back to peer %s from path: %s", targetPeerID, storing.Path)
+	err = sendRequestedFileToPeer(node, targetPeerID, storing.Path)
+	if err != nil {
+		log.Printf("Error sending requested file to peer %s: %v", targetPeerID, err)
+		return
+	}
+
+	log.Printf("File sent successfully to peer %s: %s", targetPeerID, storing.Path)
+}
+
 func handleSendAllRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) ([]models.Storing, error) {
 	log.Printf("Handling 'send_all' request for peer: %s", targetPeerID)
 
@@ -266,7 +348,7 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 	fileHash, err := reader.ReadString('\n')
 	if err != nil {
 		log.Printf("Error reading file hash from stream from peer %s: %v", targetPeerID, err)
-		sendDataToPeer(node, targetPeerID, "", "Failed to read file hash", "", "", "")
+		sendDataToPeer(node, targetPeerID, "", "File not found", "", "", "")
 		return
 	}
 	fileHash = strings.TrimSpace(fileHash)
@@ -276,7 +358,7 @@ func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerI
 	password, err := reader.ReadString('\n')
 	if err != nil {
 		log.Printf("Error reading password from stream from peer %s: %v", targetPeerID, err)
-		sendDataToPeer(node, targetPeerID, "", "Failed to read password", "", "", "")
+		sendDataToPeer(node, targetPeerID, "", "Invalid password", "", "", "")
 		return
 	}
 	password = strings.TrimSpace(password)
@@ -422,6 +504,23 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 
 		log.Printf("File request sent successfully to peer %s", targetPeerIDParsed)
 
+	} else if dataType == "download_request" {
+		// Send a "download_request" header
+		log.Printf("Sending download request to peer %s for hash: %s", targetPeerIDParsed, hash)
+		_, err = s.Write([]byte("download_request\n"))
+		if err != nil {
+			log.Printf("Failed to send download_request header to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		// Write the hash of the file to download
+		_, err = s.Write([]byte(hash + "\n"))
+		if err != nil {
+			log.Printf("Failed to send hash for download to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		log.Printf("Download request sent successfully to peer %s for hash: %s", targetPeerIDParsed, hash)
 	} else if dataType == "request_all" {
 		log.Printf("Sending 'request_all' signal to peer %s", targetPeerIDParsed)
 		_, err = s.Write([]byte("request_all\n"))
@@ -498,38 +597,6 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 	}
 
 	return nil
-}
-
-func SendRequest(node host.Host, targetPeerID, hash, password string) (string, []byte, string, error) {
-	// Call sendDataToPeer to send the request
-	err := sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
-	if err != nil {
-		return "", nil, "", err
-	}
-
-	log.Println("Waiting for signal...")
-	<-signalChan
-	time.Sleep(500 * time.Millisecond)
-	dataMutex.Lock() // Lock the mutex to safely access the global variables
-	defer dataMutex.Unlock()
-
-	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" {
-		log.Printf("No file name, data, or file extension received after waiting for the requested file")
-		return "", nil, "", nil
-	}
-
-	// Retrieve the file name, data, and extension
-	name := receivedFileName // Copy the file name
-	data := receivedFileData // Copy the data
-	ext := receivedFileExt   // Copy the file extension
-
-	// Clear the global variables
-	receivedFileData = nil
-	receivedFileExt = ""
-	receivedFileName = ""
-
-	log.Printf("name: %s, %d bytes, ext: %s", name, len(data), ext)
-	return name, data, ext, nil
 }
 
 // Function to receive a requested file and store it in the global variable

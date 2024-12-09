@@ -1,0 +1,5 @@
+./btcd/btcd -C ./btc/conf/btcd.conf --testnet --connect=130.245.173.221:18333
+
+./btcwallet/btcwallet -C ./btc/conf/btcwallet.conf --testnet
+
+./btcd/cmd/btcctl/btcctl -C ./btc/conf/btcctl.conf

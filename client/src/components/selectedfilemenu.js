@@ -4,6 +4,7 @@ import TableContext from './TableContext';
 import React, { useContext } from 'react';
 import InfoPopup from './InfoPopup.js';
 import { ConfirmationPopup } from './ConfirmationPopup.js';
+import DownloadPopup from './DownloadFile.js';
 
 import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
@@ -148,26 +149,37 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
       <Close className="icon" onClick={() => setSelectedFiles([])} />
       <p style={{ display: 'inline' }}>{selectedFiles.length} selected</p>
 
-      <ConfirmationPopup trigger={<Download className="icon" />}
+      {/* <ConfirmationPopup trigger={<Download className="icon" />}
         action={downloadOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to download " + endingWords}
-        monetaryInfo={true} />
-      <ConfirmationPopup trigger={<Host className="icon" />}
+        monetaryInfo={true} /> */}
+      {selectedFiles.length === 1 && <DownloadPopup addFile={addFile} 
+                     currentHash={confirmationInfo[0].hash} 
+                     basicTrigger={true} 
+                     fileInfo={confirmationInfo[0]}/>}
+      {selectedFiles.length > 1 && <Download className="grayedout" />}
+      {selectedFiles.length === 1 && <ConfirmationPopup trigger={<Host className="icon" />}
         action={hostOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to host " + endingWords}
-        actionMessage={"Host"} />
-      <ConfirmationPopup trigger={<Share className="icon" />}
+        actionMessage={"Host"}
+        addFile={addFile} />}
+      {selectedFiles.length > 1 && <Host className="grayedout" />}
+
+      {selectedFiles.length === 1 && <ConfirmationPopup trigger={<Share className="icon" />}
         action={shareOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to share " + endingWords}
-        actionMessage={"Share"} />
+        actionMessage={"Share"} />}
+      {selectedFiles.length > 1 && <Share className="grayedout"/>}
+
       <ConfirmationPopup trigger={<Delete className="icon" />}
         action={deleteOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to delete " + endingWords}
-        actionMessage={"Delete"} />
+        actionMessage={"Delete"}
+        section={currSection} />
 
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
         fileInfo={[selectedFiles[0]]} />)}

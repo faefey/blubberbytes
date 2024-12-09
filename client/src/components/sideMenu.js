@@ -19,8 +19,8 @@ const SideMenu = ({files=true, items, currSection, addFile}) => {
         <div id="side-menu-header">
           <h3>Files</h3>
           <div id="side-menu-buttons">
-            <HostPopup addFile={addFile} />
-            <DownloadPopup addFile={addFile} />
+            <HostPopup addFile={addFile} uploadButton={true}/>
+            <DownloadPopup addFile={addFile}/>
           </div>
         </div>
       }

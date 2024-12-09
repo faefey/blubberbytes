@@ -199,7 +199,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			hash := args[2]
 
 			// Call requestFileInfo function
-			requestFileInfo(node, targetPeerID, hash)
+			RequestFileInfo(node, targetPeerID, hash)
 
 		case "FIND_SHARING":
 			if len(args) < 2 {
@@ -356,6 +356,25 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			filePath := args[2]
 			fmt.Printf("Sending file to peer %s: %s\n", targetPeerID, filePath)
 			sendDataToPeer(node, targetPeerID, filePath, "", "", "", "")
+		case "SEND_DOWNLOAD_REQUEST":
+			if len(args) < 3 {
+				fmt.Println("Expected target peer ID and file hash")
+				continue
+			}
+			targetPeerID := args[1]
+			hash := args[2]
+
+			// Call the SendDownloadRequest function
+			name, data, ext, err := simply_download(node, targetPeerID, hash)
+			if err != nil {
+				fmt.Printf("Failed to send download request: %v\n", err)
+				continue
+			}
+
+			fmt.Printf("Download request successful:\n")
+			fmt.Printf("File Name: %s\n", name)
+			fmt.Printf("File Extension: %s\n", ext)
+			fmt.Printf("File Data Size: %d bytes\n", len(data))
 
 		case "SEND_REQUEST":
 			if len(args) < 4 {
@@ -391,7 +410,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			key := args[1]
 
 			fmt.Println("Searching for providers...")
-			providerIDs, err := getProviderIDs(key)
+			providerIDs, err := GetProviderIDs(key)
 			if err != nil {
 				fmt.Printf("Error getting providers: %v\n", err)
 				continue
@@ -430,7 +449,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 				continue
 			}
 			key := args[1]
-			provideKey(key)
+			ProvideKey(key)
 
 			// New command handling for storing file metadata in DHT with a specified price
 		case "HOST_FILE":

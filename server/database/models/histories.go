@@ -1,6 +1,6 @@
 package models
 
-// Table for upload history
+// Table for Uploads
 type Uploads struct {
 	Id        int64  `json:"id"`
 	Date      string `json:"date"`
@@ -10,7 +10,7 @@ type Uploads struct {
 	Size      int64  `json:"size"`
 }
 
-// Table for download history
+// Table for Downloads
 type Downloads struct {
 	Id        int64   `json:"id"`
 	Date      string  `json:"date"`
@@ -21,16 +21,17 @@ type Downloads struct {
 	Price     float64 `json:"price"`
 }
 
-// Table for transaction history
+// Struct (not a table) for Transactions
 type Transactions struct {
-	Id      int64   `json:"id"`
-	Date    string  `json:"date"`
-	Wallet  string  `json:"wallet"`
-	Amount  float64 `json:"amount"`
-	Balance float64 `json:"balance"`
+	Id            string  `json:"id"`
+	Date          string  `json:"date"`
+	Wallet        string  `json:"wallet"`
+	Amount        float64 `json:"amount"`
+	Category      string  `json:"category"`
+	Confirmations int64   `json:"confirmations"`
 }
 
 // Put this on hold until proxies are implemented
-// Table for proxy history
+// Table for Proxies
 type Proxies struct {
 }

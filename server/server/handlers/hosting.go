@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"server/database/models"
 	"server/database/operations"
+	"server/p2p"
 )
 
 func HostingHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
@@ -36,6 +37,12 @@ func AddHostingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	} else if record != nil {
 		fmt.Fprint(w, "The file is already being hosted.")
+		return
+	}
+
+	err = p2p.ProvideKey(m.Hash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

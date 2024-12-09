@@ -243,3 +243,13 @@
     display: flex;
     justify-content: space-evenly;
 }
+
+#confirmation-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.warning-message {
+    color: red;
+}

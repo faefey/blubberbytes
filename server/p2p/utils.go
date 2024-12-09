@@ -13,14 +13,14 @@ import (
 	"github.com/multiformats/go-multihash"
 )
 
-func requestFileInfo(node host.Host, targetPeerID, hash string) (*models.JoinedHosting, error) {
+func RequestFileInfo(node host.Host, targetPeerID, hash string) (models.JoinedHosting, error) {
 	log.Printf("Preparing to request file info from peer %s for hash: %s", targetPeerID, hash)
 
 	// Send the "request_info" command
 	err := sendDataToPeer(node, targetPeerID, "", "", "request_info", hash, "")
 	if err != nil {
 		log.Printf("Failed to request file info from peer %s: %v", targetPeerID, err)
-		return nil, err
+		return models.JoinedHosting{}, err
 	}
 
 	log.Printf("File info request sent successfully to peer %s for hash: %s", targetPeerID, hash)
@@ -36,14 +36,14 @@ func requestFileInfo(node host.Host, targetPeerID, hash string) (*models.JoinedH
 		receivedInfo = models.JoinedHosting{} // Clear the global variable
 		dataMutex.Unlock()
 
-		return &info, nil
+		return info, nil
 	case <-time.After(10 * time.Second): // Timeout
 		log.Println("Timeout: No response received.")
-		return nil, fmt.Errorf("timed out waiting for response from peer %s", targetPeerID)
+		return models.JoinedHosting{}, fmt.Errorf("timed out waiting for response from peer %s", targetPeerID)
 	}
 }
 
-func provideKey(key string) error {
+func ProvideKey(key string) error {
 	// Log the start of the provideKey process
 	log.Printf("Starting to provide key: %s\n", key)
 	dht := dhtRouting
@@ -81,7 +81,7 @@ func provideKey(key string) error {
 	return nil
 }
 
-func getProviderIDs(key string) ([]string, error) {
+func GetProviderIDs(key string) ([]string, error) {
 	// Assign dhtRouting to a local variable for clarity
 	dht := dhtRouting
 
@@ -117,4 +117,107 @@ func getProviderIDs(key string) ([]string, error) {
 	}
 
 	return ids, nil
+}
+
+func simply_download(node host.Host, targetPeerID, hash string) (string, []byte, string, error) {
+	// Log the start of the function
+	log.Printf("Starting SendDownloadRequest to peer %s for hash %s", targetPeerID, hash)
+
+	// Call sendDataToPeer to send the request
+	log.Println("Calling sendDataToPeer to send the download request...")
+	err := sendDataToPeer(node, targetPeerID, "", "", "download_request", hash, "")
+	if err != nil {
+		log.Printf("Failed to send download request to peer %s: %v", targetPeerID, err)
+		return "", nil, "", err
+	}
+	log.Println("Download request sent successfully. Waiting for signal...")
+
+	// Wait for the first signal
+	<-signalChan
+	log.Println("First signal received. Proceeding...")
+
+	time.Sleep(500 * time.Millisecond)
+
+	// Check for hash signal
+	select {
+	case <-hashSignalChan: // Replace with your actual hash signal channel
+		log.Println("Received hash signal indicating the hash is invalid.")
+		return "", nil, "", fmt.Errorf("hash is invalid")
+	case <-time.After(100 * time.Millisecond):
+		log.Println("No hash signal received within 100ms. Continuing...")
+	}
+
+	// Lock the data mutex
+	log.Println("Acquiring lock to access global variables...")
+	dataMutex.Lock()
+	defer dataMutex.Unlock()
+	log.Println("Global variables locked. Checking received data...")
+
+	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" {
+		log.Println("File data, name, or extension is missing in the received data.")
+		return "", nil, "", fmt.Errorf("file data, name, or extension is missing")
+	}
+
+	// Retrieve the file name, data, and extension
+	log.Printf("Received file details:\n - Name: %s\n - Extension: %s\n - Data Size: %d bytes", receivedFileName, receivedFileExt, len(receivedFileData))
+	name := receivedFileName
+	data := receivedFileData
+	ext := receivedFileExt
+
+	// Clear the global variables
+	log.Println("Clearing global variables for the next request...")
+	receivedFileData = nil
+	receivedFileExt = ""
+	receivedFileName = ""
+
+	// Log success and return the results
+	log.Println("SendDownloadRequest completed successfully.")
+	return name, data, ext, nil
+}
+
+func SendRequest(node host.Host, targetPeerID, hash, password string) (string, []byte, string, error) {
+	// Call sendDataToPeer to send the request
+	err := sendDataToPeer(node, targetPeerID, "", "", "request", hash, password)
+	if err != nil {
+		return "", nil, "", err
+	}
+
+	<-signalChan // Wait for the first signal
+
+	time.Sleep(500 * time.Millisecond)
+
+	// Check for hash signal
+	select {
+	case <-hashSignalChan: // Replace with your actual hash signal channel
+		return "", nil, "", fmt.Errorf("hash is invalid")
+	case <-time.After(100 * time.Millisecond):
+		// No hash signal received, continue
+	}
+
+	// Check for password signal
+	select {
+	case <-passwordSignalChan: // Replace with your actual password signal channel
+		return "", nil, "", fmt.Errorf("password is invalid")
+	case <-time.After(100 * time.Millisecond):
+		// No password signal received, continue
+	}
+
+	dataMutex.Lock() // Lock the mutex to safely access the global variables
+	defer dataMutex.Unlock()
+
+	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" {
+		return "", nil, "", fmt.Errorf("file data, name, or extension is missing")
+	}
+
+	// Retrieve the file name, data, and extension
+	name := receivedFileName // Copy the file name
+	data := receivedFileData // Copy the data
+	ext := receivedFileExt   // Copy the file extension
+
+	// Clear the global variables
+	receivedFileData = nil
+	receivedFileExt = ""
+	receivedFileName = ""
+
+	return name, data, ext, nil
 }

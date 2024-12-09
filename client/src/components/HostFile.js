@@ -7,12 +7,16 @@ import '../stylesheets/hostFile.css';
 
 import { ReactComponent as EcksButton } from '../icons/close.svg';
 import { ReactComponent as HostIcon } from '../icons/host.svg';
+import { ReactComponent as UploadIcon } from '../icons/upload3.svg';
 
 /*
     Button that is displayed only when the hosted files are shown
     When clicked, a popup is prompted
 */
-export default function HostPopup({addFile}) {
+/*
+NOTE: This can be used for uploading files as well.
+*/
+export default function HostPopup({addFile, uploadButton=false}) {
     const [fileName, setFileName] = useState('No file chosen');
     const fileInputRef = useRef(null);
     const [errors, setErrors] = useState({'fileError' : '', 'priceError' : ''});
@@ -43,10 +47,12 @@ export default function HostPopup({addFile}) {
 
         let currErrors = {'fileError' : '', 'priceError' : ''};
 
-        if (filePrice === "" || isNaN(filePrice))
-            currErrors['priceError'] = 'Please enter a non-negative number.';
-        else if (Number(filePrice) < 0)
-            currErrors['priceError'] = 'Number must be non-negative.';
+        if (!uploadButton) {
+            if (filePrice === "" || isNaN(filePrice))
+                currErrors['priceError'] = 'Please enter a non-negative number.';
+            else if (Number(filePrice) < 0)
+                currErrors['priceError'] = 'Number must be non-negative.';
+        }
 
         if (fileName === "")
             currErrors['fileError'] = 'Please select a file.';
@@ -59,7 +65,7 @@ export default function HostPopup({addFile}) {
         if (currErrors['fileError'] === '' && currErrors['priceError'] === '') {
             setFileName("No file chosen");
             //console.log(fileInputRef.current.files[0]);
-            addFile('storing', fileInputRef.current.files[0], fileInputRef.current.files[0])
+            addFile('storing', fileInputRef.current.files[0])
             //console.log(`File name:${fileName}\n File price:${filePrice}`);
             close();
         }
@@ -70,9 +76,9 @@ export default function HostPopup({addFile}) {
         <Tooltip id="host-tooltip" />
         <Popup  trigger={<button className="host-button"
                                  data-tooltip-id="host-tooltip"
-                                 data-tooltip-content="Host file"
+                                 data-tooltip-content="Upload File"
                                  data-tooltip-place="top">
-                            <HostIcon />
+                            <UploadIcon />
                         </button>}
                 position={['left']}
                 className="popup-content"
@@ -101,7 +107,7 @@ export default function HostPopup({addFile}) {
                     {errors['fileError'] !== '' && <div className="errors">{errors['fileError']}</div>}
 
                     <br />
-                    <div id="label-div">
+                    {!uploadButton && <div id="label-div">
                         <label><h3><span className="required">*</span>File Price: </h3></label>
                         <input id="input-price" 
                                type="text" 
@@ -114,12 +120,12 @@ export default function HostPopup({addFile}) {
                                 }
                             }} 
                             />
-                    </div>
+                    </div>}
 
                     {errors['priceError'] !== '' && <div className="errors">{errors['priceError']}</div>}
              
                     <button className="host-button" type="submit">
-                        Host file
+                        {uploadButton ? "Upload File" : "Host File"}
                     </button>
 
                 </form>
