@@ -20,6 +20,10 @@ func GetProvidersHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	providers, err := p2p.GetProviderIDs(string(body))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(providers)
@@ -38,6 +42,10 @@ func RequestMetadataHandler(w http.ResponseWriter, r *http.Request, node host.Ho
 	}
 
 	metadata, err := p2p.RequestFileInfo(node, request.Peer, request.Hash)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(metadata)
@@ -55,7 +63,11 @@ func DownloadFileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	operations.AddDownloads(db, "", "", "", "", 0, 0)
+	err = operations.AddDownloads(db, "", "", "", "", 0, 0)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	fmt.Fprint(w, "walletaddress")
 }
