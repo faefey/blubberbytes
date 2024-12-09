@@ -17,8 +17,8 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
 
       <hr className="rece-divider" /></>)}
 
+      {actionMessage !== "Delete" && 
       <div className="rece-sect">
-        
         {files.map((file, index) => (
           <div key={index}>
             <div className="rece-row">
@@ -40,7 +40,26 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
             </div>}
           </div> 
             ))}
+      </div>}
+
+      {actionMessage == "Delete" && 
+      <>
+      <div className="rece-sect">
+        <div className="rece-row">
+                <span><b>File Name</b></span>
+                <span><b>File Size</b></span>
+        </div>
       </div>
+      <div className="rece-sect">
+        {files.map((file, index) => (
+          <div key={index}>
+            <div className="rece-row">
+              <span><b>{file.name}</b></span>
+              <span>{formatSize(file.size)}</span>
+            </div>
+          </div> 
+            ))}
+      </div></>}
 
       {monetaryInfo && (<><hr className="rece-divider" />
 

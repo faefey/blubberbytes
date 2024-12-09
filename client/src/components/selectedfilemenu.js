@@ -178,7 +178,8 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
         action={deleteOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to delete " + endingWords}
-        actionMessage={"Delete"} />
+        actionMessage={"Delete"}
+        section={currSection} />
 
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
         fileInfo={[selectedFiles[0]]} />)}
