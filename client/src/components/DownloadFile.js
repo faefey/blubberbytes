@@ -4,6 +4,7 @@ import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
 import { Tooltip } from 'react-tooltip';
 import Receipt from './Receipt.js';
+import axios from 'axios';
 
 import FakeFileData from '../data/fakeFileData.json';
 import samplePeers from '../data/samplePeers.json';
@@ -13,13 +14,14 @@ import { ProgressBar } from './ProgressComponents.js';
 import { ReactComponent as EcksButton } from '../icons/close.svg';
 
 import { ReactComponent as DownloadIcon } from '../icons/download_white.svg';
+import { ReactComponent as Download } from '../icons/download.svg';
 
 //                                    console.log(`Curr entries: ${currEntries} minimum: ${currEntries * numRows} maximum: ${(currEntries + 1) * numRows}`);
 /*
     Button that is displayed only when the hosted files are shown
     When clicked, a popup is prompted
 */
-export default function DownloadPopup({addFile}) {
+export default function DownloadPopup({addFile, currentHash=null, basicTrigger=false, fileInfo=null}) {
     const [fileData, setFileData] = useState('');
     const [peerData, setPeerData] = useState(['', 'XXX']);
     const [currHash, setCurrHash] = useState('');
@@ -27,6 +29,8 @@ export default function DownloadPopup({addFile}) {
     const [peerError, setPeerError] = useState('');
     const inputRef = useRef(null);
     
+    const [actualPeerData, setActualPeerData] = useState([]);
+
     const [confPage, setConfPage] = useState(false);
 
     const [showButton, setShowButton] = useState(false);
@@ -59,6 +63,25 @@ export default function DownloadPopup({addFile}) {
         }
       }, [confPage]);
 
+    useEffect(() => {
+        if (currentHash) {
+            setFileData(fileInfo);
+        }
+    }, [currentHash]);
+
+
+    function getProviders() {
+        axios.post('http://localhost:3001/getproviders', currentHash)
+          .then(res => {
+            setActualPeerData(res.data);
+          });
+    }
+
+    // useEffect(() => {
+    //     console.log("Actual peer data: ", actualPeerData);
+    // }, [actualPeerData]);
+
+
     //Where file is to be downloaded
     const inputData = (event, close) => {
         event.preventDefault();
@@ -68,11 +91,11 @@ export default function DownloadPopup({addFile}) {
         if (peerData[0] === "")
             currPeerError = "Please select a peer to download from.";
             
-        console.log(fileData);
+        //console.log(fileData);
 
         setPeerError(currPeerError);
 
-        console.log(currPeerError);
+        //console.log(currPeerError);
         if (currPeerError === "")
             close();
 
@@ -96,7 +119,7 @@ export default function DownloadPopup({addFile}) {
                 setOnPeerTable(false);
                 setPeerError("");
                 setShowButton(false);
-                console.log(onPeerTable);
+                //console.log(onPeerTable);
             }
             else {
                 //setShowButton(true);
@@ -148,34 +171,53 @@ export default function DownloadPopup({addFile}) {
         setPeerData([peer.peerid, peer.price]);
     };
 
+    if (!basicTrigger) {
+        var theTrigger = <button className="host-button"
+                            data-tooltip-id="download-tooltip"
+                            data-tooltip-content="Download file"
+                            data-tooltip-place="top"
+                            onClick={getProviders}>
+                            <DownloadIcon />
+                        </button>;
+    }
+    else {
+        var theTrigger =<Download className="icon" onClick={getProviders}/>;
+    }
+
+    // console.log("Current hash: ", currentHash);
+    // console.log("On peer table: ", onPeerTable);
+    // console.log("On conf page:", confPage);
+
     return (
         <>
         <Tooltip id="download-tooltip"/>
-        <Popup  trigger={<button className="host-button"
-                                 data-tooltip-id="download-tooltip"
-                                 data-tooltip-content="Download file"
-                                 data-tooltip-place="top">
-                                <DownloadIcon />
-                         </button>}
+        <Popup  trigger={theTrigger}
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
-                onClose = {() => {setHashError(''); setFileData(''); setPeerData(['', 'XXX']); setPeerError(""); setShowButton(false); setConfPage(false);}}
+                onClose = {() => {setHashError('');
+                                  if (!currentHash) {
+                                    setFileData(''); 
+                                    setPeerData(['', 'XXX']); 
+                                  } 
+                                  setPeerError("");
+                                  setShowButton(false); 
+                                  setConfPage(false);}}
                 closeOnDocumentClick={false} modal>
             {(close) => (
             <div id="popup-border">
                 <button className="ecks-button" onClick= {() => close()}><EcksButton /></button>
                 { !confPage && (<form onSubmit={(event) => inputData(event, close)}>
-                    <div id="label-div">
+                    {!currentHash && <div id="label-div">
                         <label><h3><span className="required">*</span>File hash:</h3></label>
                         <div id="file-input-container">
                             <input type="text" name="hash" autoComplete="off" ref={inputRef}/>
                         </div>
                         <button className="host-button" onClick={handleSearch}>Search</button>
-                    </div>
+                    </div>}
                     {(hashError === '' && fileData !== '') &&
                     <>
-                    {onPeerTable && (<>
+                    {(onPeerTable) && (<>
                     <h3 className="peer-title"><span className="required">*</span>Select a Peer to Download From</h3>
                         <table className="peer-table">
                             <tbody>
@@ -189,7 +231,7 @@ export default function DownloadPopup({addFile}) {
                                     <th className="teeh">Location</th>
                                     <th className="teeh">Price (ORCA)</th>
                                 </tr>
-                                {samplePeers.map((peer, index) => {
+                                {actualPeerData.map((peer, index) => {
                                     if (index >= currEntries * numRows && index < (currEntries + 1) * numRows)
                                         return (
                                         <tr key={peer.peerid} 
@@ -201,12 +243,10 @@ export default function DownloadPopup({addFile}) {
                                                 data-tooltip-place="top">
                                                     {peer.peerid.substring(0, 10)}
                                             </td>
-                                            <td className="teedee">{peer.location}</td>
-                                            <td className="teedee">{peer.price}</td>
                                         </tr>
                                         );
                                 })}
-                                {(samplePeers.length > numRows) && (<tr>
+                                {(actualPeerData.length > numRows) && (<tr>
                                     <td className="teedee button-td prev">
                                         {currEntries > 0 && (<button className="host-button trans"
                                                 onClick={(event) => handleTransition(event, "-")}>
@@ -215,7 +255,7 @@ export default function DownloadPopup({addFile}) {
                                     </td>
                                     <td className="teedee button-td"></td>
                                     <td className="teedee button-td next">
-                                        {((currEntries + 1)* numRows < samplePeers.length) && (<button className="host-button trans"
+                                        {((currEntries + 1)* numRows < actualPeerData.length) && (<button className="host-button trans"
                                                 onClick={(event) => handleTransition(event, "+")}>
                                                     Next
                                         </button>)}
@@ -224,7 +264,7 @@ export default function DownloadPopup({addFile}) {
                             </tbody>
                         </table>
                         {peerError !== '' && <div className="errors peer-error">{peerError}</div>}
-                        {samplePeers.map(peer => (<Tooltip id={peer.peerid}/>))}
+                        {actualPeerData.map(peer => (<Tooltip id={peer.peerid}/>))}
                         <Tooltip id="truncation" />
                         </>)}
                         {!onPeerTable && (<div className="file-metadata">
@@ -241,10 +281,10 @@ export default function DownloadPopup({addFile}) {
                                     <div>Date:</div>
                                     <div><strong>{fileData.date}</strong></div>
                                 </span>
-                                <span className="meta-elem">
+                                {/* <span className="meta-elem">
                                     <div>Downloads:</div>
                                     <div><strong>{fileData.downloads}</strong></div>
-                                </span>
+                                </span> */}
                             </div>
                             <div className="file-price meta-elem">
                                 <div>Price:</div>
@@ -265,7 +305,7 @@ export default function DownloadPopup({addFile}) {
 
                 </form>) }
                 {confPage && (<>
-                                <Receipt balance={500} files={[{price : peerData[1], FileName : fileData.name}]} newBalance={480}/>
+                                <Receipt balance={500} files={[fileData]} newBalance={480}/>
                                 {!loading && <h3 style={{textAlign: "center"}}>Would you like to confirm this transaction?</h3>}
                                 {!loading && <div className="confirmation-buttons">
                                 <button className="host-button"
