@@ -35,7 +35,14 @@ func DownloadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(downloadsRecords)
 }
 
-func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, miningaddr string, db *sql.DB) {
+func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, db *sql.DB) {
+	walletInfo, err := operations.GetWalletInfo(db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	address := walletInfo.Address
+
 	listSinceBlockResult, err := btcwallet.ListSinceBlock(nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -46,7 +53,7 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 
 	var temp []btcjson.ListTransactionsResult
 	for _, transaction := range transactions {
-		if !(transaction.Category == "send" && transaction.Address == miningaddr) {
+		if !(transaction.Category == "send" && transaction.Address == address) {
 			temp = append(temp, transaction)
 		}
 	}

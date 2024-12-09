@@ -2,10 +2,12 @@ package btc
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"fmt"
 	"log"
 	"path/filepath"
+	"server/database/operations"
 	"time"
 
 	"github.com/btcsuite/btcd/chaincfg"
@@ -27,7 +29,7 @@ func generatePrivatePassphrase(length int) string {
 	return base64.StdEncoding.EncodeToString(passphrase)
 }
 
-func createWallet(walletDir string, net string) {
+func createWallet(walletDir string, net string, db *sql.DB) error {
 	//Choose which network parameters to use based on net
 	netParams := &chaincfg.MainNetParams
 	if net == "simnet" {
@@ -47,12 +49,19 @@ func createWallet(walletDir string, net string) {
 
 	_, err := loader.CreateNewWallet(pubPassphrase, privPassphrase, nil, time.Now())
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("error creating wallet: %v", err)
 	}
 
 	if err := loader.UnloadWallet(); err != nil {
-		fmt.Printf("error unloading wallet: %v", err)
+		return fmt.Errorf("error unloading wallet: %v", err)
 	}
 
-	log.Println("New wallet successfully created with public passphrase " + pubPassphraseString + " and private " + privPassphraseString)
+	log.Println("New wallet successfully created")
+
+	err = operations.UpdateWalletPassphrases(db, pubPassphraseString, privPassphraseString)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

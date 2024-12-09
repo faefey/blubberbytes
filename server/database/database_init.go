@@ -98,3 +98,56 @@ func SetupHistoriesTables(db *sql.DB) error {
 
 	return nil
 }
+
+// SetupWalletInfoTable initializes the WalletInfo table with a placeholder row.
+func SetupWalletInfoTable(db *sql.DB) error {
+	createTable :=
+		`CREATE TABLE IF NOT EXISTS WalletInfo (
+			address TEXT PRIMARY KEY NOT NULL,
+			pubPassphrase TEXT NOT NULL,
+			privPassphrase TEXT NOT NULL
+		);`
+
+	// Execute the table creation statement
+	_, err := db.Exec(createTable)
+	if err != nil {
+		return fmt.Errorf("error creating WalletInfo table: %v", err)
+	}
+	fmt.Printf("WalletInfo table created successfully.\n")
+
+	query := `INSERT INTO WalletInfo (address, pubPassphrase, privPassphrase) VALUES (?, ?, ?)`
+	_, err = db.Exec(query, "", "", "")
+	if err != nil {
+		return fmt.Errorf("error initializing WalletInfo table: %v", err)
+	}
+	fmt.Printf("WalletInfo table initialized successfully.\n")
+
+	return nil
+}
+
+// SetupProxyTable initializes the Proxy table with a placeholder row.
+func SetupProxyTable(db *sql.DB) error {
+	createTable :=
+		`CREATE TABLE IF NOT EXISTS Proxy (
+			ip TEXT NOT NULL,
+			port TEXT NOT NULL,
+			rate REAL NOT NULL,
+			PRIMARY KEY(ip, port)
+		);`
+
+	// Execute the table creation statement
+	_, err := db.Exec(createTable)
+	if err != nil {
+		return fmt.Errorf("error creating Proxy table: %v", err)
+	}
+	fmt.Printf("Proxy table created successfully.\n")
+
+	query := `INSERT INTO Proxy (ip, port, rate) VALUES (?, ?, ?)`
+	_, err = db.Exec(query, "", "", 0)
+	if err != nil {
+		return fmt.Errorf("error initializing Proxy table: %v", err)
+	}
+	fmt.Printf("Proxy table initialized successfully.\n")
+
+	return nil
+}

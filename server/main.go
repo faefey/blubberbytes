@@ -64,7 +64,7 @@ func main() {
 	// }
 
 	// Starts btc-related processes and saves wallet address
-	btcdCmd, btcwalletCmd, btcd, btcwallet, miningaddr, err := btc.Start(net, false)
+	btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start(net, db, false)
 	if err != nil {
 		log.Println(err)
 		return
@@ -86,7 +86,7 @@ func main() {
 
 	go p2p.P2PAsync(node, dht, db)
 	go gateway.Gateway(node, db)
-	go server.Server(node, btcwallet, miningaddr, db)
+	go server.Server(node, btcwallet, db)
 
 	// Blocks until a signal is received
 	<-sigs

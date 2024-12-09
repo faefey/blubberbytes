@@ -45,6 +45,18 @@ func CreateNewTables(db *sql.DB) error {
 		return fmt.Errorf("failed to set up files tables: %v", err)
 	}
 
+	// Create WalletInfo table
+	err = SetupWalletInfoTable(db)
+	if err != nil {
+		return fmt.Errorf("failed to set up WalletInfo table: %v", err)
+	}
+
+	// Create Proxy table
+	err = SetupProxyTable(db)
+	if err != nil {
+		return fmt.Errorf("failed to set up Proxy table: %v", err)
+	}
+
 	fmt.Println("All new tables created successfully.")
 	return nil
 }

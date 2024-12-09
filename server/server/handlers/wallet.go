@@ -5,11 +5,19 @@ import (
 	"encoding/json"
 	"net/http"
 	"server/database/models"
+	"server/database/operations"
 
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
-func WalletHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, miningaddr string, db *sql.DB) {
+func WalletHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, db *sql.DB) {
+	walletInfo, err := operations.GetWalletInfo(db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	address := walletInfo.Address
+
 	currentBalance, err := btcwallet.GetBalance("*")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -23,7 +31,7 @@ func WalletHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.
 	}
 
 	wallet := models.Wallet{
-		Address:        miningaddr,
+		Address:        address,
 		CurrentBalance: currentBalance.ToBTC(),
 		PendingBalance: pendingBalance.ToBTC(),
 	}

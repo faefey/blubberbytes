@@ -1,30 +1,62 @@
 package btc
 
 import (
+	"database/sql"
 	"errors"
-	"io"
+	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+
+	"server/database/operations"
 
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/rpcclient"
 )
 
-func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, string, error) {
-	walletAddrPath := "./btc/walletaddress.txt"
-
-	if _, err := os.Stat(walletAddrPath); errors.Is(err, os.ErrNotExist) {
-		walletDir := btcutil.AppDataDir("btcwallet", false)
-		createWallet(walletDir, net)
-
-		btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, "", debug)
+func Start(net string, db *sql.DB, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
+	walletDir := btcutil.AppDataDir("btcwallet", false)
+	if _, err := os.Stat(filepath.Join(walletDir, net+"/wallet.db")); errors.Is(err, os.ErrNotExist) {
+		err := createWallet(walletDir, net, db)
 		if err != nil {
-			return nil, nil, nil, nil, "", err
+			return nil, nil, nil, nil, err
+		}
+	} else {
+		var pubPassphrase, privPassphrase string
+
+		fmt.Print("Enter your public passphrase: ")
+		_, err := fmt.Scanln(&pubPassphrase)
+		if err != nil {
+			return nil, nil, nil, nil, err
 		}
 
-		err = storeAddress(btcwallet, walletAddrPath)
+		fmt.Print("Enter your private passphrase: ")
+		_, err = fmt.Scanln(&privPassphrase)
 		if err != nil {
-			return nil, nil, nil, nil, "", err
+			return nil, nil, nil, nil, err
+		}
+
+		err = operations.UpdateWalletPassphrases(db, pubPassphrase, privPassphrase)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+	}
+
+	walletInfo, err := operations.GetWalletInfo(db)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+	address := walletInfo.Address
+
+	if address == "" {
+		btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, "", debug)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+
+		address, err = operations.StoreAddress(btcwallet, db)
+		if err != nil {
+			return nil, nil, nil, nil, err
 		}
 
 		ShutdownClient(btcd)
@@ -34,23 +66,12 @@ func Start(net string, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rp
 		InterruptCmd(btcdCmd)
 	}
 
-	file, err := os.Open(walletAddrPath)
+	btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, address, debug)
 	if err != nil {
-		return nil, nil, nil, nil, "", err
-	}
-	defer file.Close()
-
-	miningaddr, err := io.ReadAll(file)
-	if err != nil {
-		return nil, nil, nil, nil, "", err
+		return nil, nil, nil, nil, err
 	}
 
-	btcdCmd, btcwalletCmd, btcd, btcwallet, err := startBtc(net, string(miningaddr), debug)
-	if err != nil {
-		return nil, nil, nil, nil, "", err
-	}
-
-	return btcdCmd, btcwalletCmd, btcd, btcwallet, string(miningaddr), nil
+	return btcdCmd, btcwalletCmd, btcd, btcwallet, nil
 }
 
 // Start all btc-related processes.
