@@ -114,6 +114,8 @@ func createNode() (host.Host, *dht.IpfsDHT, error) {
 				fmt.Println("Connected to Relay Node")
 			case "12D3KooWM8uovScE5NPihSCKhXe8sbgdJAi88i2aXT2MmwjGWoSX":
 				fmt.Println("Connected to Bootstrap Node")
+			case "12D3KooWE1xpVccUXZJWZLVWPxXzUJQ7kMqN8UQ2WLn9uQVytmdA":
+				fmt.Println("Connected to Bootstrap Node")
 			default:
 				addPeerID(peerID)
 				fmt.Println("Connected to peer:", peerID)

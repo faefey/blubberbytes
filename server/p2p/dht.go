@@ -225,6 +225,51 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "UPDATE_WALLET_INFO":
+			// Random test data for the WalletInfo table
+			address := "1BitcoinWalletAddress"
+			pubPassphrase := "publicPass123"
+			privPassphrase := "privatePass456"
+
+			// Update the wallet address
+			err := operations.UpdateWalletAddress(db, address)
+			if err != nil {
+				fmt.Printf("Error updating wallet address: %v\n", err)
+			} else {
+				fmt.Println("Wallet address updated successfully with test data!")
+			}
+
+			// Update the wallet passphrases
+			err = operations.UpdateWalletPassphrases(db, pubPassphrase, privPassphrase)
+			if err != nil {
+				fmt.Printf("Error updating wallet passphrases: %v\n", err)
+			} else {
+				fmt.Println("Wallet passphrases updated successfully with test data!")
+			}
+
+		case "UPDATE_PROXY":
+			// Random test data for the Proxy table
+			ip := "192.168.0.100"
+			port := "9090"
+			rate := 50.0
+
+			// Call the UpdateProxy function with the random test data
+			err := operations.UpdateProxy(db, ip, port, rate)
+			if err != nil {
+				fmt.Printf("Error updating proxy: %v\n", err)
+			} else {
+				fmt.Println("Proxy updated successfully with test data!")
+			}
+
+		case "PROXY":
+			// Call the handleProxyRequest function
+			proxies, err := randomProxiesInfo(node)
+			if err != nil {
+				log.Fatalf("Error handling proxy request: %v", err)
+			}
+
+			log.Printf("Received proxies: %+v", proxies)
+
 		case "REQUEST_FILE_INFO":
 			if len(args) < 3 {
 				fmt.Println("Usage: REQUEST_FILE_INFO <peerID> <file_hash>")
@@ -399,17 +444,41 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			targetPeerID := args[1]
 			hash := args[2]
 
-			// Call the SendDownloadRequest function
-			name, data, ext, err := simply_download(node, targetPeerID, hash)
+			// Log the test command
+			fmt.Printf("Testing SEND_DOWNLOAD_REQUEST with target peer: %s and hash: %s\n", targetPeerID, hash)
+
+			// Call the simply_download function
+			name, data, ext, walletInfo, err := SimplyDownload(node, targetPeerID, hash)
 			if err != nil {
 				fmt.Printf("Failed to send download request: %v\n", err)
 				continue
 			}
 
+			// Display file information
 			fmt.Printf("Download request successful:\n")
 			fmt.Printf("File Name: %s\n", name)
 			fmt.Printf("File Extension: %s\n", ext)
 			fmt.Printf("File Data Size: %d bytes\n", len(data))
+
+			// Display wallet info if available
+			fmt.Println("Wallet Info:")
+			if walletInfo.Address != "" {
+				fmt.Printf(" - Address: %s\n", walletInfo.Address)
+				fmt.Printf(" - Public Passphrase: %s\n", walletInfo.PubPassphrase)
+				fmt.Printf(" - Private Passphrase: %s\n", walletInfo.PrivPassphrase)
+			} else {
+				fmt.Println(" - No wallet info received.")
+			}
+
+			// Test debug: Verify global variable clearing
+			fmt.Println("Testing global variable clearing...")
+			dataMutex.Lock()
+			defer dataMutex.Unlock()
+			if receivedFileData != nil || receivedFileExt != "" || receivedFileName != "" || receivedWalletInfo.Address != "" {
+				fmt.Println("Error: Global variables were not cleared properly after the request!")
+			} else {
+				fmt.Println("Global variables cleared successfully.")
+			}
 
 		case "SEND_REQUEST":
 			if len(args) < 4 {

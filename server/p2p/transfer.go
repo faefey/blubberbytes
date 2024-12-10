@@ -29,9 +29,12 @@ var (
 	receivedFileExt    string
 	receivedFileName   string
 	receivedInfo       models.JoinedHosting
+	receivedWalletInfo models.WalletInfo
 	infoSignal         = make(chan struct{})
 	passwordSignalChan = make(chan struct{})
 	hashSignalChan     = make(chan struct{})
+	proxyList          []models.Proxy        // Global list to store received proxies
+	proxySignal        = make(chan struct{}) // Channel to signal when a response is received
 	dataMutex          sync.Mutex
 )
 
@@ -85,6 +88,70 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 
 			log.Printf("File received successfully. Total bytes written: %d to file: %s", n, filePath)
 
+		} else if header == "requested_proxy" {
+			log.Printf("Processing 'requested_proxy' response from peer: %s", s.Conn().RemotePeer())
+
+			// Log the start of reading the response
+			log.Println("Attempting to read the 'requested_proxy' response.")
+
+			// Read the next line to check for the response type
+			response, err := reader.ReadString('\n')
+			if err != nil {
+				log.Printf("Error reading 'requested_proxy' response from peer %s: %v", s.Conn().RemotePeer(), err)
+				log.Println("Possible reasons: Peer closed the stream prematurely or did not send data.")
+				log.Println("Ensure the sending peer is properly sending the 'requested_proxy' response.")
+				// Send a signal even if there's an error
+				proxySignal <- struct{}{}
+				return
+			}
+			response = strings.TrimSpace(response)
+
+			// Log the raw response received
+			log.Printf("Raw response received: %s", response)
+
+			// Check the response
+			if response == "no proxy anymore" {
+				log.Println("No proxy available. Peer has no proxies to provide.")
+				// Send a signal and exit
+				proxySignal <- struct{}{}
+				return
+			}
+
+			// Log that a proxy response was received
+			log.Println("Received proxy data, attempting to unmarshal JSON.")
+
+			// If a proxy is available, unmarshal the JSON data
+			var proxy models.Proxy
+			err = json.Unmarshal([]byte(response), &proxy)
+			if err != nil {
+				log.Printf("Error unmarshaling proxy data from peer %s: %v", s.Conn().RemotePeer(), err)
+				log.Printf("Received data was: %s", response)
+				log.Println("Ensure the response is valid JSON in the format: {\"IP\":\"<ip>\",\"Port\":\"<port>\",\"Rate\":<rate>}")
+				// Send a signal even if there's an unmarshaling error
+				proxySignal <- struct{}{}
+				return
+			}
+
+			// Log the received proxy data
+			log.Printf("Received proxy from peer: %+v", proxy)
+
+			// Add the received proxy to the global list
+			dataMutex.Lock()
+			proxyList = append(proxyList, proxy)
+			dataMutex.Unlock()
+
+			log.Printf("Proxy added to global list. Current list size: %d", len(proxyList))
+
+			// Send a signal after adding the proxy
+			proxySignal <- struct{}{}
+		} else if header == "proxy_request" {
+			log.Printf("Processing 'proxy_request' request from peer: %s", s.Conn().RemotePeer())
+
+			// Use the helper function to handle the proxy response
+			err := sendProxyResponseToPeer(node, s.Conn().RemotePeer().String(), db)
+			if err != nil {
+				log.Printf("Error processing 'proxy_request': %v", err)
+			}
 		} else if header == "download_request" {
 			handleDownloadRequest(s, db, node, s.Conn().RemotePeer().String())
 		} else if header == "request_info" {
@@ -219,10 +286,111 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			dataMutex.Unlock()
 
 			log.Printf("File name received and stored: %s", receivedFileName)
+		} else if header == "requested_wallet_info" {
+			log.Printf("Handling wallet info transfer from peer: %s", s.Conn().RemotePeer())
+
+			// Read the JSON data containing wallet info
+			data, err := reader.ReadString('\n')
+			if err != nil {
+				log.Printf("Error reading wallet info from stream: %v", err)
+				return
+			}
+			data = strings.TrimSpace(data)
+
+			// Check for "No wallet info available" response
+			if data == "No wallet info available" {
+				log.Println("No wallet info available from peer.")
+				return
+			}
+
+			// Parse the wallet info JSON
+			var walletInfo models.WalletInfo
+			err = json.Unmarshal([]byte(data), &walletInfo)
+			if err != nil {
+				log.Printf("Error unmarshaling wallet info: %v", err)
+				log.Printf("Received raw data: %s", data)
+				return
+			}
+
+			// Safely store the received wallet info
+			dataMutex.Lock()
+			receivedWalletInfo = walletInfo
+			dataMutex.Unlock()
+
+			log.Printf("Wallet info received and stored: %+v", walletInfo)
 		} else {
 			log.Printf("Unknown header type received: %s", header)
 		}
 	})
+}
+
+func sendProxyResponseToPeer(node host.Host, targetPeerID string, db *sql.DB) error {
+	log.Printf("Preparing to send proxy response to peer %s", targetPeerID)
+
+	// Decode the target peer ID
+	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+	if err != nil {
+		log.Printf("Failed to decode target peer ID: %v", err)
+		return err
+	}
+
+	// Open a new stream to the target peer
+	ctx := context.Background()
+	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
+	if err != nil {
+		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	defer func() {
+		log.Printf("Closing stream to peer %s", targetPeerIDParsed)
+		s.Close()
+	}()
+	log.Printf("Stream opened successfully to peer %s", targetPeerIDParsed)
+
+	// Send the "requested_proxy" header
+	_, err = s.Write([]byte("requested_proxy\n"))
+	if err != nil {
+		log.Printf("Failed to send 'requested_proxy' header to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+
+	// Retrieve the proxy from the database
+	proxy, err := operations.GetProxy(db)
+	if err != nil {
+		// Send "no proxy anymore" if there's a database error
+		_, _ = s.Write([]byte("no proxy anymore\n"))
+		log.Printf("Error retrieving proxy from database: %v", err)
+		return err
+	}
+
+	if proxy == nil {
+		// No proxy found, send "no proxy anymore"
+		_, err = s.Write([]byte("no proxy anymore\n"))
+		if err != nil {
+			log.Printf("Error sending 'no proxy anymore' message to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+		log.Println("Sent 'no proxy anymore' message.")
+		return nil
+	}
+
+	// Proxy found, send it back as JSON
+	proxyData, err := json.Marshal(proxy)
+	if err != nil {
+		// Send "no proxy anymore" if JSON marshaling fails
+		_, _ = s.Write([]byte("no proxy anymore\n"))
+		log.Printf("Error marshaling proxy data: %v", err)
+		return err
+	}
+
+	_, err = s.Write(append(proxyData, '\n'))
+	if err != nil {
+		log.Printf("Error sending proxy data to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+
+	log.Printf("Successfully sent proxy data to peer %s: %+v", targetPeerIDParsed, proxy)
+	return nil
 }
 
 func handleDownloadRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) {
@@ -273,6 +441,14 @@ func handleDownloadRequest(s network.Stream, db *sql.DB, node host.Host, targetP
 	}
 	log.Printf("File extension sent successfully to peer %s: %s", targetPeerID, fileExt)
 
+	// Send wallet info
+	err = sendWalletInfoToPeer(node, targetPeerID, db)
+	if err != nil {
+		log.Printf("Error sending wallet info to peer %s: %v", targetPeerID, err)
+		return
+	}
+	log.Printf("Wallet info sent successfully to peer %s", targetPeerID)
+
 	// Use sendDataToPeer to send the requested file back
 	log.Printf("Sending requested file back to peer %s from path: %s", targetPeerID, storing.Path)
 	err = sendRequestedFileToPeer(node, targetPeerID, storing.Path)
@@ -282,6 +458,65 @@ func handleDownloadRequest(s network.Stream, db *sql.DB, node host.Host, targetP
 	}
 
 	log.Printf("File sent successfully to peer %s: %s", targetPeerID, storing.Path)
+}
+
+func sendWalletInfoToPeer(node host.Host, targetPeerID string, db *sql.DB) error {
+	log.Printf("Preparing to send wallet info to peer %s", targetPeerID)
+
+	// Decode the target peer ID
+	targetPeerIDParsed, err := peer.Decode(targetPeerID)
+	if err != nil {
+		log.Printf("Failed to decode target peer ID: %v", err)
+		return err
+	}
+	log.Printf("Successfully decoded target peer ID: %s", targetPeerID)
+
+	// Open a stream to the target peer
+	ctx := context.Background()
+	s, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
+	if err != nil {
+		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	defer s.Close()
+	log.Printf("Stream opened successfully to peer %s", targetPeerID)
+
+	// Write the "requested_wallet_info" header
+	_, err = s.Write([]byte("requested_wallet_info\n"))
+	if err != nil {
+		log.Printf("Failed to send requested_wallet_info header to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Sent 'requested_wallet_info' header to peer %s", targetPeerID)
+
+	// Retrieve wallet info from the database
+	walletInfo, err := operations.GetWalletInfo(db)
+	if err != nil {
+		log.Printf("Error retrieving wallet info from database: %v", err)
+		return err
+	}
+	if walletInfo == nil {
+		log.Printf("No wallet info found in the database.")
+		_, _ = s.Write([]byte("No wallet info available\n"))
+		return nil
+	}
+
+	// Marshal wallet info to JSON
+	walletData, err := json.Marshal(walletInfo)
+	if err != nil {
+		log.Printf("Error marshaling wallet info: %v", err)
+		return err
+	}
+
+	// Send the wallet info as JSON
+	_, err = s.Write(append(walletData, '\n'))
+	if err != nil {
+		log.Printf("Error sending wallet info to peer %s: %v", targetPeerIDParsed, err)
+		return err
+	}
+	log.Printf("Wallet info sent to peer %s: %+v", targetPeerID, walletInfo)
+
+	return nil
 }
 
 func handleSendAllRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) ([]models.Storing, error) {
@@ -503,6 +738,9 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 		}
 
 		log.Printf("File request sent successfully to peer %s", targetPeerIDParsed)
+
+	} else if dataType == "proxy_request" {
+		_, err = s.Write([]byte("proxy_request\n"))
 
 	} else if dataType == "download_request" {
 		// Send a "download_request" header

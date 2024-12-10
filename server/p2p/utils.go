@@ -7,6 +7,8 @@ import (
 	"server/database/models"
 	"time"
 
+	"math/rand"
+
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -119,7 +121,7 @@ func GetProviderIDs(key string) ([]string, error) {
 	return ids, nil
 }
 
-func simply_download(node host.Host, targetPeerID, hash string) (string, []byte, string, error) {
+func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, string, models.WalletInfo, error) {
 	// Log the start of the function
 	log.Printf("Starting SendDownloadRequest to peer %s for hash %s", targetPeerID, hash)
 
@@ -128,7 +130,7 @@ func simply_download(node host.Host, targetPeerID, hash string) (string, []byte,
 	err := sendDataToPeer(node, targetPeerID, "", "", "download_request", hash, "")
 	if err != nil {
 		log.Printf("Failed to send download request to peer %s: %v", targetPeerID, err)
-		return "", nil, "", err
+		return "", nil, "", models.WalletInfo{}, err
 	}
 	log.Println("Download request sent successfully. Waiting for signal...")
 
@@ -140,9 +142,9 @@ func simply_download(node host.Host, targetPeerID, hash string) (string, []byte,
 
 	// Check for hash signal
 	select {
-	case <-hashSignalChan: // Replace with your actual hash signal channel
+	case <-hashSignalChan:
 		log.Println("Received hash signal indicating the hash is invalid.")
-		return "", nil, "", fmt.Errorf("hash is invalid")
+		return "", nil, "", models.WalletInfo{}, fmt.Errorf("hash is invalid")
 	case <-time.After(100 * time.Millisecond):
 		log.Println("No hash signal received within 100ms. Continuing...")
 	}
@@ -153,9 +155,9 @@ func simply_download(node host.Host, targetPeerID, hash string) (string, []byte,
 	defer dataMutex.Unlock()
 	log.Println("Global variables locked. Checking received data...")
 
-	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" {
-		log.Println("File data, name, or extension is missing in the received data.")
-		return "", nil, "", fmt.Errorf("file data, name, or extension is missing")
+	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" || receivedWalletInfo.Address == "" {
+		log.Println("File data, name, extension, or wallet info is missing in the received data.")
+		return "", nil, "", models.WalletInfo{}, fmt.Errorf("file data, name, extension, or wallet info is missing")
 	}
 
 	// Retrieve the file name, data, and extension
@@ -164,15 +166,20 @@ func simply_download(node host.Host, targetPeerID, hash string) (string, []byte,
 	data := receivedFileData
 	ext := receivedFileExt
 
-	// Clear the global variables
+	// Retrieve wallet info directly
+	walletInfo := receivedWalletInfo
+	log.Printf("Retrieved wallet info:\n - Address: %s\n - Public Passphrase: %s", walletInfo.Address, walletInfo.PubPassphrase)
+
+	// Clear the global variables for the next request
 	log.Println("Clearing global variables for the next request...")
 	receivedFileData = nil
 	receivedFileExt = ""
 	receivedFileName = ""
+	receivedWalletInfo = models.WalletInfo{} // Clear wallet info
 
 	// Log success and return the results
 	log.Println("SendDownloadRequest completed successfully.")
-	return name, data, ext, nil
+	return name, data, ext, walletInfo, nil
 }
 
 func SendRequest(node host.Host, targetPeerID, hash, password string) (string, []byte, string, error) {
@@ -220,4 +227,65 @@ func SendRequest(node host.Host, targetPeerID, hash, password string) (string, [
 	receivedFileName = ""
 
 	return name, data, ext, nil
+}
+
+func randomProxiesInfo(node host.Host) ([]models.Proxy, error) {
+	// Get a list of provider IDs for the "PROXY" key from the DHT
+	providerIDs, err := GetProviderIDs("PROXY")
+	if err != nil {
+		log.Printf("Failed to get provider IDs for PROXY key: %v", err)
+		return nil, err
+	}
+
+	// Log the original list of provider IDs
+	log.Println("Original provider IDs:", providerIDs)
+
+	// Shuffle the list of provider IDs using a random generator
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r.Shuffle(len(providerIDs), func(i, j int) {
+		providerIDs[i], providerIDs[j] = providerIDs[j], providerIDs[i]
+	})
+
+	// Log the shuffled list
+	log.Println("Shuffled provider IDs:", providerIDs)
+
+	// Select up to 5 random providers
+	selectedProviders := providerIDs
+	if len(providerIDs) > 5 {
+		selectedProviders = providerIDs[:5]
+	}
+
+	// Log the selected providers
+	log.Println("Selected providers:", selectedProviders)
+
+	// Send proxy requests and wait for signals
+	for _, targetPeerID := range selectedProviders {
+		// Send the proxy request
+		err := sendDataToPeer(node, targetPeerID, "", "", "proxy_request", "", "")
+		if err != nil {
+			log.Printf("Failed to send proxy request to peer %s: %v", targetPeerID, err)
+			// Continue to the next peer even if one fails
+			continue
+		}
+
+		// Wait for a signal indicating the proxy response was processed
+		select {
+		case <-proxySignal:
+			log.Printf("Signal received after sending proxy request to peer %s. Proceeding to next peer.", targetPeerID)
+		case <-time.After(5 * time.Second): // Timeout after 5 seconds
+			log.Printf("Timeout waiting for response signal from peer %s. Skipping to next peer.", targetPeerID)
+		}
+	}
+
+	// Read, log, and clear the global list of proxies
+	dataMutex.Lock()
+	defer dataMutex.Unlock()
+
+	log.Printf("Returning global proxy list: %+v", proxyList)
+	result := make([]models.Proxy, len(proxyList))
+	copy(result, proxyList) // Create a copy of the proxy list to return
+	proxyList = nil         // Clear the global list
+	log.Println("Global proxy list cleared.")
+
+	return result, nil
 }
