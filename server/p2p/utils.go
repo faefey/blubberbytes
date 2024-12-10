@@ -227,7 +227,7 @@ func SendRequest(node host.Host, targetPeerID, hash, password string) (string, [
 	return name, data, ext, nil
 }
 
-func randomProxiesInfo(node host.Host) ([]models.Proxy, error) {
+func RandomProxiesInfo(node host.Host) ([]models.Proxy, error) {
 	// Get a list of provider IDs for the "PROXY" key from the DHT
 	providerIDs, err := GetProviderIDs("PROXY")
 	if err != nil {
@@ -288,8 +288,7 @@ func randomProxiesInfo(node host.Host) ([]models.Proxy, error) {
 	return result, nil
 }
 
-func explore(node host.Host, peerIDs []string) ([]models.JoinedHosting, error) {
-
+func Explore(node host.Host, peerIDs []string) ([]models.JoinedHosting, error) {
 	// Iterate through the list of peer IDs
 	for _, peerID := range peerIDs {
 		log.Printf("Requesting all files from peer: %s", peerID)

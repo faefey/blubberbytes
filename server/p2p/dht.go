@@ -276,7 +276,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 
 		case "PROXY":
 			// Call the handleProxyRequest function
-			proxies, err := randomProxiesInfo(node)
+			proxies, err := RandomProxiesInfo(node)
 			if err != nil {
 				log.Fatalf("Error handling proxy request: %v", err)
 			}
@@ -328,7 +328,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			}
 
 			// Call the explore function with the test list of peer IDs
-			collectedHostings, err := explore(node, peerIDs)
+			collectedHostings, err := Explore(node, peerIDs)
 			if err != nil {
 				log.Printf("Error during explore: %v", err)
 			} else {
