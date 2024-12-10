@@ -1,10 +1,11 @@
 // selectedfilemenu.js
 import '../stylesheets/selectedFileMenu.css';
 import TableContext from './TableContext';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import InfoPopup from './InfoPopup.js';
 import { ConfirmationPopup } from './ConfirmationPopup.js';
 import DownloadPopup from './DownloadFile.js';
+import SharePopup from './SharePopup.js';
 
 import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
@@ -110,6 +111,8 @@ function FileFilters({ currSection, filters, setFilters }) {
 
 function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
   const { setSelectedFiles } = useContext(TableContext);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [gatewayLink, setGatewayLink] = useState("");
 
   const downloadOnClick = () => {
     const link = document.createElement('a');
@@ -128,15 +131,18 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
   const shareOnClick = async () => {
     const selectedFile = selectedFiles[0];
     const link = await addFile('sharing', selectedFile);
-    if (link) {
-      navigator.clipboard.writeText(link)
-        .then(() => {
-          alert('Saved to clipboard');
-        })
-        .catch(err => {
-          console.error('Failed to copy: ', err);
-        });
-    }
+    setGatewayLink(gatewayLink);
+    setPopupOpen(true);
+    console.log("Generated Link: ", link);
+    // if (link) {
+    //   navigator.clipboard.writeText(link)
+    //     .then(() => {
+    //       alert('Saved to clipboard');
+    //     })
+    //     .catch(err => {
+    //       console.error('Failed to copy: ', err);
+    //     });
+    // }
   }
 
   const deleteOnClick = () => removeFiles(selectedFiles);
@@ -154,6 +160,7 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
         fileInfo={confirmationInfo}
         message={"Are you sure you want to download " + endingWords}
         monetaryInfo={true} /> */}
+      <SharePopup link={gatewayLink} isOpen={popupOpen} setIsOpen={setPopupOpen}/>
       {selectedFiles.length === 1 && <DownloadPopup addFile={addFile} 
                      currentHash={confirmationInfo[0].hash} 
                      basicTrigger={true} 
