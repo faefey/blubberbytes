@@ -15,31 +15,25 @@ import (
 )
 
 func Start(net string, db *sql.DB, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient.Client, *rpcclient.Client, error) {
+	pubPassphrase := "public"
+	var privPassphrase string
+	fmt.Print("Enter your private passphrase: ")
+	_, err := fmt.Scanln(&privPassphrase)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
 	walletDir := btcutil.AppDataDir("btcwallet", false)
 	if _, err := os.Stat(filepath.Join(walletDir, net+"/wallet.db")); errors.Is(err, os.ErrNotExist) {
-		err := createWallet(walletDir, net, db)
+		err := createWallet(walletDir, net, pubPassphrase, privPassphrase, db)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-	} else {
-		var pubPassphrase, privPassphrase string
+	}
 
-		fmt.Print("Enter your public passphrase: ")
-		_, err := fmt.Scanln(&pubPassphrase)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
-
-		fmt.Print("Enter your private passphrase: ")
-		_, err = fmt.Scanln(&privPassphrase)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
-
-		err = operations.UpdateWalletPassphrases(db, pubPassphrase, privPassphrase)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
+	err = operations.UpdateWalletPassphrases(db, pubPassphrase, privPassphrase)
+	if err != nil {
+		return nil, nil, nil, nil, err
 	}
 
 	walletInfo, err := operations.GetWalletInfo(db)
