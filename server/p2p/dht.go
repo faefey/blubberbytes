@@ -175,6 +175,41 @@ func storeFileInDHT(ctx context.Context, dht *dht.IpfsDHT, filePath string, file
 	return nil
 }
 
+// Helper function to perform periodic tasks
+func periodicTaskHelper(interval time.Duration, db *sql.DB) {
+	// Create a ticker
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			err := provideAllKeys(db)
+			if err != nil {
+				log.Printf("Error in periodic task: %v\n", err)
+			}
+		}
+	}
+}
+
+// Function to provide all keys from the Hosting table
+func provideAllKeys(db *sql.DB) error {
+	// Retrieve all hosting records
+	hostingRecords, err := operations.GetAllHosting(db)
+	if err != nil {
+		return fmt.Errorf("error retrieving hosting records: %v", err)
+	}
+
+	// Provide each hosting record's key to the DHT
+	for _, record := range hostingRecords {
+		err := ProvideKey(record.Hash)
+		if err != nil {
+			log.Printf("Error providing key for hash %s: %v\n", record.Hash, err)
+		}
+	}
+	return nil
+}
+
 func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.DB) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("User Input \n ")

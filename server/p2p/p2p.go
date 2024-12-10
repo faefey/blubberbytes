@@ -46,7 +46,12 @@ func P2PAsync(node host.Host, dht *dht.IpfsDHT, db *sql.DB) {
 	go receiveDataFromPeer(node, db, "D:/blubberbytes/cse416-dht-go-main/") // Ensures a folder path is used
 	go handleInput(ctx, dht, node, db)                                      // Pass db connection to handleInput
 
-	defer node.Close()
+	// Call the helper function to periodically provide keys
+	go periodicTaskHelper(12*time.Hour, db)
 
-	select {}
+	// Keep the program running
+	<-ctx.Done()
+
+	defer node.Close()
+	fmt.Println("Node closed.")
 }
