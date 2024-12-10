@@ -289,3 +289,32 @@ func randomProxiesInfo(node host.Host) ([]models.Proxy, error) {
 
 	return result, nil
 }
+
+func explore(node host.Host, peerIDs []string) ([]models.JoinedHosting, error) {
+
+	// Iterate through the list of peer IDs
+	for _, peerID := range peerIDs {
+		log.Printf("Requesting all files from peer: %s", peerID)
+
+		// Send a generic "request all files" signal to the peer
+		err := sendDataToPeer(node, peerID, "", "", "request_all", "", "")
+		if err != nil {
+			log.Printf("Error requesting all files from peer %s: %v", peerID, err)
+			continue
+		}
+
+		log.Printf("Request sent to peer %s for all files. Waiting for response signal...", peerID)
+
+		// Wait for a signal (blocking until the signal is received)
+		<-hostingUpdateSignal
+		log.Printf("Response signal received from peer %s", peerID)
+	}
+
+	// After processing all peers, collect and clear the global hosting list
+	collectedHostings := hostingList
+	hostingList = []models.JoinedHosting{} // Clear the global hosting list
+
+	// Log and return the collected hostings
+	log.Printf("Total collected hostings: %d", len(collectedHostings))
+	return collectedHostings, nil
+}

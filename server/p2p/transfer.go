@@ -14,7 +14,6 @@ import (
 	"server/database/operations"
 	"strings"
 	"sync"
-	"time"
 
 	// Add the necessary packages from libp2p, for example:
 	"github.com/libp2p/go-libp2p/core/host"    // for host.Host
@@ -23,19 +22,21 @@ import (
 )
 
 var (
-	storing            []models.Storing // Global variable to hold Storing objects
-	storingMutex       sync.Mutex       // Mutex to ensure thread-safe access to the global variable
-	receivedFileData   []byte
-	receivedFileExt    string
-	receivedFileName   string
-	receivedInfo       models.JoinedHosting
-	receivedWalletInfo models.WalletInfo
-	infoSignal         = make(chan struct{})
-	passwordSignalChan = make(chan struct{})
-	hashSignalChan     = make(chan struct{})
-	proxyList          []models.Proxy        // Global list to store received proxies
-	proxySignal        = make(chan struct{}) // Channel to signal when a response is received
-	dataMutex          sync.Mutex
+	storing             []models.Storing // Global variable to hold Storing objects
+	storingMutex        sync.Mutex       // Mutex to ensure thread-safe access to the global variable
+	receivedFileData    []byte
+	receivedFileExt     string
+	receivedFileName    string
+	receivedInfo        models.JoinedHosting
+	receivedWalletInfo  models.WalletInfo
+	infoSignal          = make(chan struct{})
+	passwordSignalChan  = make(chan struct{})
+	hashSignalChan      = make(chan struct{})
+	hostingUpdateSignal = make(chan struct{})
+	proxyList           []models.Proxy        // Global list to store received proxies
+	proxySignal         = make(chan struct{}) // Channel to signal when a response is received
+	hostingList         []models.JoinedHosting
+	dataMutex           sync.Mutex
 )
 
 // Channel for signaling when data is ready
@@ -226,31 +227,34 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 		} else if header == "request_all" {
 			log.Printf("Received 'send_all' request from peer: %s", s.Conn().RemotePeer())
 			handleSendAllRequest(s, db, node, s.Conn().RemotePeer().String())
-		} else if header == "requested_storings" {
-			// Handle requested_storings
-			log.Printf("Handling 'requested_storings' from peer: %s", s.Conn().RemotePeer())
+		} else if header == "requested_hostings" {
+			log.Printf("Handling 'requested_hostings' from peer: %s", s.Conn().RemotePeer())
 
 			// Read JSON data
 			data, err := io.ReadAll(reader)
 			if err != nil {
-				log.Printf("Error reading 'requested_storings' data: %v", err)
+				log.Printf("Error reading 'requested_hostings' data: %v", err)
 				return
 			}
 
-			// Parse JSON into a slice of Storing objects
-			var receivedStorings []models.Storing
-			err = json.Unmarshal(data, &receivedStorings)
+			// Parse JSON into a slice of JoinedHosting objects
+			var receivedHostings []models.JoinedHosting
+			err = json.Unmarshal(data, &receivedHostings)
 			if err != nil {
-				log.Printf("Error unmarshalling 'requested_storings' data: %v", err)
+				log.Printf("Error unmarshalling 'requested_hostings' data: %v", err)
 				return
 			}
 
-			// Safely add the received storings to the global storing list
-			storingMutex.Lock()
-			storing = append(storing, receivedStorings...)
-			storingMutex.Unlock()
+			// Safely add the received hostings to the global hosting list
+			dataMutex.Lock()
+			hostingList = append(hostingList, receivedHostings...)
+			dataMutex.Unlock()
 
-			log.Printf("Successfully added %d storings to the global list", len(receivedStorings))
+			log.Printf("Successfully added %d hostings to the global hosting list", len(receivedHostings))
+
+			hostingUpdateSignal <- struct{}{}
+			log.Println("Signal sent for hosting updates")
+
 		} else if header == "requested_file_ext" {
 			// Handle file extension
 			log.Printf("Handling file extension transfer from peer: %s", s.Conn().RemotePeer())
@@ -519,21 +523,21 @@ func sendWalletInfoToPeer(node host.Host, targetPeerID string, db *sql.DB) error
 	return nil
 }
 
-func handleSendAllRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) ([]models.Storing, error) {
+func handleSendAllRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) {
 	log.Printf("Handling 'send_all' request for peer: %s", targetPeerID)
 
-	// Retrieve all storing records from the database
-	storingRecords, err := operations.GetAllStoring(db)
+	// Retrieve all hosting records from the database
+	hostingRecords, err := operations.GetAllHosting(db)
 	if err != nil {
-		log.Printf("Error retrieving storing records: %v", err)
-		return nil, err // Return the error if retrieval fails
+		log.Printf("Error retrieving hosting records: %v", err)
+		return // Exit the function if retrieval fails
 	}
 
 	// Decode the target peer ID
 	targetPeerIDParsed, err := peer.Decode(targetPeerID)
 	if err != nil {
 		log.Printf("Failed to decode target peer ID: %v", err)
-		return nil, err
+		return
 	}
 
 	// Open a stream to the target peer
@@ -541,37 +545,34 @@ func handleSendAllRequest(s network.Stream, db *sql.DB, node host.Host, targetPe
 	stream, err := node.NewStream(network.WithAllowLimitedConn(ctx, "/senddata/p2p"), targetPeerIDParsed, "/senddata/p2p")
 	if err != nil {
 		log.Printf("Failed to open stream to peer %s: %v", targetPeerIDParsed, err)
-		return nil, err
+		return
 	}
 	defer stream.Close()
 	log.Printf("Stream opened successfully to peer %s", targetPeerIDParsed)
 
 	// Send the header to indicate the type of data being sent
-	header := "requested_storings\n"
+	header := "requested_hostings\n"
 	_, err = stream.Write([]byte(header))
 	if err != nil {
 		log.Printf("Error sending header to peer %s: %v", targetPeerIDParsed, err)
-		return nil, err
+		return
 	}
 
-	// Serialize the storing records to JSON
-	jsonData, err := json.Marshal(storingRecords)
+	// Serialize the hosting records to JSON
+	jsonData, err := json.Marshal(hostingRecords)
 	if err != nil {
-		log.Printf("Error serializing storing records to JSON: %v", err)
-		return nil, err // Return the error if serialization fails
+		log.Printf("Error serializing hosting records to JSON: %v", err)
+		return // Exit the function if serialization fails
 	}
 
 	// Send the JSON data back to the requesting peer
 	_, err = stream.Write(jsonData)
 	if err != nil {
-		log.Printf("Error sending storing records to peer %s: %v", targetPeerIDParsed, err)
-		return nil, err
+		log.Printf("Error sending hosting records to peer %s: %v", targetPeerIDParsed, err)
+		return
 	}
 
-	log.Printf("All storing records sent successfully to peer: %s", targetPeerIDParsed)
-
-	// Return the list of storing records
-	return storingRecords, nil
+	log.Printf("All hosting records sent successfully to peer: %s", targetPeerIDParsed)
 }
 
 func handleFileRequest(s network.Stream, db *sql.DB, node host.Host, targetPeerID string) {
@@ -1016,7 +1017,7 @@ func handleInfoRequest(s network.Stream, db *sql.DB, node host.Host) {
 	log.Printf("Received file info request for hash: %s from peer: %s", hash, s.Conn().RemotePeer())
 
 	// Query the database for the requested file info
-	joinedHosting, err := GetJoinedHosting(db, hash)
+	joinedHosting, err := operations.FindHosting(db, hash)
 	if err != nil {
 		log.Printf("Error retrieving file info for hash %s: %v", hash, err)
 		_, _ = s.Write([]byte(fmt.Sprintf("error: %v\n", err)))
@@ -1031,82 +1032,4 @@ func handleInfoRequest(s network.Stream, db *sql.DB, node host.Host) {
 	}
 
 	log.Printf("File info response sent successfully for hash %s to peer %s", hash, s.Conn().RemotePeer())
-}
-
-func GetJoinedHosting(db *sql.DB, hash string) (*models.JoinedHosting, error) {
-	// Query the Storing table
-	storing, err := operations.FindStoring(db, hash)
-	if err != nil {
-		return nil, fmt.Errorf("error finding storing record for hash %s: %v", hash, err)
-	}
-	if storing == nil {
-		return nil, fmt.Errorf("no record found in Storing table for hash %s", hash)
-	}
-
-	// Query the Hosting table
-	hosting, err := operations.FindHosting(db, hash)
-	if err != nil {
-		return nil, fmt.Errorf("error finding hosting record for hash %s: %v", hash, err)
-	}
-
-	// Create the JoinedHosting object
-	joinedHosting := &models.JoinedHosting{
-		Hash:      storing.Hash,
-		Name:      storing.Name,
-		Extension: storing.Extension,
-		Size:      storing.Size,
-		Path:      storing.Path,
-		Date:      storing.Date,
-		Price:     0, // Default to 0 if no hosting data
-	}
-
-	// Add Hosting price if available
-	if hosting != nil {
-		joinedHosting.Price = hosting.Price
-	}
-
-	return joinedHosting, nil
-}
-
-func explore(node host.Host) ([]models.Storing, error) {
-	listMutex.Lock()                           // Lock the mutex for safe access to peerIDList
-	peers := append([]string{}, peerIDList...) // Make a copy to avoid issues with concurrent modifications
-	listMutex.Unlock()
-
-	// Request all files from each peer
-	for _, peerID := range peers {
-		log.Printf("Requesting all files from peer: %s", peerID)
-
-		// Send a generic "request all files" signal to the peer
-		err := sendDataToPeer(node, peerID, "", "", "request_all", "", "")
-		if err != nil {
-			log.Printf("Error requesting all files from peer %s: %v", peerID, err)
-			continue
-		}
-
-		log.Printf("Request sent to peer %s for all files", peerID)
-	}
-
-	// Wait to allow responses to be processed (if needed)
-	time.Sleep(1 * time.Second) // Adjust this delay based on your network latency
-
-	// Lock the global storing list to safely access it
-	storingMutex.Lock()
-	defer storingMutex.Unlock()
-
-	// Make a copy of the storing list
-	storedFiles := append([]models.Storing{}, storing...)
-
-	// Print each file's details
-	log.Printf("Number of stored files: %d", len(storedFiles))
-	for i, file := range storedFiles {
-		log.Printf("File %d: Hash=%s, Name=%s, Extension=%s, Size=%d, Path=%s, Date=%s",
-			i+1, file.Hash, file.Name, file.Extension, file.Size, file.Path, file.Date)
-	}
-
-	// Clear the global storing list
-	storing = []models.Storing{}
-
-	// Return the collected storing records
-	return storedFiles, nil
 }

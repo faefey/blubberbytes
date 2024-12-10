@@ -225,6 +225,19 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "ACA":
+			if len(args) < 2 {
+				fmt.Println("PeerID required for ACA command")
+				continue
+			}
+			peerID := args[1]
+			err := sendDataToPeer(node, peerID, "", "", "request_all", "", "")
+			if err != nil {
+				fmt.Printf("Failed to send data to peer: %v\n", err)
+			} else {
+				fmt.Println("Data sent to peer successfully")
+			}
+
 		case "UPDATE_WALLET_INFO":
 			// Random test data for the WalletInfo table
 			address := "1BitcoinWalletAddress"
@@ -308,7 +321,23 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			peerID := args[1] // Extract the peerID from user input
 			connectToPeerUsingRelay(node, peerID)
 		case "EXPLORE":
-			explore(node)
+			// Define a test list of peer IDs (placeholder for your two nodes)
+			peerIDs := []string{
+				"12D3KooWBe5oQUZbpupTUeEaw4PgZ9DMtnPQ3ebnuU1TXqxN3poP", // Replace with the actual first peer ID
+				"12D3KooWHbbocnbPcrckuofGodoSBeyDE67ixLm9g45MUF8LApFv", // Replace with the actual second peer ID
+			}
+
+			// Call the explore function with the test list of peer IDs
+			collectedHostings, err := explore(node, peerIDs)
+			if err != nil {
+				log.Printf("Error during explore: %v", err)
+			} else {
+				log.Printf("Explore completed. Total collected hostings: %d", len(collectedHostings))
+				for i, hosting := range collectedHostings {
+					log.Printf("Hosting %d: %+v", i+1, hosting)
+				}
+			}
+
 		case "DELETE_SHARING":
 			if len(args) < 2 {
 				fmt.Println("Expected file hash")
