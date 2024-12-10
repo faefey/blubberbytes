@@ -22,21 +22,21 @@ import (
 )
 
 var (
-	storing             []models.Storing // Global variable to hold Storing objects
-	storingMutex        sync.Mutex       // Mutex to ensure thread-safe access to the global variable
-	receivedFileData    []byte
-	receivedFileExt     string
-	receivedFileName    string
-	receivedInfo        models.JoinedHosting
-	receivedWalletInfo  models.WalletInfo
-	infoSignal          = make(chan struct{})
-	passwordSignalChan  = make(chan struct{})
-	hashSignalChan      = make(chan struct{})
-	hostingUpdateSignal = make(chan struct{})
-	proxyList           []models.Proxy        // Global list to store received proxies
-	proxySignal         = make(chan struct{}) // Channel to signal when a response is received
-	hostingList         []models.JoinedHosting
-	dataMutex           sync.Mutex
+	storing               []models.Storing // Global variable to hold Storing objects
+	storingMutex          sync.Mutex       // Mutex to ensure thread-safe access to the global variable
+	receivedFileData      []byte
+	receivedFileExt       string
+	receivedFileName      string
+	receivedInfo          models.JoinedHosting
+	receivedWalletAddress string
+	infoSignal            = make(chan struct{})
+	passwordSignalChan    = make(chan struct{})
+	hashSignalChan        = make(chan struct{})
+	hostingUpdateSignal   = make(chan struct{})
+	proxyList             []models.Proxy        // Global list to store received proxies
+	proxySignal           = make(chan struct{}) // Channel to signal when a response is received
+	hostingList           []models.JoinedHosting
+	dataMutex             sync.Mutex
 )
 
 // Channel for signaling when data is ready
@@ -290,38 +290,29 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			dataMutex.Unlock()
 
 			log.Printf("File name received and stored: %s", receivedFileName)
-		} else if header == "requested_wallet_info" {
-			log.Printf("Handling wallet info transfer from peer: %s", s.Conn().RemotePeer())
+		} else if header == "requested_wallet_address" {
+			log.Printf("Handling wallet address transfer from peer: %s", s.Conn().RemotePeer())
 
-			// Read the JSON data containing wallet info
+			// Read the wallet address string
 			data, err := reader.ReadString('\n')
 			if err != nil {
-				log.Printf("Error reading wallet info from stream: %v", err)
+				log.Printf("Error reading wallet address from stream: %v", err)
 				return
 			}
 			data = strings.TrimSpace(data)
 
-			// Check for "No wallet info available" response
-			if data == "No wallet info available" {
-				log.Println("No wallet info available from peer.")
+			// Check for "No wallet address available" response
+			if data == "No wallet address available" {
+				log.Println("No wallet address available from peer.")
 				return
 			}
 
-			// Parse the wallet info JSON
-			var walletInfo models.WalletInfo
-			err = json.Unmarshal([]byte(data), &walletInfo)
-			if err != nil {
-				log.Printf("Error unmarshaling wallet info: %v", err)
-				log.Printf("Received raw data: %s", data)
-				return
-			}
-
-			// Safely store the received wallet info
+			// Safely store the received wallet address
 			dataMutex.Lock()
-			receivedWalletInfo = walletInfo
+			receivedWalletAddress = data
 			dataMutex.Unlock()
 
-			log.Printf("Wallet info received and stored: %+v", walletInfo)
+			log.Printf("Wallet address received and stored: %s", receivedWalletAddress)
 		} else {
 			log.Printf("Unknown header type received: %s", header)
 		}
@@ -445,13 +436,13 @@ func handleDownloadRequest(s network.Stream, db *sql.DB, node host.Host, targetP
 	}
 	log.Printf("File extension sent successfully to peer %s: %s", targetPeerID, fileExt)
 
-	// Send wallet info
-	err = sendWalletInfoToPeer(node, targetPeerID, db)
+	// Send wallet address
+	err = sendWalletAddressToPeer(node, targetPeerID, db)
 	if err != nil {
-		log.Printf("Error sending wallet info to peer %s: %v", targetPeerID, err)
+		log.Printf("Error sending wallet address to peer %s: %v", targetPeerID, err)
 		return
 	}
-	log.Printf("Wallet info sent successfully to peer %s", targetPeerID)
+	log.Printf("Wallet address sent successfully to peer %s", targetPeerID)
 
 	// Use sendDataToPeer to send the requested file back
 	log.Printf("Sending requested file back to peer %s from path: %s", targetPeerID, storing.Path)
@@ -464,8 +455,8 @@ func handleDownloadRequest(s network.Stream, db *sql.DB, node host.Host, targetP
 	log.Printf("File sent successfully to peer %s: %s", targetPeerID, storing.Path)
 }
 
-func sendWalletInfoToPeer(node host.Host, targetPeerID string, db *sql.DB) error {
-	log.Printf("Preparing to send wallet info to peer %s", targetPeerID)
+func sendWalletAddressToPeer(node host.Host, targetPeerID string, db *sql.DB) error {
+	log.Printf("Preparing to send wallet address to peer %s", targetPeerID)
 
 	// Decode the target peer ID
 	targetPeerIDParsed, err := peer.Decode(targetPeerID)
@@ -485,13 +476,13 @@ func sendWalletInfoToPeer(node host.Host, targetPeerID string, db *sql.DB) error
 	defer s.Close()
 	log.Printf("Stream opened successfully to peer %s", targetPeerID)
 
-	// Write the "requested_wallet_info" header
-	_, err = s.Write([]byte("requested_wallet_info\n"))
+	// Write the "requested_wallet_address" header
+	_, err = s.Write([]byte("requested_wallet_address\n"))
 	if err != nil {
-		log.Printf("Failed to send requested_wallet_info header to peer %s: %v", targetPeerIDParsed, err)
+		log.Printf("Failed to send requested_wallet_address header to peer %s: %v", targetPeerIDParsed, err)
 		return err
 	}
-	log.Printf("Sent 'requested_wallet_info' header to peer %s", targetPeerID)
+	log.Printf("Sent 'requested_wallet_address' header to peer %s", targetPeerID)
 
 	// Retrieve wallet info from the database
 	walletInfo, err := operations.GetWalletInfo(db)
@@ -499,26 +490,19 @@ func sendWalletInfoToPeer(node host.Host, targetPeerID string, db *sql.DB) error
 		log.Printf("Error retrieving wallet info from database: %v", err)
 		return err
 	}
-	if walletInfo == nil {
-		log.Printf("No wallet info found in the database.")
-		_, _ = s.Write([]byte("No wallet info available\n"))
+	if walletInfo == nil || walletInfo.Address == "" {
+		log.Printf("No wallet address found in the database.")
+		_, _ = s.Write([]byte("No wallet address available\n"))
 		return nil
 	}
 
-	// Marshal wallet info to JSON
-	walletData, err := json.Marshal(walletInfo)
+	// Send the wallet address as plain text
+	_, err = s.Write([]byte(walletInfo.Address + "\n"))
 	if err != nil {
-		log.Printf("Error marshaling wallet info: %v", err)
+		log.Printf("Error sending wallet address to peer %s: %v", targetPeerIDParsed, err)
 		return err
 	}
-
-	// Send the wallet info as JSON
-	_, err = s.Write(append(walletData, '\n'))
-	if err != nil {
-		log.Printf("Error sending wallet info to peer %s: %v", targetPeerIDParsed, err)
-		return err
-	}
-	log.Printf("Wallet info sent to peer %s: %+v", targetPeerID, walletInfo)
+	log.Printf("Wallet address sent to peer %s: %s", targetPeerID, walletInfo.Address)
 
 	return nil
 }

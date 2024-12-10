@@ -476,8 +476,8 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			// Log the test command
 			fmt.Printf("Testing SEND_DOWNLOAD_REQUEST with target peer: %s and hash: %s\n", targetPeerID, hash)
 
-			// Call the simply_download function
-			name, data, ext, walletInfo, err := SimplyDownload(node, targetPeerID, hash)
+			// Call the SimplyDownload function
+			name, data, ext, walletAddress, err := SimplyDownload(node, targetPeerID, hash)
 
 			if err != nil {
 				fmt.Printf("Failed to send download request: %v\n", err)
@@ -490,21 +490,19 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			fmt.Printf("File Extension: %s\n", ext)
 			fmt.Printf("File Data Size: %d bytes\n", len(data))
 
-			// Display wallet info if available
-			fmt.Println("Wallet Info:")
-			if walletInfo.Address != "" {
-				fmt.Printf(" - Address: %s\n", walletInfo.Address)
-				fmt.Printf(" - Public Passphrase: %s\n", walletInfo.PubPassphrase)
-				fmt.Printf(" - Private Passphrase: %s\n", walletInfo.PrivPassphrase)
+			// Display wallet address if available
+			fmt.Println("Wallet Address:")
+			if walletAddress != "" {
+				fmt.Printf(" - Address: %s\n", walletAddress)
 			} else {
-				fmt.Println(" - No wallet info received.")
+				fmt.Println(" - No wallet address received.")
 			}
 
 			// Test debug: Verify global variable clearing
 			fmt.Println("Testing global variable clearing...")
 			dataMutex.Lock()
 			defer dataMutex.Unlock()
-			if receivedFileData != nil || receivedFileExt != "" || receivedFileName != "" || receivedWalletInfo.Address != "" {
+			if receivedFileData != nil || receivedFileExt != "" || receivedFileName != "" || receivedWalletAddress != "" {
 				fmt.Println("Error: Global variables were not cleared properly after the request!")
 			} else {
 				fmt.Println("Global variables cleared successfully.")

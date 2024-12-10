@@ -121,16 +121,16 @@ func GetProviderIDs(key string) ([]string, error) {
 	return ids, nil
 }
 
-func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, string, models.WalletInfo, error) {
+func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, string, string, error) {
 	// Log the start of the function
 	log.Printf("Starting SendDownloadRequest to peer %s for hash %s", targetPeerID, hash)
 
-	// Call sendDataToPeer to send the request
+	// Call sendDataToPeer to send the download request
 	log.Println("Calling sendDataToPeer to send the download request...")
 	err := sendDataToPeer(node, targetPeerID, "", "", "download_request", hash, "")
 	if err != nil {
 		log.Printf("Failed to send download request to peer %s: %v", targetPeerID, err)
-		return "", nil, "", models.WalletInfo{}, err
+		return "", nil, "", "", err
 	}
 	log.Println("Download request sent successfully. Waiting for signal...")
 
@@ -144,7 +144,7 @@ func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, 
 	select {
 	case <-hashSignalChan:
 		log.Println("Received hash signal indicating the hash is invalid.")
-		return "", nil, "", models.WalletInfo{}, fmt.Errorf("hash is invalid")
+		return "", nil, "", "", fmt.Errorf("hash is invalid")
 	case <-time.After(100 * time.Millisecond):
 		log.Println("No hash signal received within 100ms. Continuing...")
 	}
@@ -155,9 +155,9 @@ func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, 
 	defer dataMutex.Unlock()
 	log.Println("Global variables locked. Checking received data...")
 
-	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" || receivedWalletInfo.Address == "" {
-		log.Println("File data, name, extension, or wallet info is missing in the received data.")
-		return "", nil, "", models.WalletInfo{}, fmt.Errorf("file data, name, extension, or wallet info is missing")
+	if receivedFileData == nil || receivedFileExt == "" || receivedFileName == "" || receivedWalletAddress == "" {
+		log.Println("File data, name, extension, or wallet address is missing in the received data.")
+		return "", nil, "", "", fmt.Errorf("file data, name, extension, or wallet address is missing")
 	}
 
 	// Retrieve the file name, data, and extension
@@ -166,20 +166,18 @@ func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, 
 	data := receivedFileData
 	ext := receivedFileExt
 
-	// Retrieve wallet info directly
-	walletInfo := receivedWalletInfo
-	log.Printf("Retrieved wallet info:\n - Address: %s\n - Public Passphrase: %s", walletInfo.Address, walletInfo.PubPassphrase)
+	// Retrieve wallet address directly
+	walletAddress := receivedWalletAddress
+	log.Printf("Retrieved wallet address: %s", walletAddress)
 
 	// Clear the global variables for the next request
 	log.Println("Clearing global variables for the next request...")
 	receivedFileData = nil
 	receivedFileExt = ""
 	receivedFileName = ""
-	receivedWalletInfo = models.WalletInfo{} // Clear wallet info
+	receivedWalletAddress = "" // Clear wallet address
 
-	// Log success and return the results
-	log.Println("SendDownloadRequest completed successfully.")
-	return name, data, ext, walletInfo, nil
+	return name, data, ext, walletAddress, nil
 }
 
 func SendRequest(node host.Host, targetPeerID, hash, password string) (string, []byte, string, error) {
