@@ -1,22 +1,27 @@
 .notification-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
-  width: 320px;
-  height: 100px;
-  padding: 20px;
+  min-width: fit-content;
+  min-height: fit-content;
+  padding: 15px 55px 15px 55px;
   background-color: #CCEBFF;
   color: black;
   border-radius: 8px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   font-size: 15px;
-  text-align: center;
-  font-family: Arial, sans-serif;
   animation: fadeIn 0.5s ease-out;
 }
 
+.notification-box p {
+  margin: 0px;
+}
+
 .notification-box.bottom-right {
-  bottom: 50px;
-  right: 50px;
+  bottom: 30px;
+  right: 30px;
 }
 
 .notification-box .close-button {
@@ -40,10 +45,10 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    /* transform: scale(0.9); */
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    /* transform: scale(1); */
   }
 }

@@ -3,15 +3,14 @@ import "../stylesheets/notificationbox.css"; // css
 
 const NotificationBox = ({
   message = "This is a notification",
-  duration = 5000, // 5 seconds
+  duration = 6000, // 6 seconds
   position = "bottom-right",
+  setMessage,
   onClose,
 }) => {
-  const [visible, setVisible] = useState(true);
-
   useEffect(() => {
     const timer = setTimeout(() => {
-      setVisible(false);
+      setMessage("");
       if (onClose) onClose();
     }, duration);
 
@@ -19,12 +18,10 @@ const NotificationBox = ({
 
   }, [duration, onClose]);
 
-  if (!visible) return null;
-
   return (
     <div className={`notification-box ${position}`}>
       <p>{message}</p>
-      <button className="close-button" onClick={() => setVisible(false)}>
+      <button className="close-button" onClick={() => setMessage("")}>
         X
       </button>
     </div>

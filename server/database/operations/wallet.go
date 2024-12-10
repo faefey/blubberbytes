@@ -16,7 +16,7 @@ func UpdateWalletAddress(db *sql.DB, address string) error {
 		return fmt.Errorf("error updating record from WalletInfo: %v", err)
 	}
 
-	fmt.Printf("Record updated successfully in WalletInfo.\n")
+	fmt.Printf("Wallet address updated successfully in WalletInfo.\n")
 	return nil
 }
 
@@ -28,7 +28,7 @@ func UpdateWalletPassphrases(db *sql.DB, pubPassphrase, privPassphrase string) e
 		return fmt.Errorf("error updating record from WalletInfo: %v", err)
 	}
 
-	fmt.Printf("Record updated successfully in WalletInfo.\n")
+	fmt.Printf("Wallet passphrases updated successfully in WalletInfo.\n")
 	return nil
 }
 

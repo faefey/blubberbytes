@@ -15,6 +15,7 @@ function App() {
   const [currSection, setCurrSection] = useState('storing')
   const [origShownData, setOrigShownData] = useState([])
   const [currShownData, setCurrShownData] = useState([])
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
     axios.get('http://localhost:3001/storing')
@@ -78,24 +79,44 @@ function App() {
     setOrigShownData(dataRes.data)
     setCurrShownData(dataRes.data)
 
-    if(addRes.data.startsWith("http://"))
-      return addRes.data
-    else if(addRes.data !== "")
-      alert(addRes.data)
+    if(addRes.data === "") {
+      if(currSection === "storing")
+        setMessage("The file is now being stored.")
+      else if(currSection === "hosting")
+        setMessage("The file is now being hosted.")
+      else
+        setMessage("The file has been saved.")
+    }
+    else {
+      if(addRes.data.startsWith("http://")) {
+        setMessage("The file is now being shared.")
+        return addRes.data
+      }
+      else
+        setMessage(addRes.data)
+    }
   }
 
   async function removeFiles(files) {
     for (const file of files) {
       await axios.post("http://localhost:3001/delete" + currSection, file.hash)
     }
+    
     const res = await axios.get("http://localhost:3001/" + currSection)
     setOrigShownData(res.data)
     setCurrShownData(res.data)
-  }
 
-  function refreshExplore(e) {
-    alert("will implement later")
-    e.stopPropagation()
+    const fileString = files.length === 1 ? 
+      "The file is now no longer " : 
+      "The files are now no longer " 
+    if(currSection === "storing")
+      setMessage(fileString + "being stored, hosted, and shared.")
+    else if(currSection === "hosting")
+      setMessage(fileString + "being hosted.")
+    else if(currSection === "sharing")
+      setMessage(fileString + "being shared.")
+    else
+      setMessage(fileString + "saved.")
   }
 
   return (
@@ -107,8 +128,6 @@ function App() {
         setCurrShownData={setCurrShownData}
       />
 
-      <NotificationBox />
-
       {currPage === 0 &&
         <MainContent
           currSection={currSection}
@@ -116,7 +135,6 @@ function App() {
           updateShownData={updateShownData}
           addFile={addFile}
           removeFiles={removeFiles}
-          refreshExplore={refreshExplore}
         />
       }
 
@@ -125,6 +143,8 @@ function App() {
           backToPrev={backToPrev}
         />
       }
+
+      {message != "" && <NotificationBox message={message} setMessage={setMessage} />}
     </div>
   );
 }

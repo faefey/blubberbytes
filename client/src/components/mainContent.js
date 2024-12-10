@@ -5,13 +5,11 @@ import {ReactComponent as Hosting} from '../icons/server.svg'
 import {ReactComponent as Sharing} from '../icons/folder.svg'
 import {ReactComponent as Explore} from '../icons/globe1.svg'
 
-import {ReactComponent as Refresh} from '../icons/refresh.svg'
-
-export default function MainContent({currSection, currShownData, updateShownData, addFile, removeFiles, refreshExplore}) {
+export default function MainContent({currSection, currShownData, updateShownData, addFile, removeFiles}) {
   const fileItems = [
     {
       label: 'Storing', icon: <Hosting />,
-      onClick: () => updateShownData('storing'),
+      onClick: () => updateShownData('storing')
     },
     {
       label: 'Hosting', icon: <Hosting />,
@@ -23,8 +21,7 @@ export default function MainContent({currSection, currShownData, updateShownData
     },
     {
       label: 'Explore', icon: <Explore />,
-      onClick: () => updateShownData('explore'),
-      extraIcon: <Refresh id="refresh" className="icon extraicon" onClick={refreshExplore} />
+      onClick: () => updateShownData('explore')
     },
     {
       label: 'Saved', icon: <Explore />,
