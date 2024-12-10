@@ -71,8 +71,16 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 		cors(w, r, func() { handlers.TransactionsHandler(w, r, btcwallet, db) })
 	})
 
+	http.HandleFunc("/proxies", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.ProxiesHandler(w, r, db) })
+	})
+
 	http.HandleFunc("/wallet", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, func() { handlers.WalletHandler(w, r, btcwallet, db) })
+	})
+
+	http.HandleFunc("/refreshproxies", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.RefreshProxiesHandler(w, r, db) })
 	})
 
 	// POST routes
@@ -86,6 +94,10 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 
 	http.HandleFunc("/downloadfile", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, func() { handlers.DownloadFileHandler(w, r, node, btcwallet, netParams, db) })
+	})
+
+	http.HandleFunc("/explore", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.ExploreHandler(w, r, db) })
 	})
 
 	http.HandleFunc("/addstoring", func(w http.ResponseWriter, r *http.Request) {

@@ -10,6 +10,7 @@ import (
 	"server/p2p"
 	"time"
 
+	"github.com/btcsuite/btcd/btcutil"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/libp2p/go-libp2p/core/host"
@@ -73,17 +74,29 @@ func DownloadFileHandler(w http.ResponseWriter, r *http.Request, node host.Host,
 		return
 	}
 
-	// address, err := btcutil.DecodeAddress("", netParams)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	walletInfo, err := operations.GetWalletInfo(db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// _, err = btcwallet.SendFrom("default", address, btcutil.Amount(request.Price))
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
+	err = btcwallet.WalletPassphrase(walletInfo.PrivPassphrase, 300)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	address, err := btcutil.DecodeAddress(walletInfo.Address, netParams)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = btcwallet.SendFrom("default", address, btcutil.Amount(request.Price))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	date := time.Now().Local().Format("01/02/2006")
 	err = operations.AddDownloads(db, date, request.Hash, name, ext, int64(len(data)), request.Price)
