@@ -119,7 +119,7 @@ func GetProviderIDs(key string) ([]string, error) {
 	return ids, nil
 }
 
-func simply_download(node host.Host, targetPeerID, hash string) (string, []byte, string, error) {
+func SimplyDownload(node host.Host, targetPeerID, hash string) (string, []byte, string, error) {
 	// Log the start of the function
 	log.Printf("Starting SendDownloadRequest to peer %s for hash %s", targetPeerID, hash)
 

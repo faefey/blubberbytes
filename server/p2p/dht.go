@@ -365,7 +365,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			hash := args[2]
 
 			// Call the SendDownloadRequest function
-			name, data, ext, err := simply_download(node, targetPeerID, hash)
+			name, data, ext, err := SimplyDownload(node, targetPeerID, hash)
 			if err != nil {
 				fmt.Printf("Failed to send download request: %v\n", err)
 				continue

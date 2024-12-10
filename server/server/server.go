@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"server/server/handlers"
 
+	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/libp2p/go-libp2p/core/host"
 )
@@ -33,7 +34,7 @@ func cors(w http.ResponseWriter, r *http.Request, handler func()) {
 	}
 }
 
-func Server(node host.Host, btcwallet *rpcclient.Client, db *sql.DB) {
+func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Params, db *sql.DB) {
 	http.HandleFunc("/setupHTTPProxy", setupHTTPProxy)
 	http.HandleFunc("/viewRandomNeighborFiles", viewRandomNeighborFiles)
 
@@ -84,7 +85,7 @@ func Server(node host.Host, btcwallet *rpcclient.Client, db *sql.DB) {
 	})
 
 	http.HandleFunc("/downloadfile", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.DownloadFileHandler(w, r, db) })
+		cors(w, r, func() { handlers.DownloadFileHandler(w, r, node, btcwallet, netParams, db) })
 	})
 
 	http.HandleFunc("/addstoring", func(w http.ResponseWriter, r *http.Request) {

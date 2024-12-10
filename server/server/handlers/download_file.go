@@ -8,7 +8,10 @@ import (
 	"net/http"
 	"server/database/operations"
 	"server/p2p"
+	"time"
 
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/libp2p/go-libp2p/core/host"
 )
 
@@ -51,11 +54,12 @@ func RequestMetadataHandler(w http.ResponseWriter, r *http.Request, node host.Ho
 	json.NewEncoder(w).Encode(metadata)
 }
 
-func DownloadFileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func DownloadFileHandler(w http.ResponseWriter, r *http.Request, node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Params, db *sql.DB) {
 	decoder := json.NewDecoder(r.Body)
 	var request struct {
-		Peer string `json:"peer"`
-		Hash string `json:"hash"`
+		Peer  string  `json:"peer"`
+		Hash  string  `json:"hash"`
+		Price float64 `json:"price"`
 	}
 	err := decoder.Decode(&request)
 	if err != nil {
@@ -63,11 +67,39 @@ func DownloadFileHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	err = operations.AddDownloads(db, "", "", "", "", 0, 0)
+	name, data, ext, err := p2p.SimplyDownload(node, request.Peer, request.Hash)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprint(w, "walletaddress")
+	// address, err := btcutil.DecodeAddress("", netParams)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// _, err = btcwallet.SendFrom("default", address, btcutil.Amount(request.Price))
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+
+	date := time.Now().Local().Format("01/02/2006")
+	err = operations.AddDownloads(db, date, request.Hash, name, ext, int64(len(data)), request.Price)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var contentType string
+	if ext == "" {
+		contentType = "application/octet-stream"
+	} else {
+		contentType = ext
+	}
+
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", name))
+	w.Write(data)
 }
