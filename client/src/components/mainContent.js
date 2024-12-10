@@ -1,14 +1,16 @@
 import SideMenu from './sideMenu.js';
 import Table from "./Table.js";
 
-import {ReactComponent as Hosting} from '../icons/server.svg'
-import {ReactComponent as Sharing} from '../icons/folder.svg'
-import {ReactComponent as Explore} from '../icons/globe1.svg'
+import {ReactComponent as Storing} from '../icons/folder.svg'
+import {ReactComponent as Hosting} from '../icons/harddrive.svg'
+import {ReactComponent as Sharing} from '../icons/hub.svg'
+import {ReactComponent as Explore} from '../icons/globe.svg'
+import {ReactComponent as Saved} from '../icons/bookmark.svg'
 
 export default function MainContent({currSection, currShownData, updateShownData, addFile, removeFiles}) {
   const fileItems = [
     {
-      label: 'Storing', icon: <Hosting />,
+      label: 'Storing', icon: <Storing />,
       onClick: () => updateShownData('storing')
     },
     {
@@ -24,7 +26,7 @@ export default function MainContent({currSection, currShownData, updateShownData
       onClick: () => updateShownData('explore')
     },
     {
-      label: 'Saved', icon: <Explore />,
+      label: 'Saved', icon: <Saved />,
       onClick: () => updateShownData('saved')
     }
   ];

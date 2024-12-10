@@ -449,6 +449,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 
 			// Call the simply_download function
 			name, data, ext, walletInfo, err := SimplyDownload(node, targetPeerID, hash)
+
 			if err != nil {
 				fmt.Printf("Failed to send download request: %v\n", err)
 				continue

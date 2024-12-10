@@ -57,7 +57,7 @@ func SetupHistoriesTables(db *sql.DB) error {
 			CREATE TABLE IF NOT EXISTS Uploads (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				date TEXT NOT NULL,
-				hash TEXT UNIQUE NOT NULL,
+				hash TEXT NOT NULL,
 				name TEXT NOT NULL,
 				extension TEXT NOT NULL,
 				size INTEGER NOT NULL
@@ -66,7 +66,7 @@ func SetupHistoriesTables(db *sql.DB) error {
 			CREATE TABLE IF NOT EXISTS Downloads (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				date TEXT NOT NULL,
-				hash TEXT UNIQUE NOT NULL,
+				hash TEXT NOT NULL,
 				name TEXT NOT NULL,
 				extension TEXT NOT NULL,
 				size INTEGER NOT NULL,

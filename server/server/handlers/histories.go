@@ -36,13 +36,6 @@ func DownloadsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
 }
 
 func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcclient.Client, db *sql.DB) {
-	walletInfo, err := operations.GetWalletInfo(db)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	address := walletInfo.Address
-
 	listSinceBlockResult, err := btcwallet.ListSinceBlock(nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -53,7 +46,7 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 
 	var temp []btcjson.ListTransactionsResult
 	for _, transaction := range transactions {
-		if !(transaction.Category == "send" && transaction.Address == address) {
+		if !(transaction.Category == "send" && *transaction.Fee == 0) {
 			temp = append(temp, transaction)
 		}
 	}
@@ -77,4 +70,15 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(transactionsRecords)
+}
+
+func ProxiesHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	downloadsRecords, err := operations.GetAllDownloads(db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(downloadsRecords)
 }

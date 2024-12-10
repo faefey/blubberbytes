@@ -10,6 +10,8 @@ import (
 	"server/p2p"
 	"server/server"
 	"syscall"
+
+	"github.com/btcsuite/btcd/chaincfg"
 )
 
 func main() {
@@ -49,6 +51,12 @@ func main() {
 	}
 
 	net := "testnet"
+	netParams := &chaincfg.MainNetParams
+	if net == "simnet" {
+		netParams = &chaincfg.SimNetParams
+	} else if net == "testnet" {
+		netParams = &chaincfg.TestNet3Params
+	}
 
 	// err = os.Remove("./btc/walletaddress.txt")
 	// if err != nil && !os.IsNotExist(err) {
@@ -86,7 +94,7 @@ func main() {
 
 	go p2p.P2PAsync(node, dht, db)
 	go gateway.Gateway(node, db)
-	go server.Server(node, btcwallet, db)
+	go server.Server(node, btcwallet, netParams, db)
 
 	// Blocks until a signal is received
 	<-sigs

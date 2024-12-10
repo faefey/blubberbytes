@@ -80,9 +80,9 @@ function App() {
     setCurrShownData(dataRes.data)
 
     if(addRes.data === "") {
-      if(currSection === "storing")
+      if(section === "storing")
         setMessage("The file is now being stored.")
-      else if(currSection === "hosting")
+      else if(section === "hosting")
         setMessage("The file is now being hosted.")
       else
         setMessage("The file has been saved.")
@@ -144,7 +144,7 @@ function App() {
         />
       }
 
-      {message != "" && <NotificationBox message={message} setMessage={setMessage} />}
+      {message !== "" && <NotificationBox message={message} setMessage={setMessage} />}
     </div>
   );
 }

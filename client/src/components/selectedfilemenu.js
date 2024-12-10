@@ -8,8 +8,8 @@ import DownloadPopup from './DownloadFile.js';
 
 import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
-import { ReactComponent as Host } from '../icons/server.svg'
-import { ReactComponent as Share } from '../icons/share.svg';
+import { ReactComponent as Host } from '../icons/harddrive.svg'
+import { ReactComponent as Share } from '../icons/link.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 

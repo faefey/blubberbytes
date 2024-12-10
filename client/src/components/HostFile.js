@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Popup from 'reactjs-popup';
 import { Tooltip } from 'react-tooltip';
 
@@ -6,8 +6,7 @@ import 'reactjs-popup/dist/index.css';
 import '../stylesheets/hostFile.css';
 
 import { ReactComponent as EcksButton } from '../icons/close.svg';
-import { ReactComponent as HostIcon } from '../icons/host.svg';
-import { ReactComponent as UploadIcon } from '../icons/upload3.svg';
+import { ReactComponent as UploadIcon } from '../icons/upload.svg';
 
 /*
     Button that is displayed only when the hosted files are shown
