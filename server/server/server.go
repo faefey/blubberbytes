@@ -79,6 +79,10 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 		cors(w, r, func() { handlers.WalletHandler(w, r, btcwallet, db) })
 	})
 
+	http.HandleFunc("/generate", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.GenerateHandler(w, r, btcwallet, db) })
+	})
+
 	http.HandleFunc("/refreshproxies", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, func() { handlers.RefreshProxiesHandler(w, r, node, db) })
 	})
