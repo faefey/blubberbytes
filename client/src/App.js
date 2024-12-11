@@ -33,6 +33,8 @@ function App() {
     if(currSection === "explore") {
       setOrigShownData(exploreData);
       setCurrShownData(exploreData);
+      if(exploreData.length === 0)
+        setMessage("Please download a file by hash in order to see recommended files.")
     }
     else {
       axios.get("http://localhost:3001/" + currSection)
@@ -50,6 +52,8 @@ function App() {
     if(section === "explore") {
       setOrigShownData(exploreData);
       setCurrShownData(exploreData);
+      if(exploreData.length === 0)
+        setMessage("Please download a file by hash in order to see recommended files.")
     }
     else {
       axios.get("http://localhost:3001/" + section)
