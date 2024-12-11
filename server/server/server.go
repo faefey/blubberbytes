@@ -128,6 +128,10 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 		cors(w, r, func() { handlers.DeleteSharingHandler(w, r, db) })
 	})
 
+	http.HandleFunc("/sharinglink", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.SharingLinkHandler(w, r, node, db) })
+	})
+
 	http.HandleFunc("/addsaved", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, func() { handlers.AddSavedHandler(w, r, db) })
 	})

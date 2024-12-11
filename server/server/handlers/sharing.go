@@ -64,3 +64,19 @@ func DeleteSharingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 }
+
+func SharingLinkHandler(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	record, err := operations.FindSharing(db, string(body))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "http://localhost:3002/viewfile?address=%s&hash=%s&password=%s", node, record.Hash, record.Password)
+}
