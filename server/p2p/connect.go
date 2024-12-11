@@ -53,6 +53,9 @@ func refreshReservation(node host.Host, interval time.Duration) {
 }
 
 func connectToPeer(node host.Host, peerAddr string) {
+	// Log every time the function is called
+	log.Printf("Attempting to connect to peer with address: %s", peerAddr)
+
 	addr, err := multiaddr.NewMultiaddr(peerAddr)
 	if err != nil {
 		log.Printf("Failed to parse peer address: %s", err)

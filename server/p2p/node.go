@@ -113,13 +113,32 @@ func createNode() (host.Host, *dht.IpfsDHT, error) {
 			case "12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN":
 				fmt.Println("Connected to Relay Node")
 			case "12D3KooWM8uovScE5NPihSCKhXe8sbgdJAi88i2aXT2MmwjGWoSX":
-				fmt.Println("Connected to Bootstrap Node")
+				fmt.Println("Connected to Bootstrap Node1")
 			case "12D3KooWE1xpVccUXZJWZLVWPxXzUJQ7kMqN8UQ2WLn9uQVytmdA":
-				fmt.Println("Connected to Bootstrap Node")
+				fmt.Println("Connected to Bootstrap Node2")
+
+				// Log additional details for debugging
+				fmt.Printf("Bootstrap Node2 Multiaddr: %s\n", conn.RemoteMultiaddr().String())
+				fmt.Printf("Local Multiaddr: %s\n", conn.LocalMultiaddr().String())
+
+				// Check if the connection is inbound or outbound
+				if conn.Stat().Direction == network.DirInbound {
+					fmt.Println("Connection direction: Inbound")
+				} else {
+					fmt.Println("Connection direction: Outbound")
+				}
+
+				// Check the number of connected peers to see if it's repeatedly connecting
+				connectedPeers := node.Network().Peers()
+				fmt.Printf("Total connected peers: %d\n", len(connectedPeers))
+
 			default:
 				addPeerID(peerID)
 				fmt.Println("Connected to peer:", peerID)
 			}
+		},
+		DisconnectedF: func(n network.Network, conn network.Conn) {
+			log.Printf("Disconnected from peer: %s", conn.RemotePeer().String())
 		},
 	})
 

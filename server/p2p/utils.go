@@ -11,7 +11,6 @@ import (
 
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multihash"
 )
 
@@ -83,13 +82,13 @@ func ProvideKey(key string) error {
 	return nil
 }
 
-func GetProviderIDs(key string) ([]string, error) {
+func GetProviderIDs(key string, node host.Host) ([]string, error) {
 	// Assign dhtRouting to a local variable for clarity
 	dht := dhtRouting
 
 	// Check if the DHT is initialized
 	if dht == nil {
-		return nil, fmt.Errorf("dhtRouting is not initialized")
+		return []string{}, fmt.Errorf("dhtRouting is not initialized")
 	}
 
 	// Use global context
@@ -100,7 +99,7 @@ func GetProviderIDs(key string) ([]string, error) {
 	hash := sha256.Sum256(data)
 	mh, err := multihash.EncodeName(hash[:], "sha2-256")
 	if err != nil {
-		return nil, fmt.Errorf("error encoding multihash: %v", err)
+		return []string{}, fmt.Errorf("error encoding multihash: %v", err)
 	}
 
 	// Create a CID from the multihash
@@ -112,9 +111,12 @@ func GetProviderIDs(key string) ([]string, error) {
 	// Collect provider IDs
 	var ids []string
 	for p := range providers {
-		if p.ID == peer.ID("") {
-			break
+
+		// Skip the node's own PeerID
+		if p.ID == node.ID() {
+			continue
 		}
+
 		ids = append(ids, p.ID.String())
 	}
 
@@ -232,7 +234,7 @@ func randomProxiesInfo(node host.Host) ([]models.Proxy, error) {
 	providerIDs, err := GetProviderIDs("PROXY")
 	if err != nil {
 		log.Printf("Failed to get provider IDs for PROXY key: %v", err)
-		return nil, err
+		return []models.Proxy{}, err
 	}
 
 	// Log the original list of provider IDs
