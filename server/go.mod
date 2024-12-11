@@ -3,6 +3,7 @@ module server
 go 1.23.2
 
 require (
+	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/btcsuite/btcd v0.24.2
 	github.com/btcsuite/btcd/btcutil v1.1.5
 	github.com/ipfs/go-cid v0.4.1

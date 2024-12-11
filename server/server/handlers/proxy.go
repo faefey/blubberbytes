@@ -33,7 +33,7 @@ func UpdateProxyHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	err = operations.UpdateProxy(db, m.IP, m.Port, m.Rate, address)
+	err = operations.UpdateProxy(db, m.IP, m.Rate, address)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

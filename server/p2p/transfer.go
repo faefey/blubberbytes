@@ -127,7 +127,7 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			if err != nil {
 				log.Printf("Error unmarshaling proxy data from peer %s: %v", s.Conn().RemotePeer(), err)
 				log.Printf("Received data was: %s", response)
-				log.Println("Ensure the response is valid JSON in the format: {\"IP\":\"<ip>\",\"Port\":\"<port>\",\"Rate\":<rate>}")
+				log.Println("Ensure the response is valid JSON in the format: {\"IP\":\"<ip>\",\"Rate\":<rate>},\"Wallet\":<wallet>}")
 				// Send a signal even if there's an unmarshaling error
 				proxySignal <- struct{}{}
 				return

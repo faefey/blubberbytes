@@ -8,6 +8,7 @@ import (
 	"server/database"
 	"server/gateway"
 	"server/p2p"
+	"server/proxy"
 	"server/server"
 	"syscall"
 
@@ -95,6 +96,7 @@ func main() {
 	go p2p.P2PAsync(node, dht, db)
 	go gateway.Gateway(node, db)
 	go server.Server(node, btcwallet, netParams, db)
+	go proxy.Proxy(db)
 
 	// Blocks until a signal is received
 	<-sigs

@@ -263,12 +263,11 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		case "UPDATE_PROXY":
 			// Random test data for the Proxy table
 			ip := "192.168.0.100"
-			port := "9090"
 			rate := 50.0
 			address := "123"
 
 			// Call the UpdateProxy function with the random test data
-			err := operations.UpdateProxy(db, ip, port, rate, address)
+			err := operations.UpdateProxy(db, ip, rate, address)
 			if err != nil {
 				fmt.Printf("Error updating proxy: %v\n", err)
 			} else {

@@ -129,11 +129,9 @@ func SetupWalletInfoTable(db *sql.DB) error {
 func SetupProxyTable(db *sql.DB) error {
 	createTable :=
 		`CREATE TABLE IF NOT EXISTS Proxy (
-			ip TEXT NOT NULL,
-			port TEXT NOT NULL,
+			ip PRIMARY KEY TEXT NOT NULL,
 			rate REAL NOT NULL,
 			wallet TEXT NOT NULL,
-			PRIMARY KEY(ip, port)
 		);`
 
 	// Execute the table creation statement
@@ -143,12 +141,31 @@ func SetupProxyTable(db *sql.DB) error {
 	}
 	fmt.Printf("Proxy table created successfully.\n")
 
-	query := `INSERT INTO Proxy (ip, port, rate, wallet) VALUES (?, ?, ?, ?)`
+	query := `INSERT INTO Proxy (ip, rate, wallet) VALUES (?, ?, ?, ?)`
 	_, err = db.Exec(query, "", "", 0, "")
 	if err != nil {
 		return fmt.Errorf("error initializing Proxy table: %v", err)
 	}
 	fmt.Printf("Proxy table initialized successfully.\n")
+
+	return nil
+}
+
+func SetupProxyLogsTable(db *sql.DB) error {
+	createTable :=
+		`CREATE TABLE IF NOT EXISTS ProxyLogs (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			ip TEXT NOT NULL,
+			rate REAL NOT NULL,
+			wallet TEXT NOT NULL,
+		);`
+
+	// Execute the table creation statement
+	_, err := db.Exec(createTable)
+	if err != nil {
+		return fmt.Errorf("error creating ProxyLogs table: %v", err)
+	}
+	fmt.Printf("ProxyLogs table created successfully.\n")
 
 	return nil
 }

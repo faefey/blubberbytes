@@ -4,10 +4,11 @@ for each user (1 user = 1 IP address) and every 5 minutes this information is lo
 a txt file in the format [IP, bytes]\n[IP, bytes]\n[IP, bytes]
 */
 
-package main
+package proxy
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
@@ -15,6 +16,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"server/database/operations"
 
 	"github.com/armon/go-socks5"
 )
@@ -149,8 +152,7 @@ func customDial(ctx context.Context, network, addr string) (net.Conn, error) {
 	return &trafficInterceptor{conn: conn, clientIP: clientIP}, nil
 }
 
-func proxy() {
-
+func Proxy(db *sql.DB) {
 	dial := customDial
 	conf := &socks5.Config{Dial: dial, Rules: &clientAddressRuleset{}}
 	server, err := socks5.New(conf)
@@ -166,11 +168,10 @@ func proxy() {
 			for key, value := range paymentInformation {
 				//log.Println("Hello!")
 				log.Printf("%s : %d", key, value)
-				err := appendToFile("proxyData.txt", fmt.Sprintf("[%s, %d]", key, value))
+				operations.AddProxyLogs(db, key, value, time.Now().Unix())
 				if err != nil {
 					log.Printf("Error writing to file")
 				}
-
 			}
 
 			for key := range paymentInformation {
@@ -178,9 +179,20 @@ func proxy() {
 			}
 
 			mutex.Unlock()
-
 		}
 	}()
+
+	go func() {
+		for {
+			// timeBefore := time.Now().Unix()
+			log.Println("Waiting 5 minutes...")
+			time.Sleep(time.Minute * 5)
+			log.Println("Sending request for proxy payment...")
+			// sendRequestForPayment
+		}
+	}()
+
+	fmt.Println("Proxy is running on http://localhost:8000.")
 
 	// Create SOCKS5 proxy on localhost port 8000
 	if err := server.ListenAndServe("tcp", "0.0.0.0:8000"); err != nil {
