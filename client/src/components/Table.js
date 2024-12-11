@@ -336,16 +336,16 @@ function applyFilters(data, filters) {
 		const mediaExtensions = ['.png', '.jpg', '.jpeg', '.mp4', '.mp3'];
 
 		// Type filter
-		if (filters.type && item.extension) {
-			const ext = item.extension.toLowerCase();
+		if (filters.type && item.name) {
+			const ext = item.name.split(".").pop().toLowerCase(); // Extract file extension from the filename
 			let fileType = 'other';
-
-			if (documentExtensions.some(d => ext.endsWith(d))) {
+		
+			if (documentExtensions.some(d => ext === d)) {
 				fileType = 'document';
-			} else if (mediaExtensions.some(m => ext.endsWith(m))) {
+			} else if (mediaExtensions.some(m => ext === m)) {
 				fileType = 'media';
 			}
-
+		
 			if (filters.type !== fileType) {
 				isValid = false;
 			}
