@@ -23,7 +23,7 @@ func GetProvidersHandler(w http.ResponseWriter, r *http.Request, node host.Host,
 		return
 	}
 
-	providers, err := p2p.GetProviderIDs(string(body))
+	providers, err := p2p.GetProviderIDs(node, string(body))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
