@@ -20,6 +20,7 @@
 }
 
 .popup-content {
+    min-width: fit-content;
     width: 420px;
     padding: 20px;
     background-color: var(--color-theme); /* Using global variable */
@@ -181,7 +182,8 @@
     padding: 0;     
     cursor: pointer;
     position: absolute;
-    left: 360px;
+    /* left: 360px; */
+    right: 0px;
     top: -20px;
 
 }

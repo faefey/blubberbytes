@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -55,11 +54,6 @@ func (t *trafficInterceptor) Close() error {
 	log.Printf("Final bytes sent: %d", t.written)
 	log.Printf("IP Of the bytes above: %s", t.clientIP)
 
-	//err := appendToFile("proxyData.txt", fmt.Sprintf("[%d, %s]", t.read + t.written, strings.Split(t.clientIP, ":")[0]))
-	//if err != nil {
-	//    log.Printf("Error writing to file %s", err)
-	//}
-
 	updatePaymentInfo(strings.Split(t.clientIP, ":")[0], t.read+t.written)
 
 	return t.conn.Close()
@@ -95,17 +89,6 @@ func (t *trafficInterceptor) GetBytesReceived() int64 {
 
 type clientAddressRuleset struct {
 	socks5.RuleSet
-}
-
-func appendToFile(filename, text string) error {
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(text + "\n")
-	return err
 }
 
 func updatePaymentInfo(key string, value int64) {
@@ -169,9 +152,6 @@ func Proxy(db *sql.DB) {
 				//log.Println("Hello!")
 				log.Printf("%s : %d", key, value)
 				operations.AddProxyLogs(db, key, value, time.Now().Unix())
-				if err != nil {
-					log.Printf("Error writing to file")
-				}
 			}
 
 			for key := range paymentInformation {

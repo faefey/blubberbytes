@@ -6,9 +6,6 @@ import { Tooltip } from 'react-tooltip';
 import Receipt from './Receipt.js';
 import axios from 'axios';
 
-import FakeFileData from '../data/fakeFileData.json';
-import samplePeers from '../data/samplePeers.json';
-
 import { ProgressBar } from './ProgressComponents.js';
 
 import { ReactComponent as EcksButton } from '../icons/close.svg';
@@ -58,17 +55,15 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
     }, [currentHash]);
 
 
-    function getProviders() {
-        axios.post('http://localhost:3001/getproviders', currentHash)
-          .then(res => {
-            if (res.data === null) {
-                setActualPeerData([]);
-            }
-            else {
-                setActualPeerData(res.data);
-            }
-          });
-    }
+    async function getProviders() {
+        const res = await axios.post('http://localhost:3001/getproviders', currentHash);
+        if (res.data === null) {
+            setActualPeerData([]);
+        }
+        else {
+            setActualPeerData(res.data);
+        }
+    };
 
     function getProvidersWithHash(the_hash) {
         axios.post('http://localhost:3001/getproviders', the_hash)
@@ -79,7 +74,7 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
             }
             else {
                 console.log("Here is the res data: " + res.data);
-                //setActualPeerData(res.data);
+                setActualPeerData(res.data);
             }
           });
 
@@ -87,7 +82,8 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
     }
 
     function getFileMetadata(the_hash, the_peer) {
-        axios.post('http://localhost:3001/requestmetadata', {hash : the_hash, peer : the_peer})
+        console.log("Inside getfilemetadata Peer: ", the_peer, "hash: ", the_hash);
+        axios.post('http://localhost:3001/requestmetadata', {peer : the_peer, hash : the_hash})
         .then(res => {
             setFileData(res.data);
         });
@@ -202,17 +198,29 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
             //link.download = 'file1.txt';
             //link.click();
             console.log("Peer " + selectedPeer + " hash " + currHash + " price " + fileData.price);
-            axios.post('http://localhost:3001/downloadfile', {peer: selectedPeer, hash: currHash, price: fileData.price})
-            .then(res => {
-                console.log("File successfully downloaded");
-              });;
-            addFile('storing', fileData, fileData.price);
+            axios.post('http://localhost:3001/downloadfile', {peer: selectedPeer, hash: currHash, price: fileData.price}, { responseType: 'blob' })
+            .then( res => {
+
+                const data = res.data;
+                const url = URL.createObjectURL(data);
+                //console.log(res);
+                //console.log(res.headers);
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', fileData.name);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              })
+            addFile('explore', actualPeerData);
     };
 
     //const [selectedPeer, setSelectedPeer] = useState("");
 
     const handleRowClick = (peer) => {
         setSelectedPeer(peer);
+        console.log("Inside handle row click ", currHash);
         getFileMetadata(currHash, peer);
         //setPeerData([peer, peer.price]);
         //setShowButton(true);
@@ -222,6 +230,7 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
     useEffect(() => {
         //setPeerData([selectedPeer, fileData.price]);
         console.log("Inside this useffect a");
+        console.log("File data: ", fileData);
         console.log("Selected peer: " + selectedPeer);
         if (fileData !== "..") {
             setShowButton(true);
@@ -255,10 +264,13 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
                 position={['left']}
                 className="popup-content"
                 overlayClassName="popup-overlay"
-                onOpen={() => {
+                onOpen={async () => {
                     if (currentHash) {
-                        getProviders();
-                        setOnPeerTable(true);
+                        await getProviders();
+                        setCurrHash(currentHash);
+
+                        if (actualPeerData.length !== 0)
+                            setOnPeerTable(true);
                         setHashError("");
                         //console.log("OnPeerTable set to true");
                     }
@@ -329,9 +341,9 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
                             </tbody>
                         </table>
                         {peerError !== '' && <div className="errors peer-error">{peerError}</div>}
-                        {actualPeerData.map(peer => (<Tooltip id={peer}/>))}
+                        {actualPeerData.map(peer => (<Tooltip key={peer} id={peer}/>))}
                         </>)}
-                        {!onPeerTable && (<div className="file-metadata">
+                        {(!onPeerTable && fileData !== "") && (<div className="file-metadata">
                             <div className="file-info">
                                 <span className="meta-elem">
                                     <div>File Name:</div>
