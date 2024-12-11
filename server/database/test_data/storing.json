@@ -1,7 +1,7 @@
 [
   {
       "hash": "a1b2c3d4e5f678901234567890abcdef1234567890abcdef1234567890abcd",
-      "name": "cse416",
+      "name": "cse416.pdf",
       "extension": ".pdf",
       "size": 204800,
       "path": "/user/files/document.pdf",
@@ -9,7 +9,7 @@
   },
   {
       "hash": "b2c3d4e5f6a78901234567890abcdef1234567890abcdef1234567890abcde",
-      "name": "landscape",
+      "name": "landscape.png",
       "extension": ".png",
       "size": 512000,
       "path": "/user/images/image.png",
@@ -17,7 +17,7 @@
   },
   {
       "hash": "c3d4e5f6a7b8901234567890abcdef1234567890abcdef1234567890abcdef1",
-      "name": "HomeAlone",
+      "name": "HomeAlone.mp4",
       "extension": ".mp4",
       "size": 104857600,
       "path": "/user/videos/video.mp4",
