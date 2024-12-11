@@ -134,15 +134,15 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
     setGatewayLink(gatewayLink);
     setPopupOpen(true);
     console.log("Generated Link: ", link);
-    // if (link) {
-    //   navigator.clipboard.writeText(link)
-    //     .then(() => {
-    //       alert('Saved to clipboard');
-    //     })
-    //     .catch(err => {
-    //       console.error('Failed to copy: ', err);
-    //     });
-    // }
+    if (link) {
+      navigator.clipboard.writeText(link)
+        .then(() => {
+          alert('Saved to clipboard');
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+    }
   }
 
   const deleteOnClick = () => removeFiles(selectedFiles);
@@ -160,7 +160,6 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
         fileInfo={confirmationInfo}
         message={"Are you sure you want to download " + endingWords}
         monetaryInfo={true} /> */}
-      <SharePopup link={gatewayLink} isOpen={popupOpen} setIsOpen={setPopupOpen}/>
       {selectedFiles.length === 1 && <DownloadPopup addFile={addFile} 
                      currentHash={confirmationInfo[0].hash} 
                      basicTrigger={true} 
@@ -174,7 +173,8 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
         addFile={addFile} />}
       {selectedFiles.length > 1 && <Host className="grayedout" />}
 
-      {selectedFiles.length === 1 && <ConfirmationPopup trigger={<Share className="icon" />}
+      {currSection === "sharing" && <SharePopup trigger={<Share className="icon" />} hash={confirmationInfo[0].hash} password={confirmationInfo[0].password}/>}
+      {(currSection !== "sharing" && selectedFiles.length === 1) && <ConfirmationPopup trigger={<Share className="icon" />}
         action={shareOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to share " + endingWords}

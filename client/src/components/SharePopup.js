@@ -1,13 +1,16 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
+import { Tooltip } from 'react-tooltip';
 
 import '../stylesheets/hostFile.css';
 import { ReactComponent as EcksButton } from '../icons/close.svg';
 
-export default function SharePopup({ link, isOpen, setIsOpen}) {
-    return (<>{(<Popup open={isOpen}
+export default function SharePopup({trigger, hash, password}) {
+    const local_link = `http://localhost:3002/viewfile?address=.&hash=${hash}&password=${password}`;
+    const cloud_link = `http://23.239.12.179:3002/viewfile?address=.&hash=${hash}&password=${password}`;
+    return (<>
+    {(<Popup trigger={trigger}
         closeOnDocumentClick={false} modal>
-
          {(close) => (
          <>
          <button className="ecks-button ecks-button-info" onClick= {() => close()}><EcksButton /></button>
@@ -15,16 +18,29 @@ export default function SharePopup({ link, isOpen, setIsOpen}) {
                  <h2 className="share-title">Share Links</h2>
                  <hr className="clip-hr"/>
                  <div className="copy-holder">
-                     <b>Local Link: </b>
-                     <CopyToClipboard text={link}/>                       
+                     <b data-tooltip-id="local-tooltip"
+                        data-tooltip-content="Share link on the local server"
+                        data-tooltip-place="top">
+                          Local Link: 
+                      </b>
+                     <i>http://localhost:3002/...</i>
+                     <CopyToClipboard text={local_link}/>                       
                  </div>
+                 <Tooltip id="local-tooltip"/>
+                 <Tooltip id="cloud-tooltip"/>
                  <div className="copy-holder">
-                     <b>Cloud Link: </b>
-                     <CopyToClipboard text={link}/>                               
+                     <b data-tooltip-id="cloud-tooltip"
+                        data-tooltip-content="Persistent link on the public Blubberbytes Server"
+                        data-tooltip-place="top">
+                      Cloud Link: 
+                      </b>
+                     <i>http://23.239.12.179:3002/...</i>
+                     <CopyToClipboard text={cloud_link}/>                               
                  </div>
              </div>
          </>)}
- </Popup>)}</>);
+ </Popup>)}
+ </>);
 }
 const CopyToClipboard = ({ text }) => {
     const handleCopy = () => {
@@ -37,7 +53,7 @@ const CopyToClipboard = ({ text }) => {
   
     return (
       <button className="copy-button" onClick={handleCopy}>
-        Copy "{text}"
+        Copy
       </button>
     );
   };

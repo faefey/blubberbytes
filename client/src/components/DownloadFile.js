@@ -22,6 +22,7 @@ import { ReactComponent as Download } from '../icons/download.svg';
     When clicked, a popup is prompted
 */
 export default function DownloadPopup({addFile, currentHash=null, basicTrigger=false, fileInfo=null}) {
+
     const [fileData, setFileData] = useState('');
     const [peerData, setPeerData] = useState(['', 'XXX']);
     const [currHash, setCurrHash] = useState('');
@@ -259,7 +260,12 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
                         getProviders();
                         setOnPeerTable(true);
                         setHashError("");
-                        console.log("OnPeerTable set to true");
+                        //console.log("OnPeerTable set to true");
+                    }
+                    else {
+                        setOnPeerTable(false);
+                        setHashError("");
+                        setShowButton(false);
                     }
                 }}
                 onClose = {() => {setHashError('');
@@ -290,23 +296,17 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
                             <tbody>
                                 <tr className="body-row">
                                     <th className="teeh">
-                                        Truncated Peer ID                                         
-                                        <span className="required"
-                                              data-tooltip-id="truncation"
-                                              data-tooltip-content={"The first 20 characters of the Peer Id. Hover over to see the full Peer Id."}
-                                              data-tooltip-place="top">   ?   </span></th>
+                                        Peer ID                                         
+                                    </th>
                                 </tr>
                                 {actualPeerData.map((peer, index) => {
                                     if (index >= currEntries * numRows && index < (currEntries + 1) * numRows)
                                         return (
-                                        <tr key={peer.peerid} 
+                                        <tr key={index} 
                                             className={`body-row ${peerData[0] === peer.peerid ? 'selected' : ''}`}
                                             onClick={() => handleRowClick(peer)}>
-                                            <td className="teedee"
-                                                data-tooltip-id={peer}
-                                                data-tooltip-content={peer}
-                                                data-tooltip-place="top">
-                                                    {peer.substring(0, 20)}
+                                            <td className="teedee">
+                                                    {peer}
                                             </td>
                                         </tr>
                                         );
@@ -330,7 +330,6 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
                         </table>
                         {peerError !== '' && <div className="errors peer-error">{peerError}</div>}
                         {actualPeerData.map(peer => (<Tooltip id={peer}/>))}
-                        <Tooltip id="truncation" />
                         </>)}
                         {!onPeerTable && (<div className="file-metadata">
                             <div className="file-info">
