@@ -1,29 +1,21 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Switch, FormControlLabel, IconButton } from '@mui/material';
 import { LineChart } from './Graphs.js';
-import '../stylesheets/UserAccount.css';
 import { Tooltip } from 'react-tooltip';
 
-import fakeProxies from '../data/fakeProxies.json';
 import { ReactComponent as Cross } from '../icons/close.svg';
 import { ReactComponent as Check } from '../icons/check.svg';
 import { ReactComponent as Fresh } from '../icons/refresh.svg';
 
 import { LoadingSpinner } from "./ProgressComponents.js";
 
-function shuffleArray(array) {
-    let shuffled = array.slice();
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-}
+import '../stylesheets/UserAccount.css';
 
 export default function ConnectProxy() {
     const [checked, setChecked] = useState(false);
     const [usageRate, setUsageRate] = useState(0);
-    const [maxUsers, setMaxUsers] = useState(0);
+    const [ipAddress, setIPAddress] = useState("");
     const [bandwidthData, setBandwidthData] = useState({ labels: [], datasets: [] });
     const [selectedProxy, setSelectedProxy] = useState(null);
     const [displayedProxies, setDisplayedProxies] = useState([]);
@@ -31,9 +23,32 @@ export default function ConnectProxy() {
 
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+    const saveProxySettings = async () => {
+        try {
+            await axios.post("http://localhost:3001/updateproxy", {
+                ip: ipAddress,
+                rate: usageRate,
+            });
+            alert("proxy settings saved successfully!");
+        } catch (error) {
+            console.error("error saving proxy settings:", error);
+            alert("failed to save proxy settings.");
+        }
+    };
+
     useEffect(() => {
-        const shuffledProxies = shuffleArray(fakeProxies).slice(0, 5);
-        setDisplayedProxies(shuffledProxies);
+        const fetchProxies = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get("http://localhost:3001/refreshproxies");
+                setDisplayedProxies(response.data.slice(0, 5));
+            } catch (error) {
+                console.error("Error fetching proxies:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProxies();
     }, []);
 
     useEffect(() => {
@@ -50,17 +65,25 @@ export default function ConnectProxy() {
         if (!event.target.checked) {
             setSelectedProxy(null);
             setUsageRate(0);
-            setMaxUsers(0);
+            setIPAddress("");
         }
     };
 
     const handleRefresh = async () => {
-        setLoading(true);
-        await sleep(1000);
-        const shuffledProxies = shuffleArray(fakeProxies.filter(proxy => proxy.id !== selectedProxy?.id));
-        const updatedProxies = selectedProxy ? [selectedProxy, ...shuffledProxies.slice(0, 4)] : shuffledProxies.slice(0, 5);
-        setDisplayedProxies(updatedProxies);
-        setLoading(false);
+        try {
+            setLoading(true);
+            await sleep(1000);
+
+            const response = await axios.get("http://localhost:3001/refreshproxies");
+            const updatedProxies = response.data.filter(proxy => proxy.id !== selectedProxy?.id);
+            setDisplayedProxies(
+                selectedProxy ? [selectedProxy, ...updatedProxies.slice(0, 4)] : updatedProxies.slice(0, 5)
+            );
+        } catch (error) {
+            console.error("Error Refreshing Proxies:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -69,7 +92,7 @@ export default function ConnectProxy() {
                 const now = new Date();
                 const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 
-                const scaleFactor = (usageRate + maxUsers) * 0.75;
+                const scaleFactor = usageRate * 0.75;
                 const newBandwidthValue = Math.random() * scaleFactor;
 
                 setBandwidthData(prevData => ({
@@ -87,14 +110,6 @@ export default function ConnectProxy() {
                             data: [...(prevData.datasets[1]?.data || []), usageRate].slice(-20),
                             borderColor: 'rgba(54, 162, 235, 0.6)',
                             borderDash: [5, 5],
-                            fill: false,
-                            tension: 0.4,
-                        },
-                        {
-                            label: 'Max Users',
-                            data: [...(prevData.datasets[2]?.data || []), maxUsers].slice(-20),
-                            borderColor: 'rgba(255, 99, 132, 0.6)',
-                            borderDash: [10, 5],
                             fill: false,
                             tension: 0.4,
                         },
@@ -116,7 +131,7 @@ export default function ConnectProxy() {
                 ],
             });
         }
-    }, [checked, usageRate, maxUsers]);
+    }, [checked, usageRate]);
 
     const chartOptions = {
         responsive: true,
@@ -134,13 +149,37 @@ export default function ConnectProxy() {
             />
             {checked ? (
                 <>
-                    <SubmissionForm title={"Usage rate: "} variable={usageRate} setVariable={setUsageRate} unit allowDecimals />
-                    <SubmissionForm title={"Max users: "} variable={maxUsers} setVariable={setMaxUsers} allowDecimals={false} />
+                    <div className="two-column">
+                        <SubmissionForm
+                            title={"IP Address: "}
+                            variable={ipAddress}
+                            setVariable={setIPAddress}
+                            allowDecimals={false}
+                        />
+                        <SubmissionForm
+                            title={"Usage rate: "}
+                            variable={usageRate}
+                            setVariable={setUsageRate}
+                            unit
+                            allowDecimals
+                        />
+                    </div>
+                    <div style={{ textAlign: 'right', marginTop: '-35px', marginRight: '15px' }}>
+                        <button className="save-button" onClick={saveProxySettings}>
+                            Save
+                        </button>
+                    </div>
                     <div className="chart">
-                        <div className="chart-header">
+                        <div className="chart-header" style={{ marginTop: '15px' }}>
                             <h3>Bandwidth</h3>
                         </div>
-                        <LineChart data={bandwidthData} options={chartOptions} />
+                        <div className="chart-graph" style={{ height: 'calc(100vh - 400px)' }}>
+                            <LineChart
+                                data={bandwidthData}
+                                options={chartOptions}
+                                style={{ height: 'calc(100vh - 400px)' }}
+                            />
+                        </div>
                     </div>
                 </>
             ) : (
@@ -151,7 +190,13 @@ export default function ConnectProxy() {
                             <Fresh />
                         </IconButton>
                     </div>
-                    {!loading && <ProxyTable proxies={displayedProxies} selectedProxy={selectedProxy} setSelectedProxy={setSelectedProxy} />}
+                    {!loading && (
+                        <ProxyTable
+                            proxies={displayedProxies}
+                            selectedProxy={selectedProxy}
+                            setSelectedProxy={setSelectedProxy}
+                        />
+                    )}
                     {loading && <LoadingSpinner message="Reloading Proxy Table..." />}
                 </div>
             )}
@@ -201,16 +246,27 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
         const newValue = event.target.value;
         setInputValue(newValue);
 
-        const parsedValue = allowDecimals ? parseFloat(newValue) : parseInt(newValue, 10);
+        const parsedValue = allowDecimals ? parseFloat(newValue) : newValue.trim();
 
-        if (!isNaN(parsedValue) && parsedValue > 0 &&
-            (allowDecimals || Number.isInteger(parsedValue))) {
+        if (allowDecimals ? !isNaN(parsedValue) : parsedValue !== "") {
             setVariable(parsedValue);
         }
     }
 
-    const isValid = !isNaN(parseFloat(inputValue)) && parseFloat(inputValue) > 0 &&
-        (allowDecimals || Number.isInteger(parseFloat(inputValue)));
+    const isValidIP = (ip) => {
+        const parts = ip.split('.');
+        if (parts.length !== 4) return false;
+        for (const part of parts) {
+            if (!/^\d{1,3}$/.test(part)) return false;
+            const num = parseInt(part, 10);
+            if (num < 0 || num > 255) return false;
+        }
+        return true;
+    }
+
+    const isValid = allowDecimals 
+        ? !isNaN(parseFloat(inputValue))
+        : isValidIP(inputValue.trim());
 
     return (
         <>
@@ -231,18 +287,20 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
                         </span>
                         {unit && <span className="unit">ORCA/MB</span>}
                     </div>
-                    {!isValid ? (
-                        <div className="error-message">
-                            <Cross style={{ fill: 'red' }} />
-                            <span>
-                                {allowDecimals
-                                    ? "please input a rational number greater than zero."
-                                    : "please input a whole number greater than zero."}
-                            </span>
-                        </div>
-                    ) : (
-                        <Check style={{ fill: 'green' }} />
-                    )}
+                    <div className="error-message-container">
+                        {!isValid ? (
+                            <div className="error-message">
+                                <Cross style={{ fill: 'red' }} />
+                                <span>
+                                    {allowDecimals
+                                        ? "Please input a valid rate."
+                                        : "Please input your device's public IP address (e.g. XXX.XXX.XXX.XXX)."}
+                                </span>
+                            </div>
+                        ) : (
+                            <Check style={{ fill: 'green' }} />
+                        )}
+                    </div>
                 </div>
             </div>
         </>
