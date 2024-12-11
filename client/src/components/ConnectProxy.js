@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Switch, FormControlLabel, IconButton } from '@mui/material';
-import { Line } from 'react-chartjs-2';
+import { LineChart } from './Graphs.js';
 import '../stylesheets/UserAccount.css';
 import { Tooltip } from 'react-tooltip';
 
@@ -140,7 +140,7 @@ export default function ConnectProxy() {
                         <div className="chart-header">
                             <h3>Bandwidth</h3>
                         </div>
-                        <Line data={bandwidthData} options={chartOptions} />
+                        <LineChart data={bandwidthData} options={chartOptions} />
                     </div>
                 </>
             ) : (

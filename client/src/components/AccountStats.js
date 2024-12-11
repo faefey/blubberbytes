@@ -4,13 +4,9 @@ import React, { useState, useEffect } from 'react';
 import hostedData from '../data/tableData1.json';
 import purchasedData from '../data/tableData2.json';
 
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip } from 'chart.js';
-import 'chartjs-adapter-date-fns';
+import { LineChart } from './Graphs.js';
 
 import './../stylesheets/UserAccount.css';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip);
 
 const AccountStats = () => {
   const [totalHostedSize, setTotalHostedSize] = useState(0);
@@ -111,7 +107,7 @@ const AccountStats = () => {
         <div className="chart-header">
           <h3>Files Downloaded Over Time</h3>
         </div>
-        <Line data={prepareDownloadsData()} options={chartOptions} />
+        <LineChart data={prepareDownloadsData()} options={chartOptions} />
       </div>
     </div>
   );

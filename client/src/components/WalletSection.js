@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Line, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Tooltip, BarElement } from 'chart.js';
-import 'chartjs-adapter-date-fns';
+import { LineChart, BarChart } from './Graphs.js';
 import { addDays, format } from 'date-fns';
 
 import './../stylesheets/UserAccount.css';
 import dropDown from '../icons/drop_down.svg';
 import transactions from '../data/transactions.json';
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Tooltip, BarElement);
 
 const rootStyles = getComputedStyle(document.documentElement);
 const colorGraphA = rootStyles.getPropertyValue('--color-graphA').trim();
@@ -146,13 +142,13 @@ const TimeFilterDropdown = ({ onSelect }) => (
 const ChartContainer = ({ chartType, chartData, chartTitle }) => {
   switch (chartType) {
     case 'balance':
-      return <Line data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
+      return <LineChart data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
     case 'earnings':
-      return <Bar data={chartData.earningsData} options={chartOptions('Monthly Earnings')} className="chart" />;
+      return <BarChart data={chartData.earningsData} options={chartOptions('Monthly Earnings')} className="chart" />;
     case 'transactions':
-      return <Line data={chartData.transactionCountData} options={chartOptions('Number of Transactions')} className="chart" />;
+      return <LineChart data={chartData.transactionCountData} options={chartOptions('Number of Transactions')} className="chart" />;
     default:
-      return <Line data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
+      return <LineChart data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
   }
 };
 
