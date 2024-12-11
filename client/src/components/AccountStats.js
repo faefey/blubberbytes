@@ -54,37 +54,49 @@ const AccountStats = () => {
     }
   };
 
+  const generateDateRange = (startDate, endDate) => {
+    const dateArray = [];
+    let currentDate = new Date(startDate);
+    const stopDate = new Date(endDate);
+    while (currentDate <= stopDate) {
+      dateArray.push(currentDate.toISOString().split('T')[0]);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dateArray;
+  };
+
   const prepareFilesData = () => {
-    const uploadsData = uploads.map(file => ({ date: new Date(file.date), count: 1 }));
-    const downloadsData = downloads.map(file => ({ date: new Date(file.date), count: 1 }));
+    const uploadsData = uploads.map(file => ({ date: file.date, count: 1 }));
+    const downloadsData = downloads.map(file => ({ date: file.date, count: 1 }));
 
-    const combinedDates = Array.from(
-      new Set([...uploadsData.map(d => d.date.toISOString()), ...downloadsData.map(d => d.date.toISOString())])
-    ).sort((a, b) => new Date(a) - new Date(b));
-
-    const uploadCounts = combinedDates.map(date =>
-      uploadsData.filter(d => d.date.toISOString() === date).length
+    const allDates = generateDateRange(
+      Math.min(...[...uploadsData, ...downloadsData].map(d => new Date(d.date))),
+      Math.max(...[...uploadsData, ...downloadsData].map(d => new Date(d.date)))
     );
-    const downloadCounts = combinedDates.map(date =>
-      downloadsData.filter(d => d.date.toISOString() === date).length
+
+    const uploadCounts = allDates.map(date =>
+      uploadsData.filter(d => d.date === date).length
+    );
+    const downloadCounts = allDates.map(date =>
+      downloadsData.filter(d => d.date === date).length
     );
 
     return {
-      labels: combinedDates.map(date => new Date(date)),
+      labels: allDates,
       datasets: [
         {
           label: 'Uploads',
           data: uploadCounts,
           borderColor: graphColorA,
           fill: false,
-          tension: 0.4,
+          tension: 0.2,
         },
         {
           label: 'Downloads',
           data: downloadCounts,
           borderColor: graphColorB,
           fill: false,
-          tension: 0.4,
+          tension: 0.2,
         },
       ],
     };
@@ -95,10 +107,22 @@ const AccountStats = () => {
       x: {
         type: 'time',
         time: { unit: 'day', tooltipFormat: 'P' },
+        min: new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0],
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          callback: (value) => Number.isInteger(value) ? value : null
+        },
+        max: (context) => {
+          const maxData = Math.max(...context.chart.data.datasets.flatMap(dataset => dataset.data));
+          return maxData * 1.15;
+        },
       },
     },
   });
-  
+
   return (
     <div className="wallet-section">
       <div className="wallet-info">
