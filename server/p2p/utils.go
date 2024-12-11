@@ -294,7 +294,10 @@ func Explore(node host.Host, peerIDs []string) ([]models.JoinedHosting, error) {
 	// Iterate through the list of peer IDs
 	for _, peerID := range peerIDs {
 		log.Printf("Requesting all files from peer: %s", peerID)
-
+		if peerID == node.ID().String() {
+			log.Printf("Skipping request to self for peer ID: %s", peerID)
+			continue
+		}
 		// Send a generic "request all files" signal to the peer
 		err := sendDataToPeer(node, peerID, "", "", "request_all", "", "")
 		if err != nil {
