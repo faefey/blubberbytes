@@ -160,34 +160,39 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
         fileInfo={confirmationInfo}
         message={"Are you sure you want to download " + endingWords}
         monetaryInfo={true} /> */}
-      {selectedFiles.length === 1 && <DownloadPopup addFile={addFile} 
+      {selectedFiles.length === 1 && (currSection !== "storing" && currSection !== "hosting" && currSection !== "sharing") && 
+                    <DownloadPopup addFile={addFile} 
                      currentHash={confirmationInfo[0].hash} 
                      basicTrigger={true} 
                      fileInfo={confirmationInfo[0]}/>}
-      {selectedFiles.length > 1 && <Download className="grayedout" />}
-      {selectedFiles.length === 1 && <ConfirmationPopup trigger={<Host className="icon" />}
+      {(selectedFiles.length > 1 || currSection === "hosting" || currSection === "sharing" || currSection === "storing") && <Download className="grayedout" />}
+      {selectedFiles.length === 1 && (currSection === "storing") &&
+      <ConfirmationPopup trigger={<Host className="icon" />}
         action={hostOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to host " + endingWords}
         actionMessage={"Host"}
         addFile={addFile} />}
-      {selectedFiles.length > 1 && <Host className="grayedout" />}
+      {(currSection !== "storing" || selectedFiles.length > 1) && <Host className="grayedout" />}
 
-      {currSection === "sharing" && <SharePopup trigger={<Share className="icon" />} hash={confirmationInfo[0].hash} password={confirmationInfo[0].password}/>}
-      {(currSection !== "sharing" && selectedFiles.length === 1) && <ConfirmationPopup trigger={<Share className="icon" />}
+      {currSection === "sharing" && selectedFiles.length === 1 && <SharePopup trigger={<Share className="icon" />} hash={confirmationInfo[0].hash} password={confirmationInfo[0].password}/>}
+      {(currSection === "hosting" && selectedFiles.length === 1) && <ConfirmationPopup trigger={<Share className="icon" />}
         action={shareOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to share " + endingWords}
         actionMessage={"Share"} />}
-      {selectedFiles.length > 1 && <Share className="grayedout"/>}
+      {(currSection !== "hosting" || selectedFiles.length > 1) && (currSection !== "sharing" || selectedFiles.length > 1) && <Share className="grayedout"/>}
 
+      {(currSection === "storing" || currSection === "hosting" || currSection === "sharing") &&
       <ConfirmationPopup trigger={<Delete className="icon" />}
         action={deleteOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to delete " + endingWords}
         actionMessage={"Delete"}
-        section={currSection} />
+        section={currSection} />}
 
+      {(currSection !== "storing" && currSection !== "hosting" && currSection !== "sharing") && 
+        <Delete className="grayedout" />}
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
         fileInfo={[selectedFiles[0]]} />)}
       {selectedFiles.length > 1 && (<Info className="grayedout" />)}
