@@ -369,7 +369,7 @@ function applyFilters(data, filters) {
 
 
 
-function formatSize(bytes) {
+export function formatSize(bytes) {
 	if (bytes >= 1e9) {
 		return (bytes / 1e9).toFixed(2) + ' GB';
 	} else if (bytes >= 1e6) {
