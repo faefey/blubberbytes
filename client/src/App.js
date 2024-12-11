@@ -89,28 +89,34 @@ function App() {
     setOrigShownData([])
     setCurrShownData([])
 
-    const addRes = await axios.post("http://localhost:3001/add" + section, newFileInfo)
-    const dataRes = await axios.get("http://localhost:3001/" + section)
-    setOrigShownData(dataRes.data)
-    setCurrShownData(dataRes.data)
-    if(section === "explore")
+    if(section === "explore") {
+      const dataRes = await axios.post("http://localhost:3001/explore", newFileInfo)
+      setOrigShownData(dataRes.data)
+      setCurrShownData(dataRes.data)
       setExploreData(dataRes.data)
-
-    if(addRes.data === "") {
-      if(section === "storing")
-        setMessage("The file is now being stored.")
-      else if(section === "hosting")
-        setMessage("The file is now being hosted.")
-      else
-        setMessage("The file has been saved.")
     }
     else {
-      if(addRes.data.startsWith("http://")) {
-        setMessage("The file is now being shared.")
-        return addRes.data
+      const addRes = await axios.post("http://localhost:3001/add" + section, newFileInfo)
+      const dataRes = await axios.get("http://localhost:3001/" + section)
+      setOrigShownData(dataRes.data)
+      setCurrShownData(dataRes.data)
+
+      if(addRes.data === "") {
+        if(section === "storing")
+          setMessage("The file is now being stored.")
+        else if(section === "hosting")
+          setMessage("The file is now being hosted.")
+        else
+          setMessage("The file has been saved.")
       }
-      else
-        setMessage(addRes.data)
+      else {
+        if(addRes.data.startsWith("http://")) {
+          setMessage("The file is now being shared.")
+          return addRes.data
+        }
+        else
+          setMessage(addRes.data)
+      }
     }
   }
 
