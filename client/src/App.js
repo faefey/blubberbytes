@@ -15,6 +15,7 @@ function App() {
   const [currSection, setCurrSection] = useState('storing')
   const [origShownData, setOrigShownData] = useState([])
   const [currShownData, setCurrShownData] = useState([])
+  const [exploreData, setExploreData] = useState([])
   const [message, setMessage] = useState("")
 
   useEffect(() => {
@@ -29,22 +30,34 @@ function App() {
     setCurrPage(0);
     setOrigShownData([]);
     setCurrShownData([]);
-    axios.get("http://localhost:3001/" + currSection)
+    if(currSection === "explore") {
+      setOrigShownData(exploreData);
+      setCurrShownData(exploreData);
+    }
+    else {
+      axios.get("http://localhost:3001/" + currSection)
       .then(res => {
         setOrigShownData(res.data)
         setCurrShownData(res.data)
       })
+    }
   }
 
   function updateShownData(section) {
     setCurrSection(section);
     setOrigShownData([]);
     setCurrShownData([]);
-    axios.get("http://localhost:3001/" + section)
+    if(section === "explore") {
+      setOrigShownData(exploreData);
+      setCurrShownData(exploreData);
+    }
+    else {
+      axios.get("http://localhost:3001/" + section)
       .then(res => {
         setOrigShownData(res.data)
         setCurrShownData(res.data)
       })
+    }
   }
 
   async function addFile(section, fileInfo) {
@@ -62,6 +75,8 @@ function App() {
       newFileInfo = {hash: fileInfo.hash, price: fileInfo.price}
     else if(section === "sharing")
       newFileInfo = {hash: fileInfo.hash, password: ""}
+    else if(section === "explore")
+      newFileInfo = fileInfo
     else
       newFileInfo = {
         hash: fileInfo.hash,
@@ -78,6 +93,8 @@ function App() {
     const dataRes = await axios.get("http://localhost:3001/" + section)
     setOrigShownData(dataRes.data)
     setCurrShownData(dataRes.data)
+    if(section === "explore")
+      setExploreData(dataRes.data)
 
     if(addRes.data === "") {
       if(section === "storing")
