@@ -82,7 +82,7 @@ func ProvideKey(key string) error {
 	return nil
 }
 
-func GetProviderIDs(key string, node host.Host) ([]string, error) {
+func GetProviderIDs(node host.Host, key string) ([]string, error) {
 	// Assign dhtRouting to a local variable for clarity
 	dht := dhtRouting
 
@@ -231,7 +231,7 @@ func SendRequest(node host.Host, targetPeerID, hash, password string) (string, [
 
 func RandomProxiesInfo(node host.Host) ([]models.Proxy, error) {
 	// Get a list of provider IDs for the "PROXY" key from the DHT
-	providerIDs, err := GetProviderIDs("PROXY", node)
+	providerIDs, err := GetProviderIDs(node, "PROXY")
 	if err != nil {
 		log.Printf("Failed to get provider IDs for PROXY key: %v", err)
 		return []models.Proxy{}, err

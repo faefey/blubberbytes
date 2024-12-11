@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"server/database/models"
 	"server/database/operations"
@@ -35,12 +34,6 @@ func UpdateProxyHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func RefreshProxiesHandler(w http.ResponseWriter, _ *http.Request, node host.Host, db *sql.DB) {
-	err := fmt.Errorf("")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	proxies, err := p2p.RandomProxiesInfo(node)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -85,7 +85,7 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 
 	// POST routes
 	http.HandleFunc("/getproviders", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.GetProvidersHandler(w, r, db) })
+		cors(w, r, func() { handlers.GetProvidersHandler(w, r, node, db) })
 	})
 
 	http.HandleFunc("/requestmetadata", func(w http.ResponseWriter, r *http.Request) {
@@ -130,6 +130,10 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 
 	http.HandleFunc("/deletesaved", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, func() { handlers.DeleteSavedHandler(w, r, db) })
+	})
+
+	http.HandleFunc("/updateproxy", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.UpdateProxyHandler(w, r, db) })
 	})
 
 	// Run the server

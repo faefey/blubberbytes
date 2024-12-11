@@ -16,7 +16,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 )
 
-func GetProvidersHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetProvidersHandler(w http.ResponseWriter, r *http.Request, node host.Host, db *sql.DB) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
