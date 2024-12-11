@@ -78,5 +78,5 @@ func SharingLinkHandler(w http.ResponseWriter, r *http.Request, node host.Host, 
 		return
 	}
 
-	fmt.Fprintf(w, "http://localhost:3002/viewfile?address=%s&hash=%s&password=%s", node, record.Hash, record.Password)
+	fmt.Fprintf(w, "http://localhost:3002/viewfile?address=%s&hash=%s&password=%s", node.ID().String(), record.Hash, record.Password)
 }
