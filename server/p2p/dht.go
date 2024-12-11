@@ -542,7 +542,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			key := args[1]
 
 			fmt.Println("Searching for providers...")
-			providerIDs, err := GetProviderIDs(key)
+			providerIDs, err := GetProviderIDs(key, node)
 			if err != nil {
 				fmt.Printf("Error getting providers: %v\n", err)
 				continue

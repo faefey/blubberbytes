@@ -231,7 +231,7 @@ func SendRequest(node host.Host, targetPeerID, hash, password string) (string, [
 
 func RandomProxiesInfo(node host.Host) ([]models.Proxy, error) {
 	// Get a list of provider IDs for the "PROXY" key from the DHT
-	providerIDs, err := GetProviderIDs("PROXY")
+	providerIDs, err := GetProviderIDs("PROXY", node)
 	if err != nil {
 		log.Printf("Failed to get provider IDs for PROXY key: %v", err)
 		return []models.Proxy{}, err
