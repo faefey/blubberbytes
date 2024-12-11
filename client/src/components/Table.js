@@ -99,7 +99,7 @@ const Table = ({ currSection, data, addFile, removeFiles }) => {
 					{ label: 'Name', accessor: 'name', sortable: true },
 					{ label: 'Extension', accessor: 'extension', sortable: true },
 					{ label: 'Size', accessor: 'size', sortable: true },
-					{ label: 'Date', accessor: 'date', sortable: true },
+					{ label: 'Date', accessor: 'date', sortable: true, sortbyOrder: 'desc' },
 					{ label: 'Price', accessor: 'price', sortable: true },
 				];
 			case 'sharing':
@@ -108,7 +108,7 @@ const Table = ({ currSection, data, addFile, removeFiles }) => {
 					{ label: 'Name', accessor: 'name', sortable: true },
 					{ label: 'Extension', accessor: 'extension', sortable: true },
 					{ label: 'Size', accessor: 'size', sortable: true },
-					{ label: 'Date', accessor: 'date', sortable: true },
+					{ label: 'Date', accessor: 'date', sortable: true, sortbyOrder: 'desc' },
 					{ label: 'Password', accessor: 'password', sortable: false },
 				];
 			case 'saved':
@@ -125,7 +125,7 @@ const Table = ({ currSection, data, addFile, removeFiles }) => {
 					{ label: 'Name', accessor: 'name', sortable: true },
 					{ label: 'Extension', accessor: 'extension', sortable: true },
 					{ label: 'Size', accessor: 'size', sortable: true },
-					{ label: 'Date', accessor: 'date', sortable: true },
+					{ label: 'Date', accessor: 'date', sortable: true , sortbyOrder: 'desc' },
 				];
 		}
 	}, [currSection]);
