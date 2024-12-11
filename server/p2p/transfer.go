@@ -33,6 +33,8 @@ var (
 	passwordSignalChan    = make(chan struct{})
 	hashSignalChan        = make(chan struct{})
 	hostingUpdateSignal   = make(chan struct{})
+	successSignal         = make(chan struct{})
+	failureSignal         = make(chan struct{})
 	proxyList             []models.Proxy        // Global list to store received proxies
 	proxySignal           = make(chan struct{}) // Channel to signal when a response is received
 	hostingList           []models.JoinedHosting
@@ -89,6 +91,55 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 
 			log.Printf("File received successfully. Total bytes written: %d to file: %s", n, filePath)
 
+		} else if header == "confirmation" {
+			// Handle confirmation message
+			log.Printf("Processing confirmation from peer: %s", s.Conn().RemotePeer())
+
+			// Read the confirmation message
+			message, err := reader.ReadString('\n')
+			if err != nil {
+				log.Printf("Error reading confirmation message from peer %s: %v", s.Conn().RemotePeer(), err)
+				return
+			}
+			message = strings.TrimSpace(message)
+
+			// Log the confirmation message
+			log.Printf("Confirmation received: %s", message)
+
+			// Send a signal based on the confirmation message
+			if message == "Processing successful" {
+				log.Println("Processing was successful. Sending success signal.")
+				successSignal <- struct{}{}
+			} else if message == "Processing failed" {
+				log.Println("Processing failed. Sending failure signal.")
+				failureSignal <- struct{}{}
+			} else {
+				log.Printf("Unknown confirmation message received: %s", message)
+			}
+		} else if header == "ProxyBill" {
+			log.Printf("Processing 'ProxyBill' from peer: %s", s.Conn().RemotePeer())
+
+			// Read JSON data for ProxyBill
+			data, err := io.ReadAll(reader)
+			if err != nil {
+				log.Printf("Error reading ProxyBill data from peer %s: %v", s.Conn().RemotePeer(), err)
+				return
+			}
+
+			// Unmarshal JSON into ProxyBill struct
+			var proxyBill models.ProxyBill
+			err = json.Unmarshal(data, &proxyBill)
+			if err != nil {
+				log.Printf("Error unmarshaling ProxyBill data from peer %s: %v", s.Conn().RemotePeer(), err)
+				log.Printf("Received data was: %s", string(data))
+				return
+			}
+
+			// Call helper function to handle the ProxyBill and send confirmation back
+			err = handleProxyBill(node, proxyBill, s.Conn().RemotePeer().String())
+			if err != nil {
+				log.Printf("Error processing ProxyBill: %v", err)
+			}
 		} else if header == "requested_proxy" {
 			log.Printf("Processing 'requested_proxy' response from peer: %s", s.Conn().RemotePeer())
 
@@ -724,6 +775,57 @@ func sendDataToPeer(node host.Host, targetPeerID, filePath, message, dataType st
 
 		log.Printf("File request sent successfully to peer %s", targetPeerIDParsed)
 
+	} else if dataType == "confirmation" {
+		log.Printf("Sending confirmation to peer %s", targetPeerIDParsed)
+
+		// Send "confirmation" header
+		_, err = s.Write([]byte("confirmation\n"))
+		if err != nil {
+			log.Printf("Failed to send confirmation header to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		// Write the confirmation message
+		_, err = s.Write([]byte(message + "\n"))
+		if err != nil {
+			log.Printf("Failed to send confirmation message to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		log.Printf("Confirmation sent successfully to peer %s with message: %s", targetPeerIDParsed, message)
+	} else if dataType == "ProxyBill" {
+		log.Printf("Sending ProxyBill to peer %s", targetPeerIDParsed)
+
+		// Convert message to JSON
+		var proxyBill models.ProxyBill
+		err = json.Unmarshal([]byte(message), &proxyBill)
+		if err != nil {
+			log.Printf("Failed to parse ProxyBill JSON: %v", err)
+			return err
+		}
+
+		// Serialize ProxyBill to JSON string
+		proxyBillJSON, err := json.Marshal(proxyBill)
+		if err != nil {
+			log.Printf("Failed to serialize ProxyBill to JSON: %v", err)
+			return err
+		}
+
+		// Send "ProxyBill" header
+		_, err = s.Write([]byte("ProxyBill\n"))
+		if err != nil {
+			log.Printf("Failed to send ProxyBill header to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		// Send the serialized ProxyBill JSON
+		_, err = s.Write(proxyBillJSON)
+		if err != nil {
+			log.Printf("Failed to send ProxyBill data to peer %s: %v", targetPeerIDParsed, err)
+			return err
+		}
+
+		log.Printf("ProxyBill sent successfully to peer %s", targetPeerIDParsed)
 	} else if dataType == "proxy_request" {
 		_, err = s.Write([]byte("proxy_request\n"))
 

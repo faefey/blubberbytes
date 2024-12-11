@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"server/database/models"
 	"server/database/operations"
 	"strconv"
 	"strings"
@@ -225,6 +226,30 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 		command := args[0]
 		command = strings.ToUpper(command)
 		switch command {
+		case "SEND_BILL":
+			if len(args) < 2 {
+				fmt.Println("PeerID required for SEND_BILL command")
+				continue
+			}
+			peerID := args[1]
+
+			// Create a ProxyBill instance with sample data
+			proxyBill := models.ProxyBill{
+				IP:     "192.168.1.100",
+				Rate:   0.02,
+				Bytes:  2048,
+				Amount: 0.04,
+				Wallet: "0xABCDEF1234567890",
+			}
+
+			// Call the new function to send the ProxyBill and wait for confirmation
+			err := sendProxyBillWithConfirmation(node, peerID, proxyBill)
+			if err != nil {
+				fmt.Printf("Error during ProxyBill transaction: %v\n", err)
+			} else {
+				fmt.Println("ProxyBill transaction completed successfully")
+			}
+
 		case "ACA":
 			if len(args) < 2 {
 				fmt.Println("PeerID required for ACA command")

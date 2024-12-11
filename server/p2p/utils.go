@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"log"
 	"server/database/models"
@@ -319,4 +320,77 @@ func Explore(node host.Host, peerIDs []string) ([]models.JoinedHosting, error) {
 	// Log and return the collected hostings
 	log.Printf("Total collected hostings: %d", len(collectedHostings))
 	return collectedHostings, nil
+}
+
+func sendProxyBillWithConfirmation(node host.Host, peerID string, proxyBill models.ProxyBill) error {
+	// Serialize ProxyBill to JSON
+	proxyBillJSON, err := json.Marshal(proxyBill)
+	if err != nil {
+		log.Printf("Failed to serialize ProxyBill: %v", err)
+		return fmt.Errorf("failed to serialize ProxyBill: %w", err)
+	}
+
+	// Send the ProxyBill to the specified peer
+	log.Printf("Sending ProxyBill to peer %s", peerID)
+	err = sendDataToPeer(node, peerID, "", string(proxyBillJSON), "ProxyBill", "", "")
+	if err != nil {
+		log.Printf("Failed to send ProxyBill to peer: %v", err)
+		return fmt.Errorf("failed to send ProxyBill to peer: %w", err)
+	}
+
+	// Wait for confirmation signal
+	select {
+	case <-successSignal:
+		log.Println("ProxyBill processing confirmed as successful")
+		return nil // No error, successful transaction
+
+	case <-failureSignal:
+		log.Println("ProxyBill processing confirmed as unsuccessful")
+		return fmt.Errorf("proxyBill processing failed")
+
+	case <-time.After(10 * time.Second): // Timeout for waiting confirmation
+		log.Println("Timed out waiting for confirmation signal")
+		return fmt.Errorf("confirmation signal timeout")
+	}
+}
+
+func handleProxyBill(node host.Host, proxyBill models.ProxyBill, peerID string) error {
+	log.Println("Received ProxyBill:")
+	log.Printf("IP: %s", proxyBill.IP)
+	log.Printf("Rate: %.2f", proxyBill.Rate)
+	log.Printf("Bytes: %d", proxyBill.Bytes)
+	log.Printf("Amount: %.2f", proxyBill.Amount)
+	log.Printf("Wallet: %s", proxyBill.Wallet)
+
+	// Placeholder function for additional processing
+	err := processProxyBill(proxyBill)
+	if err != nil {
+		log.Printf("Failed to process ProxyBill: %v", err)
+
+		// Send failure confirmation back to peer
+		err = sendDataToPeer(node, peerID, "", "Processing failed", "confirmation", "", "")
+		if err != nil {
+			log.Printf("Failed to send failure confirmation to peer: %v", err)
+		}
+		return err
+	}
+
+	// Send success confirmation back to peer
+	err = sendDataToPeer(node, peerID, "", "Processing successful", "confirmation", "", "")
+	if err != nil {
+		log.Printf("Failed to send success confirmation to peer: %v", err)
+		return err
+	}
+
+	log.Println("Successfully processed ProxyBill and sent confirmation.")
+	return nil
+}
+
+func processProxyBill(proxyBill models.ProxyBill) error {
+	log.Println("Processing ProxyBill...")
+
+	// Simulate a processing error
+	err := fmt.Errorf("simulated processing error for ProxyBill with IP: %s", proxyBill.IP)
+	log.Printf("Error: %v", err)
+	return err
 }
