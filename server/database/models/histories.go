@@ -28,6 +28,7 @@ type Transactions struct {
 	Wallet        string  `json:"wallet"`
 	Amount        float64 `json:"amount"`
 	Category      string  `json:"category"`
+	Fee           float64 `json:"fee"`
 	Confirmations int64   `json:"confirmations"`
 }
 

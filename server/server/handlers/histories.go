@@ -63,6 +63,7 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 			Date:          time.Unix(transaction.Time, 0).Local().Format("01/02/2006"),
 			Wallet:        transaction.Address,
 			Amount:        transaction.Amount,
+			Fee:           *transaction.Fee,
 			Category:      transaction.Category,
 			Confirmations: transaction.Confirmations,
 		})
