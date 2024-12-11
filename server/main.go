@@ -59,19 +59,6 @@ func main() {
 		netParams = &chaincfg.TestNet3Params
 	}
 
-	// err = os.Remove("./btc/walletaddress.txt")
-	// if err != nil && !os.IsNotExist(err) {
-	// 	log.Println("Error deleting existing walletaddress file:", err)
-	// 	return
-	// }
-
-	// walletDir := btcutil.AppDataDir("btcwallet", false)
-	// err = os.Remove(filepath.Join(walletDir, net+"/wallet.db"))
-	// if err != nil && !os.IsNotExist(err) {
-	// 	log.Println("Error deleting existing wallet file:", err)
-	// 	return
-	// }
-
 	// Starts btc-related processes and saves wallet address
 	btcdCmd, btcwalletCmd, btcd, btcwallet, err := btc.Start(net, db, false)
 	if err != nil {
