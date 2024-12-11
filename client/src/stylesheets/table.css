@@ -6,7 +6,7 @@ body {
   color: #383f4d;
   line-height: 1.5;
   font-size: 14px;
-  font-family:  "Segoe UI", "Helvetica Neue", sans-serif;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 .table_container {
@@ -18,7 +18,7 @@ body {
 .table {
   width: 100%;
   border-spacing: 0;
-  table-layout: fixed; 
+  table-layout: fixed;
 }
 
 caption {
@@ -32,9 +32,16 @@ caption {
   padding: 8px 10px;
   border-bottom: 1px solid #1a1a1a;
   font-weight: bold;
-  text-align: left; 
+  text-align: left;
 }
 
+/* Enable ellipses, overflow hidden and nowrap globally */
+.table th,
+.table td {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
 
 .table th.up {
   background-image: url('../images/sortUp.png');
@@ -45,6 +52,7 @@ caption {
 .table th.default {
   background-image: url("../images/default.png");
 }
+
 th.up,
 th.default,
 th.down {
@@ -56,7 +64,7 @@ th.down {
 .table td {
   border-top: 1px solid #ddd;
   padding: 8px 20px;
-  text-align: left; 
+  text-align: left;
 }
 
 .table tbody tr:first-child td {
@@ -72,7 +80,7 @@ th.down {
 }
 
 .selected {
-  background-color: #3394c1; 
+  background-color: #3394c1;
 }
 
 .table input[type="checkbox"] {
@@ -86,35 +94,32 @@ th.down {
 }
 
 .table tbody tr {
-  cursor: pointer; 
+  cursor: pointer;
 }
 
 .table tbody tr:hover td {
-  background-color: #d1e4ed; 
+  background-color: #d1e4ed;
 }
 
-/* Remove ellipsis and overflow for the checkbox column */
+/* Remove ellipsis ONLY for the checkbox column (first column) */
 .table th:first-child,
 .table td:first-child {
-  width: 5%;  
-  padding-left: 17px; 
+  width: 5%;
+  padding-left: 17px;
   padding-top: 15px;
-  overflow: visible; /* Allow content to expand naturally */
-  text-overflow: unset; /* Remove ellipsis behavior */
-  white-space: nowrap; /* Keep content on one line */
+  overflow: visible;       /* Allow content to expand naturally */
+  text-overflow: unset;    /* Remove ellipsis behavior */
+  white-space: nowrap;     /* Keep content on one line */
 }
-
-
-
 
 /* Set width for the "File Name" column (second column) */
 .table th:nth-child(2),
 .table td:nth-child(2) {
-  width: 30%;  /* Adjust this percentage as needed */
+  width: 30%; 
 }
 
 /* Set width for the remaining columns */
 .table th:not(:first-child):not(:nth-child(2)),
 .table td:not(:first-child):not(:nth-child(2)) {
-  width: auto;  
+  width: auto;
 }
