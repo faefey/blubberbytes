@@ -9,6 +9,7 @@
     --color-accent-blue: #b3e5fc;
     --color-accent-mint: #a7ffeb;
     --color-accent-coral: #ffb3b3;
+    --color-accent-shadow: rgba(0, 0, 0, 0.1);
 
     /* functional colors */
     --color-blue-active: #99D7FF;
