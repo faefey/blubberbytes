@@ -332,24 +332,35 @@ function applyFilters(data, filters) {
 				isValid = isValid && item.price > 20;
 			}
 		}
-		const documentExtensions = ['.pdf', '.txt', '.doc', '.docx']; // i will add more later 
-		const mediaExtensions = ['.png', '.jpg', '.jpeg', '.mp4', '.mp3'];
+
 
 		// Type filter
 		if (filters.type && item.name) {
-			const ext = item.name.split(".").pop().toLowerCase(); // Extract file extension from the filename
+			// Extract file extension
+			const ext = item.name.includes(".") ? item.name.split(".").pop().toLowerCase() : ""; // Handle no extension
+
+			// Debug print statement
+
 			let fileType = 'other';
-		
-			if (documentExtensions.some(d => ext === d)) {
+
+			// Define document and media extensions
+			const documentExtensions = ['pdf', 'txt', 'doc', 'docx']; 
+			const mediaExtensions = ['png', 'jpg', 'jpeg', 'mp4', 'mp3'];
+
+			// Check type based on extension
+			if (documentExtensions.includes(ext)) {
 				fileType = 'document';
-			} else if (mediaExtensions.some(m => ext === m)) {
+			} else if (mediaExtensions.includes(ext)) {
 				fileType = 'media';
 			}
-		
+
+
 			if (filters.type !== fileType) {
 				isValid = false;
 			}
 		}
+
+		
 
 		return isValid;
 	});
