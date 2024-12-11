@@ -1,3 +1,9 @@
+/*
+This is a SOCKS proxy using go. It logs the total number of ingoing and outgoing bytes
+for each user (1 user = 1 IP address) and every 5 minutes this information is logged to
+a txt file in the format [IP, bytes]\n[IP, bytes]\n[IP, bytes]
+*/
+
 package main
 
 import (
