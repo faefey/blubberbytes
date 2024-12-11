@@ -20,13 +20,20 @@ func UpdateProxyHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	walletInfo, err := operations.GetWalletInfo(db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	address := walletInfo.Address
+
 	err = p2p.ProvideKey("PROXY")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = operations.UpdateProxy(db, m.IP, m.Port, m.Rate)
+	err = operations.UpdateProxy(db, m.IP, m.Port, m.Rate, address)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

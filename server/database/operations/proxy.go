@@ -7,9 +7,9 @@ import (
 )
 
 // UpdateProxy updates the only record in the Proxy table.
-func UpdateProxy(db *sql.DB, ip, port string, rate float64) error {
-	query := `UPDATE Proxy SET ip = ?, port = ?, rate = ?`
-	_, err := db.Exec(query, ip, port, rate)
+func UpdateProxy(db *sql.DB, ip, port string, rate float64, wallet string) error {
+	query := `UPDATE Proxy SET ip = ?, port = ?, rate = ?, wallet = ?`
+	_, err := db.Exec(query, ip, port, rate, wallet)
 	if err != nil {
 		return fmt.Errorf("error updating record from Proxy: %v", err)
 	}

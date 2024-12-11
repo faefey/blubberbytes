@@ -132,6 +132,7 @@ func SetupProxyTable(db *sql.DB) error {
 			ip TEXT NOT NULL,
 			port TEXT NOT NULL,
 			rate REAL NOT NULL,
+			wallet TEXT NOT NULL,
 			PRIMARY KEY(ip, port)
 		);`
 
@@ -142,8 +143,8 @@ func SetupProxyTable(db *sql.DB) error {
 	}
 	fmt.Printf("Proxy table created successfully.\n")
 
-	query := `INSERT INTO Proxy (ip, port, rate) VALUES (?, ?, ?)`
-	_, err = db.Exec(query, "", "", 0)
+	query := `INSERT INTO Proxy (ip, port, rate, wallet) VALUES (?, ?, ?, ?)`
+	_, err = db.Exec(query, "", "", 0, "")
 	if err != nil {
 		return fmt.Errorf("error initializing Proxy table: %v", err)
 	}
