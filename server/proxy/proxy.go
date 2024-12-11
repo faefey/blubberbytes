@@ -1,0 +1,183 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net"
+	"os"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/armon/go-socks5"
+)
+
+var paymentInformation = make(map[string]int64)
+var mutex sync.Mutex
+
+type trafficInterceptor struct {
+	conn     net.Conn
+	clientIP string
+	read     int64
+	written  int64
+}
+
+func (t *trafficInterceptor) Read(b []byte) (n int, err error) {
+	n, err = t.conn.Read(b)
+	if err == nil {
+		t.read += int64(n)
+	}
+	//log.Printf("Total received: %d", t.read)
+	return
+}
+
+func (t *trafficInterceptor) Write(b []byte) (n int, err error) {
+	n, err = t.conn.Write(b)
+	if err == nil {
+		t.written += int64(n)
+	}
+	//log.Printf("Total sent %d", t.written)
+	return
+}
+
+func (t *trafficInterceptor) Close() error {
+	log.Printf("Final bytes received: %d", t.read)
+	log.Printf("Final bytes sent: %d", t.written)
+	log.Printf("IP Of the bytes above: %s", t.clientIP)
+
+	//err := appendToFile("proxyData.txt", fmt.Sprintf("[%d, %s]", t.read + t.written, strings.Split(t.clientIP, ":")[0]))
+	//if err != nil {
+	//    log.Printf("Error writing to file %s", err)
+	//}
+
+	updatePaymentInfo(strings.Split(t.clientIP, ":")[0], t.read+t.written)
+
+	return t.conn.Close()
+}
+
+func (t *trafficInterceptor) LocalAddr() net.Addr {
+	return t.conn.LocalAddr()
+}
+
+func (t *trafficInterceptor) RemoteAddr() net.Addr {
+	return t.conn.RemoteAddr()
+}
+
+func (t *trafficInterceptor) SetDeadline(deadline time.Time) error {
+	return t.conn.SetDeadline(deadline)
+}
+
+func (t *trafficInterceptor) SetReadDeadline(deadline time.Time) error {
+	return t.conn.SetReadDeadline(deadline)
+}
+
+func (t *trafficInterceptor) SetWriteDeadline(deadline time.Time) error {
+	return t.conn.SetWriteDeadline(deadline)
+}
+
+func (t *trafficInterceptor) GetBytesSent() int64 {
+	return t.written
+}
+
+func (t *trafficInterceptor) GetBytesReceived() int64 {
+	return t.read
+}
+
+type clientAddressRuleset struct {
+	socks5.RuleSet
+}
+
+func appendToFile(filename, text string) error {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(text + "\n")
+	return err
+}
+
+func updatePaymentInfo(key string, value int64) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	log.Printf("Key: %s value: %d\n", key, value)
+
+	if currentBytes, exists := paymentInformation[key]; exists {
+		paymentInformation[key] = currentBytes + value
+	} else {
+		paymentInformation[key] = value
+	}
+
+}
+
+func (r *clientAddressRuleset) Connect(ctx context.Context, conn net.Conn, target *socks5.AddrSpec) (*socks5.AddrSpec, error) {
+	//clientAddr := conn.RemoteAddr()
+	//log.Printf("Client address: %s", clientAddr)
+	return target, nil
+}
+
+func (r *clientAddressRuleset) Allow(ctx context.Context, req *socks5.Request) (context.Context, bool) {
+	if req.RemoteAddr != nil {
+		clientIP := req.RemoteAddr.String()
+		log.Printf("Client IP: %s", clientIP)
+		return context.WithValue(ctx, "clientIP", clientIP), true
+	}
+
+	return ctx, true
+}
+
+func customDial(ctx context.Context, network, addr string) (net.Conn, error) {
+
+	//remoteSocksProxy := "23.239.12.179:8000"
+
+	conn, err := net.Dial(network, addr)
+	if err != nil {
+		return nil, err
+	}
+
+	clientIP, _ := ctx.Value("clientIP").(string)
+	// Wrap the connection to intercept traffic
+	return &trafficInterceptor{conn: conn, clientIP: clientIP}, nil
+}
+
+func proxy() {
+
+	dial := customDial
+	conf := &socks5.Config{Dial: dial, Rules: &clientAddressRuleset{}}
+	server, err := socks5.New(conf)
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		for range ticker.C {
+			mutex.Lock()
+
+			for key, value := range paymentInformation {
+				//log.Println("Hello!")
+				log.Printf("%s : %d", key, value)
+				err := appendToFile("proxyData.txt", fmt.Sprintf("[%s, %d]", key, value))
+				if err != nil {
+					log.Printf("Error writing to file")
+				}
+
+			}
+
+			for key := range paymentInformation {
+				delete(paymentInformation, key)
+			}
+
+			mutex.Unlock()
+
+		}
+	}()
+
+	// Create SOCKS5 proxy on localhost port 8000
+	if err := server.ListenAndServe("tcp", "0.0.0.0:8000"); err != nil {
+		panic(err)
+	}
+}
