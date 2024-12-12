@@ -145,7 +145,7 @@ func Proxy(node host.Host, db *sql.DB) {
 	}
 
 	go func() {
-		ticker := time.NewTicker(5 * time.Minute)
+		ticker := time.NewTicker(10 * time.Second)
 		for range ticker.C {
 			mutex.Lock()
 
