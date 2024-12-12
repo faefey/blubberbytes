@@ -243,7 +243,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			}
 
 			// Call the new function to send the ProxyBill and wait for confirmation
-			err := sendProxyBillWithConfirmation(node, peerID, proxyBill)
+			err := SendProxyBillWithConfirmation(node, peerID, proxyBill)
 			if err != nil {
 				fmt.Printf("Error during ProxyBill transaction: %v\n", err)
 			} else {
@@ -292,7 +292,7 @@ func handleInput(ctx context.Context, dht *dht.IpfsDHT, node host.Host, db *sql.
 			address := "123"
 
 			// Call the UpdateProxy function with the random test data
-			err := operations.UpdateProxy(db, ip, rate, address)
+			err := operations.UpdateProxy(db, ip, rate, node_id, address)
 			if err != nil {
 				fmt.Printf("Error updating proxy: %v\n", err)
 			} else {

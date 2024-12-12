@@ -2,14 +2,19 @@ package p2p
 
 import (
 	"crypto/sha256"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"server/database/models"
+	"server/database/operations"
 	"time"
 
 	"math/rand"
 
+	"github.com/btcsuite/btcd/btcutil"
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/multiformats/go-multihash"
@@ -322,7 +327,7 @@ func Explore(node host.Host, peerIDs []string) ([]models.JoinedHosting, error) {
 	return collectedHostings, nil
 }
 
-func sendProxyBillWithConfirmation(node host.Host, peerID string, proxyBill models.ProxyBill) error {
+func SendProxyBillWithConfirmation(node host.Host, peerID string, proxyBill models.ProxyBill) error {
 	// Serialize ProxyBill to JSON
 	proxyBillJSON, err := json.Marshal(proxyBill)
 	if err != nil {
@@ -354,7 +359,7 @@ func sendProxyBillWithConfirmation(node host.Host, peerID string, proxyBill mode
 	}
 }
 
-func handleProxyBill(node host.Host, proxyBill models.ProxyBill, peerID string) error {
+func handleProxyBill(node host.Host, proxyBill models.ProxyBill, peerID string, btcwallet *rpcclient.Client, netParams *chaincfg.Params, db *sql.DB) error {
 	log.Println("Received ProxyBill:")
 	log.Printf("IP: %s", proxyBill.IP)
 	log.Printf("Rate: %.2f", proxyBill.Rate)
@@ -363,7 +368,7 @@ func handleProxyBill(node host.Host, proxyBill models.ProxyBill, peerID string) 
 	log.Printf("Wallet: %s", proxyBill.Wallet)
 
 	// Placeholder function for additional processing
-	err := processProxyBill(proxyBill)
+	err := processProxyBill(proxyBill, btcwallet, netParams, db)
 	if err != nil {
 		log.Printf("Failed to process ProxyBill: %v", err)
 
@@ -386,8 +391,35 @@ func handleProxyBill(node host.Host, proxyBill models.ProxyBill, peerID string) 
 	return nil
 }
 
-func processProxyBill(proxyBill models.ProxyBill) error {
+func processProxyBill(proxyBill models.ProxyBill, btcwallet *rpcclient.Client, netParams *chaincfg.Params, db *sql.DB) error {
 	log.Println("Processing ProxyBill...")
+
+	if proxyBill.Rate == -1 {
+		err := operations.AddIPtoNode(db, proxyBill.IP, proxyBill.Wallet)
+		if err != nil {
+			return err
+		}
+	} else {
+		walletInfo, err := operations.GetWalletInfo(db)
+		if err != nil {
+			return err
+		}
+
+		err = btcwallet.WalletPassphrase(walletInfo.PrivPassphrase, 300)
+		if err != nil {
+			return err
+		}
+
+		btcutilAddress, err := btcutil.DecodeAddress(proxyBill.Wallet, netParams)
+		if err != nil {
+			return err
+		}
+
+		_, err = btcwallet.SendToAddress(btcutilAddress, btcutil.Amount(proxyBill.Amount*1e8))
+		if err != nil {
+			return err
+		}
+	}
 
 	// Simulate a processing error
 	err := fmt.Errorf("simulated processing error for ProxyBill with IP: %s", proxyBill.IP)

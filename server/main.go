@@ -80,10 +80,10 @@ func main() {
 		return
 	}
 
-	go p2p.P2PAsync(node, dht, db)
+	go p2p.P2PAsync(node, dht, db, btcwallet, netParams)
 	go gateway.Gateway(node, db)
 	go server.Server(node, btcwallet, netParams, db)
-	go proxy.Proxy(db)
+	go proxy.Proxy(node, db)
 
 	// Blocks until a signal is received
 	<-sigs

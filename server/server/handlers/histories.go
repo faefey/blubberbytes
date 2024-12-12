@@ -56,7 +56,7 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 		return int(b.Time - a.Time)
 	})
 
-	var transactionsRecords []models.Transactions
+	transactionsRecords := []models.Transactions{}
 	for _, transaction := range transactions {
 		transactionsRecords = append(transactionsRecords, models.Transactions{
 			Id:            transaction.TxID,

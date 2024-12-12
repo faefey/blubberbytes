@@ -94,7 +94,6 @@ func DownloadFileHandler(w http.ResponseWriter, r *http.Request, node host.Host,
 		return
 	}
 
-	//fmt.Printf("Btcutil address: %s, request price: %f", btcutilAddress.String(), request.Price)
 	_, err = btcwallet.SendToAddress(btcutilAddress, btcutil.Amount(request.Price*1e8))
 	if err != nil {
 		fmt.Printf("SendFrom Error:  %s", err.Error())

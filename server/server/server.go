@@ -141,7 +141,7 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 	})
 
 	http.HandleFunc("/updateproxy", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.UpdateProxyHandler(w, r, db) })
+		cors(w, r, func() { handlers.UpdateProxyHandler(w, r, node, db) })
 	})
 
 	// Run the server
