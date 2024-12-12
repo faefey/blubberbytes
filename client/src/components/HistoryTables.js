@@ -95,11 +95,11 @@ const Histories = () => {
     let csvData = selectedColumns.join(',') + '\n';
 
     csvData += sortedData.map(item =>
-        selectedColumns.map(field => {
-            const value = getNestedValue(item, field);
-            return value !== null && value !== undefined ? `"${value}"` : '';
-          }).join(',')
-      ).join('\n');
+      selectedColumns.map(field => {
+        const value = getNestedValue(item, field);
+        return value !== null && value !== undefined ? `"${value}"` : '';
+      }).join(',')
+    ).join('\n');
 
     const filename = `${historyType}-history.csv`;
 
@@ -119,100 +119,128 @@ const Histories = () => {
     transaction: [
       {
         header: 'Transaction Date',
-        field: 'date', render: (value) => value ? format(new Date(value), 'MM/dd/yyyy hh:mm a') : 'Invalid Date',
-        width: '25%' },
+        field: 'date',
+        render: (value) => value ? format(new Date(value), 'MM/dd/yyyy') : 'Invalid Date',
+        width: '15%',
+      },
       {
         header: 'Recipient Wallet ID',
         field: 'wallet',
-        width: '30%' },
+        width: '20%',
+      },
       {
-        header: 'Amount',
+        header: 'Amount (ORCA)',
         field: 'amount',
         render: (value) => value ? parseFloat(value).toFixed(2) : '',
-        width: '15%',
-        align: 'right'
+        width: '10%',
+        align: 'right',
       },
       {
         header: 'Category',
         field: 'category',
-        width: '30%'
+        width: '15%',
+        align: 'center',
+      },      
+      {
+        header: 'Fee (ORCA)',
+        field: 'fee',
+        render: (value) => value ? parseFloat(value).toFixed(2) : '',
+        width: '10%',
+        align: 'right',
+      },
+      {
+        header: 'Status',
+        field: 'confirmations',
+        render: (value) => value === 0 ? 'Pending' : 'Confirmed',
+        width: '10%',
+        align: 'center',
+      },
+      {
+        header: 'Confirmations',
+        field: 'confirmations',
+        render: (value) => value || 0,
+        width: '10%',
+        align: 'center',
       },
     ],
     upload: [
       {
         header: 'Date',
-        field: 'date', render: (value) => value ? format(new Date(value), 'MM/dd/yyyy') : 'Invalid Date',
-        width: '20%'
+        field: 'date',
+        render: (value) => value ? format(new Date(value), 'MM/dd/yyyy') : 'Invalid Date',
+        width: '20%',
       },
       {
         header: 'File Name',
         field: 'name',
-        width: '30%'
+        width: '30%',
       },
       {
         header: 'Hash',
         field: 'hash',
-        render: (value) => (
-          <div className="truncated-cell" title={value}>{value}</div>
-        ),
-        width: '30%'
+        render: (value) => value,
+        width: '30%',
       },
       {
         header: 'File Size',
-        field: 'size', render: (value) => formatSize(value),
+        field: 'size',
+        render: (value) => formatSize(value),
         width: '20%',
-        align: 'right'
+        align: 'right',
       },
     ],
     download: [
       {
         header: 'Date',
-        field: 'date', render: (value) => value ? format(new Date(value), 'MM/dd/yyyy') : 'Invalid Date',
-        width: '20%'
+        field: 'date',
+        render: (value) => value ? format(new Date(value), 'MM/dd/yyyy') : 'Invalid Date',
+        width: '20%',
       },
       {
         header: 'File Name',
         field: 'name',
-        width: '30%'
+        width: '30%',
       },
       {
         header: 'Hash',
         field: 'hash',
-        render: (value) => (
-          <div className="truncated-cell" title={value}>{value}</div>
-        ),
-        width: '30%'
+        render: (value) => value,
+        width: '30%',
       },
       {
         header: 'File Size',
-        field: 'size', render: (value) => formatSize(value),
+        field: 'size',
+        render: (value) => formatSize(value),
         width: '20%',
-        align: 'right'
+        align: 'right',
       },
       {
-        header: 'Price (OC)',
-        field: 'price', render: (value) => `${parseFloat(value).toFixed(2)}`,
+        header: 'Price (ORCA)',
+        field: 'price',
+        render: (value) => `${parseFloat(value).toFixed(2)}`,
         width: '20%',
-        align: 'right'
+        align: 'right',
       },
     ],
     proxy: [
       {
         header: 'IP Address',
         field: 'ip',
-        width: '30%'
+        width: '30%',
       },
       {
         header: 'Data Transferred',
-        field: 'bytes', render: (value) => formatSize(value),
+        field: 'bytes',
+        render: (value) => formatSize(value),
         width: '20%',
-        align: 'right'
+        align: 'right',
       },
       {
         header: 'Time (seconds)',
-        field: 'time', render: (value) => `${value}s`,
+        field: 'time',
+        render: (value) => `${value}s`,
         width: '20%',
-        align: 'right'
+        align: 'right',
       },
     ],
   };
