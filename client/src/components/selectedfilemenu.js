@@ -193,11 +193,11 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
         actionMessage={"Delete"}
         section={currSection} />}
 
-      {(currSection !== "storing" && currSection !== "hosting" && currSection !== "sharing") && 
+      {/* {(currSection !== "storing" && currSection !== "hosting" && currSection !== "sharing") && 
         <Delete className="grayedout" />}
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
         fileInfo={[confirmationInfo[0]]} />)}
-      {selectedFiles.length > 1 && (<Info className="grayedout" />)}
+      {selectedFiles.length > 1 && (<Info className="grayedout" />)} */}
     </div>
   );
 }

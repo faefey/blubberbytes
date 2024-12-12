@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Switch, FormControlLabel, IconButton } from '@mui/material';
-import { LineChart } from './Graphs.js';
+import { LineChart, graphColors } from './Graphs.js';
 import { Tooltip } from 'react-tooltip';
 
 import { ReactComponent as Cross } from '../icons/close.svg';
@@ -12,9 +12,11 @@ import { LoadingSpinner } from "./ProgressComponents.js";
 
 import '../stylesheets/UserAccount.css';
 
+const {graphColorA, graphColorB} = graphColors()
+
 export default function ConnectProxy() {
     const [checked, setChecked] = useState(false);
-    const [usageRate, setUsageRate] = useState(0);
+    const [usageRate, setUsageRate] = useState("");
     const [ipAddress, setIPAddress] = useState("");
     const [bandwidthData, setBandwidthData] = useState({ labels: [], datasets: [] });
     const [selectedProxy, setSelectedProxy] = useState(null);
@@ -24,6 +26,7 @@ export default function ConnectProxy() {
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const saveProxySettings = async () => {
+        // TODO: replace the alerts with `setMessage` from `App.js`
         try {
             await axios.post("http://localhost:3001/updateproxy", {
                 ip: ipAddress,
@@ -101,14 +104,14 @@ export default function ConnectProxy() {
                         {
                             label: 'Bandwidth Usage Over Time',
                             data: [...(prevData.datasets[0]?.data || []), newBandwidthValue].slice(-20),
-                            borderColor: 'rgba(153, 102, 255, 0.6)',
+                            borderColor: graphColorA,
                             fill: false,
                             tension: 0.4,
                         },
                         {
                             label: 'Usage Rate',
                             data: [...(prevData.datasets[1]?.data || []), usageRate].slice(-20),
-                            borderColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: graphColorB,
                             borderDash: [5, 5],
                             fill: false,
                             tension: 0.4,
@@ -124,7 +127,7 @@ export default function ConnectProxy() {
                     {
                         label: 'Bandwidth Usage Over Time',
                         data: [],
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderColor: graphColorA,
                         fill: false,
                         tension: 0.4,
                     },
@@ -157,7 +160,7 @@ export default function ConnectProxy() {
                             allowDecimals={false}
                         />
                         <SubmissionForm
-                            title={"Usage rate: "}
+                            title={"Usage Rate: "}
                             variable={usageRate}
                             setVariable={setUsageRate}
                             unit
@@ -209,28 +212,28 @@ function ProxyTable({ proxies, selectedProxy, setSelectedProxy }) {
         <table className="table-container">
             <thead>
                 <tr>
-                    <th>Node</th>
+                    {/* <th>Node</th> */}
                     <th>IP Address</th>
-                    <th>Location</th>
-                    <th>Latency</th>
+                    {/* <th>Location</th> */}
+                    {/* <th>Latency</th> */}
                     <th>Price (ORCA/MB)</th>
-                    <th>Connect</th>
+                    {/* <th>Connect</th> */}
                 </tr>
             </thead>
             <tbody>
                 {proxies.map(proxy => (
                     <tr key={proxy.id} className={`proxy-row ${selectedProxy?.id === proxy.id ? 'selected' : ''}`}>
-                        <td>{proxy.node}</td>
+                        {/* <td>{proxy.node}</td> */}
                         <td>{proxy.ip}</td>
-                        <td>{proxy.location}</td>
-                        <td>{proxy.latency}</td>
-                        <td>{proxy.price}</td>
-                        <td>
+                        {/* <td>{proxy.location}</td> */}
+                        {/* <td>{proxy.latency}</td> */}
+                        <td>{proxy.rate}</td>
+                        {/* <td>
                             <Switch
                                 checked={selectedProxy?.id === proxy.id}
                                 onChange={() => setSelectedProxy(selectedProxy?.id === proxy.id ? null : proxy)}
                             />
-                        </td>
+                        </td> */}
                     </tr>
                 ))}
             </tbody>
@@ -248,7 +251,9 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
 
         const parsedValue = allowDecimals ? parseFloat(newValue) : newValue.trim();
 
-        if (allowDecimals ? !isNaN(parsedValue) : parsedValue !== "") {
+        if (allowDecimals 
+            ? !isNaN(parsedValue) && parsedValue > 0 && /^\d+(\.\d{1,2})?$/.test(newValue) 
+            : parsedValue !== "") {
             setVariable(parsedValue);
         }
     }
@@ -265,7 +270,7 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
     }
 
     const isValid = allowDecimals 
-        ? !isNaN(parseFloat(inputValue))
+        ? !isNaN(parseFloat(inputValue)) && parseFloat(inputValue) > 0 && /^\d+(\.\d{1,2})?$/.test(inputValue)
         : isValidIP(inputValue.trim());
 
     return (
@@ -279,7 +284,7 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
                                 className="input-box"
                                 name="variable"
                                 type="text"
-                                placeholder={variable}
+                                placeholder={allowDecimals ? '0.00' : 'XXX.XXX.XXX.XXX'}
                                 value={inputValue}
                                 autoComplete="off"
                                 onChange={handleChange}
@@ -293,8 +298,8 @@ function SubmissionForm({ title, variable, setVariable, unit = false, allowDecim
                                 <Cross style={{ fill: 'red' }} />
                                 <span>
                                     {allowDecimals
-                                        ? "Please input a valid rate."
-                                        : "Please input your device's public IP address (e.g. XXX.XXX.XXX.XXX)."}
+                                        ? "Please input a valid rate greater than zero."
+                                        : "Please input your device's public IP address."}
                                 </span>
                             </div>
                         ) : (
