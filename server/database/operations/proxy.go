@@ -33,7 +33,7 @@ func GetProxy(db *sql.DB) (*models.Proxy, error) {
 	return &proxy, nil
 }
 
-// AddSaved inserts a new record into the Saved table.
+// AddProxyLogs inserts a new record into the ProxyLogs table.
 func AddProxyLogs(db *sql.DB, ip string, bytes, time int64) error {
 	query := `INSERT INTO ProxyLogs (ip, bytes, time) VALUES (?, ?, ?)`
 	_, err := db.Exec(query, ip, bytes, time)
@@ -46,10 +46,10 @@ func AddProxyLogs(db *sql.DB, ip string, bytes, time int64) error {
 }
 
 func GetProxyLogs(db *sql.DB) ([]models.ProxyLogs, error) {
-	query := `SELECT id, ip, node, bytes, time FROM ProxyLogs`
+	query := `SELECT id, ip, bytes, time FROM ProxyLogs`
 	rows, err := db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("error querying Storing table: %v", err)
+		return nil, fmt.Errorf("error querying ProxyLogs table: %v", err)
 	}
 	defer rows.Close()
 
@@ -58,7 +58,7 @@ func GetProxyLogs(db *sql.DB) ([]models.ProxyLogs, error) {
 		var record models.ProxyLogs
 		err := rows.Scan(&record.Id, &record.IP, &record.Node, &record.Bytes, &record.Bytes, &record.Time)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning Storing record: %v", err)
+			return nil, fmt.Errorf("error scanning ProxyLogs record: %v", err)
 		}
 		proxyLogsRecords = append(proxyLogsRecords, record)
 	}

@@ -157,8 +157,8 @@ func SetupProxyLogsTable(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS ProxyLogs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			ip TEXT NOT NULL,
-			rate REAL NOT NULL,
-			wallet TEXT NOT NULL
+			bytes INTEGER NOT NULL,
+			time INTEGER NOT NULL
 		);`
 
 	// Execute the table creation statement

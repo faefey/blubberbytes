@@ -155,7 +155,7 @@ func Proxy(node host.Host, db *sql.DB) {
 				operations.AddProxyLogs(db, key, value, time.Now().Unix())
 			}
 
-			// timeBefore := time.Now().Unix()
+			// timeBefore := time.Now().Unix() - (5 * time.Minute).Milliseconds()
 			// log.Println("Sending request for proxy payment...")
 			// err := p2p.SendProxyBillWithConfirmation(node, )
 
