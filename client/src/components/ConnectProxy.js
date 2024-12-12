@@ -19,7 +19,6 @@ export default function ConnectProxy() {
     const [usageRate, setUsageRate] = useState("");
     const [ipAddress, setIPAddress] = useState("");
     const [bandwidthData, setBandwidthData] = useState({ labels: [], datasets: [] });
-    const [selectedProxy, setSelectedProxy] = useState(null);
     const [displayedProxies, setDisplayedProxies] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -54,19 +53,9 @@ export default function ConnectProxy() {
         fetchProxies();
     }, []);
 
-    useEffect(() => {
-        if (selectedProxy) {
-            setDisplayedProxies(prevProxies => {
-                const filteredProxies = prevProxies.filter(proxy => proxy.id !== selectedProxy.id);
-                return [selectedProxy, ...filteredProxies];
-            });
-        }
-    }, [selectedProxy]);
-
     const handleChange = (event) => {
         setChecked(event.target.checked);
         if (!event.target.checked) {
-            setSelectedProxy(null);
             setUsageRate(0);
             setIPAddress("");
         }
@@ -78,10 +67,7 @@ export default function ConnectProxy() {
             await sleep(1000);
 
             const response = await axios.get("http://localhost:3001/refreshproxies");
-            const updatedProxies = response.data.filter(proxy => proxy.id !== selectedProxy?.id);
-            setDisplayedProxies(
-                selectedProxy ? [selectedProxy, ...updatedProxies.slice(0, 4)] : updatedProxies.slice(0, 5)
-            );
+            setDisplayedProxies(response.data.slice(0, 5));
         } catch (error) {
             console.error("Error Refreshing Proxies:", error);
         } finally {
@@ -186,54 +172,47 @@ export default function ConnectProxy() {
                     </div>
                 </>
             ) : (
-                <div>
-                    <div className="chart-header">
-                        <h3>Available Proxies</h3>
-                        <IconButton className="refresh-button" onClick={handleRefresh}>
-                            <Fresh />
-                        </IconButton>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div style={{ flex: 1 }}>
+                        <div className="chart-header">
+                            <h3>Available Proxies</h3>
+                            <IconButton className="refresh-button" onClick={handleRefresh}>
+                                <Fresh />
+                            </IconButton>
+                        </div>
+                        {!loading && (
+                            <ProxyTable proxies={displayedProxies} />
+                        )}
+                        {loading && <LoadingSpinner message="Reloading Proxy Table..." />}
                     </div>
-                    {!loading && (
-                        <ProxyTable
-                            proxies={displayedProxies}
-                            selectedProxy={selectedProxy}
-                            setSelectedProxy={setSelectedProxy}
-                        />
-                    )}
-                    {loading && <LoadingSpinner message="Reloading Proxy Table..." />}
+                    <div style={{ flex: 1, marginLeft: '20px', padding: '20px', borderLeft: '1px solid #ccc' }}>
+                        <h3>Setup Instructions</h3>
+                        <p>Go into the application menu on Firefox (the 3 bars in the top right corner) and select Settings.</p>
+                        <p>Scroll to the bottom and click “Settings…” beneath Network Settings.</p>
+                        <p>In the section that says “SOCKS Host”, put the IP of the proxy you wish to connect to.</p>
+                        <p>For the port, enter 8000. Click the “SOCKS v5” button beneath this.</p>
+                        <p>Finally press OK.</p>
+                    </div>
                 </div>
             )}
         </div>
     );
 }
 
-function ProxyTable({ proxies, selectedProxy, setSelectedProxy }) {
+function ProxyTable({ proxies }) {
     return (
         <table className="table-container">
             <thead>
                 <tr>
-                    {/* <th>Node</th> */}
                     <th>IP Address</th>
-                    {/* <th>Location</th> */}
-                    {/* <th>Latency</th> */}
                     <th>Price (ORCA/MB)</th>
-                    {/* <th>Connect</th> */}
                 </tr>
             </thead>
             <tbody>
                 {proxies.map(proxy => (
-                    <tr key={proxy.id} className={`proxy-row ${selectedProxy?.id === proxy.id ? 'selected' : ''}`}>
-                        {/* <td>{proxy.node}</td> */}
+                    <tr key={proxy.id} className="proxy-row">
                         <td>{proxy.ip}</td>
-                        {/* <td>{proxy.location}</td> */}
-                        {/* <td>{proxy.latency}</td> */}
                         <td>{proxy.rate}</td>
-                        {/* <td>
-                            <Switch
-                                checked={selectedProxy?.id === proxy.id}
-                                onChange={() => setSelectedProxy(selectedProxy?.id === proxy.id ? null : proxy)}
-                            />
-                        </td> */}
                     </tr>
                 ))}
             </tbody>
