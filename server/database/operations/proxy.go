@@ -56,7 +56,7 @@ func GetProxyLogs(db *sql.DB) ([]models.ProxyLogs, error) {
 	proxyLogsRecords := []models.ProxyLogs{}
 	for rows.Next() {
 		var record models.ProxyLogs
-		err := rows.Scan(&record.Id, &record.IP, &record.Node, &record.Bytes, &record.Bytes, &record.Time)
+		err := rows.Scan(&record.Id, &record.IP, &record.Bytes, &record.Time)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning ProxyLogs record: %v", err)
 		}

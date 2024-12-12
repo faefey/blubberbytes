@@ -12,7 +12,6 @@ type Proxy struct {
 type ProxyLogs struct {
 	Id    string `json:"id"`
 	IP    string `json:"ip"`
-	Node  string `json:"node"`
 	Bytes int64  `json:"bytes"`
 	Time  int64  `json:"time"`
 }
