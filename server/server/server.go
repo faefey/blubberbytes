@@ -87,6 +87,10 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 		cors(w, r, func() { handlers.RefreshProxiesHandler(w, r, node, db) })
 	})
 
+	http.HandleFunc("/proxylogs", func(w http.ResponseWriter, r *http.Request) {
+		cors(w, r, func() { handlers.ProxyLogsHandler(w, r, db) })
+	})
+
 	// POST routes
 	http.HandleFunc("/getproviders", func(w http.ResponseWriter, r *http.Request) {
 		cors(w, r, func() { handlers.GetProvidersHandler(w, r, node, db) })
@@ -141,7 +145,7 @@ func Server(node host.Host, btcwallet *rpcclient.Client, netParams *chaincfg.Par
 	})
 
 	http.HandleFunc("/updateproxy", func(w http.ResponseWriter, r *http.Request) {
-		cors(w, r, func() { handlers.UpdateProxyHandler(w, r, db) })
+		cors(w, r, func() { handlers.UpdateProxyHandler(w, r, node, db) })
 	})
 
 	// Run the server

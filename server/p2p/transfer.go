@@ -16,6 +16,8 @@ import (
 	"sync"
 
 	// Add the necessary packages from libp2p, for example:
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/libp2p/go-libp2p/core/host"    // for host.Host
 	"github.com/libp2p/go-libp2p/core/network" // for network.Stream
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -44,7 +46,7 @@ var (
 // Channel for signaling when data is ready
 var signalChan = make(chan struct{}, 1)
 
-func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
+func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string, btcwallet *rpcclient.Client, netParams *chaincfg.Params) {
 	node.SetStreamHandler("/senddata/p2p", func(s network.Stream) {
 		log.Printf("New stream opened from peer: %s", s.Conn().RemotePeer())
 		defer func() {
@@ -136,7 +138,7 @@ func receiveDataFromPeer(node host.Host, db *sql.DB, folderPath string) {
 			}
 
 			// Call helper function to handle the ProxyBill and send confirmation back
-			err = handleProxyBill(node, proxyBill, s.Conn().RemotePeer().String())
+			err = handleProxyBill(node, proxyBill, s.Conn().RemotePeer().String(), btcwallet, netParams, db)
 			if err != nil {
 				log.Printf("Error processing ProxyBill: %v", err)
 			}

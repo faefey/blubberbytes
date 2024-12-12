@@ -57,6 +57,18 @@ func CreateNewTables(db *sql.DB) error {
 		return fmt.Errorf("failed to set up Proxy table: %v", err)
 	}
 
+	// Create ProxyLogs table
+	err = SetupProxyLogsTable(db)
+	if err != nil {
+		return fmt.Errorf("failed to set up ProxyLogs table: %v", err)
+	}
+
+	// Create IPtoNode table
+	err = SetupIPtoNodeTable(db)
+	if err != nil {
+		return fmt.Errorf("failed to set up IPtoNode table: %v", err)
+	}
+
 	fmt.Println("All new tables created successfully.")
 	return nil
 }

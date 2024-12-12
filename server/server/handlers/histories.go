@@ -44,7 +44,7 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 
 	transactions := listSinceBlockResult.Transactions
 
-	var temp []btcjson.ListTransactionsResult
+	temp := []btcjson.ListTransactionsResult{}
 	for _, transaction := range transactions {
 		if !(transaction.Category == "send" && *transaction.Fee == 0) {
 			temp = append(temp, transaction)
@@ -56,14 +56,20 @@ func TransactionsHandler(w http.ResponseWriter, _ *http.Request, btcwallet *rpcc
 		return int(b.Time - a.Time)
 	})
 
-	var transactionsRecords []models.Transactions
+	transactionsRecords := []models.Transactions{}
 	for _, transaction := range transactions {
+		var fee float64
+		if transaction.Fee == nil {
+			fee = 0
+		} else {
+			fee = *transaction.Fee
+		}
 		transactionsRecords = append(transactionsRecords, models.Transactions{
 			Id:            transaction.TxID,
 			Date:          time.Unix(transaction.Time, 0).Local().Format("01/02/2006"),
 			Wallet:        transaction.Address,
 			Amount:        transaction.Amount,
-			Fee:           *transaction.Fee,
+			Fee:           fee,
 			Category:      transaction.Category,
 			Confirmations: transaction.Confirmations,
 		})

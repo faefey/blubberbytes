@@ -19,6 +19,7 @@ import (
 	"server/database/operations"
 
 	"github.com/armon/go-socks5"
+	"github.com/libp2p/go-libp2p/core/host"
 )
 
 var paymentInformation = make(map[string]int64)
@@ -135,7 +136,7 @@ func customDial(ctx context.Context, network, addr string) (net.Conn, error) {
 	return &trafficInterceptor{conn: conn, clientIP: clientIP}, nil
 }
 
-func Proxy(db *sql.DB) {
+func Proxy(node host.Host, db *sql.DB) {
 	dial := customDial
 	conf := &socks5.Config{Dial: dial, Rules: &clientAddressRuleset{}}
 	server, err := socks5.New(conf)
@@ -154,21 +155,15 @@ func Proxy(db *sql.DB) {
 				operations.AddProxyLogs(db, key, value, time.Now().Unix())
 			}
 
+			// timeBefore := time.Now().Unix() - (5 * time.Minute).Milliseconds()
+			// log.Println("Sending request for proxy payment...")
+			// err := p2p.SendProxyBillWithConfirmation(node, )
+
 			for key := range paymentInformation {
 				delete(paymentInformation, key)
 			}
 
 			mutex.Unlock()
-		}
-	}()
-
-	go func() {
-		for {
-			// timeBefore := time.Now().Unix()
-			log.Println("Waiting 5 minutes...")
-			time.Sleep(time.Minute * 5)
-			log.Println("Sending request for proxy payment...")
-			// sendRequestForPayment
 		}
 	}()
 

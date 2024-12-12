@@ -131,6 +131,7 @@ func SetupProxyTable(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS Proxy (
 			ip TEXT PRIMARY KEY NOT NULL,
 			rate REAL NOT NULL,
+			node TEXT NOT NULL,
 			wallet TEXT NOT NULL
 		);`
 
@@ -141,8 +142,8 @@ func SetupProxyTable(db *sql.DB) error {
 	}
 	fmt.Printf("Proxy table created successfully.\n")
 
-	query := `INSERT INTO Proxy (ip, rate, wallet) VALUES (?, ?, ?)`
-	_, err = db.Exec(query, "", "", 0, "")
+	query := `INSERT INTO Proxy (ip, rate, node, wallet) VALUES (?, ?, ?, ?)`
+	_, err = db.Exec(query, "", 0, "", "")
 	if err != nil {
 		return fmt.Errorf("error initializing Proxy table: %v", err)
 	}
@@ -156,8 +157,8 @@ func SetupProxyLogsTable(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS ProxyLogs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			ip TEXT NOT NULL,
-			rate REAL NOT NULL,
-			wallet TEXT NOT NULL
+			bytes INTEGER NOT NULL,
+			time INTEGER NOT NULL
 		);`
 
 	// Execute the table creation statement
@@ -166,6 +167,23 @@ func SetupProxyLogsTable(db *sql.DB) error {
 		return fmt.Errorf("error creating ProxyLogs table: %v", err)
 	}
 	fmt.Printf("ProxyLogs table created successfully.\n")
+
+	return nil
+}
+
+func SetupIPtoNodeTable(db *sql.DB) error {
+	createTable :=
+		`CREATE TABLE IF NOT EXISTS IPtoNode (
+			ip TEXT PRIMARY KEY NOT NULL,
+			node TEXT NOT NULL
+		);`
+
+	// Execute the table creation statement
+	_, err := db.Exec(createTable)
+	if err != nil {
+		return fmt.Errorf("error creating IPtoNode table: %v", err)
+	}
+	fmt.Printf("IPtoNode table created successfully.\n")
 
 	return nil
 }
