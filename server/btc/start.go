@@ -25,12 +25,12 @@ func Start(net string, db *sql.DB, debug bool) (*exec.Cmd, *exec.Cmd, *rpcclient
 
 	walletDir := btcutil.AppDataDir("btcwallet", false)
 
-	// err = os.Remove(filepath.Join(walletDir, net+"/wallet.db"))
-	// if err != nil && !os.IsNotExist(err) {
-	// 	return nil, nil, nil, nil, err
-	// }
+	err = os.Remove(filepath.Join(walletDir, net+"/wallet.db"))
+	if err != nil && !os.IsNotExist(err) {
+		return nil, nil, nil, nil, err
+	}
 
-	fmt.Println("Import your wallet (not done yet)")
+	// fmt.Println("Import your wallet (not done yet)")
 
 	if _, err := os.Stat(filepath.Join(walletDir, net+"/wallet.db")); errors.Is(err, os.ErrNotExist) {
 		err := createWallet(walletDir, net, pubPassphrase, privPassphrase, db)
