@@ -41,6 +41,8 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
     const [progress, setProgress] = useState(0);
 
     const [selectedPeer, setSelectedPeer] = useState("");
+    
+    const [walletAmount, setWalletAmount] = useState(-1);
 
     useEffect(() => {
         if (inputRef.current) {
@@ -64,6 +66,19 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
             setActualPeerData(res.data);
         }
     };
+
+    async function getWalletAmount() {
+        const res = await axios.get('http://localhost:3001/wallet');
+        setWalletAmount(res.data.currentBalance);
+
+        console.log(res.data.currentBalance);
+
+        return res.data.currentBalance;
+    }
+
+    useEffect(() => { 
+        getWalletAmount(); 
+    } , [onPeerTable]);
 
     function getProvidersWithHash(the_hash) {
         axios.post('http://localhost:3001/getproviders', the_hash)
@@ -197,6 +212,9 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
             //link.href = 'samplefiles/file1.txt';
             //link.download = 'file1.txt';
             //link.click();
+
+           //walletAmount = await getWalletAmount();
+
             console.log("Peer " + selectedPeer + " hash " + currHash + " price " + fileData.price);
             axios.post('http://localhost:3001/downloadfile', {peer: selectedPeer, hash: currHash, price: fileData.price}, { responseType: 'blob' })
             .then( res => {
@@ -381,7 +399,7 @@ export default function DownloadPopup({addFile, currentHash=null, basicTrigger=f
 
                 </form>) }
                 {confPage && (<>
-                                <Receipt balance={500} files={[fileData]} newBalance={480}/>
+                                <Receipt balance={walletAmount} files={[fileData]} newBalance={fileData.price}/>
                                 {!loading && <h3 style={{textAlign: "center"}}>Would you like to confirm this transaction?</h3>}
                                 {!loading && <div className="confirmation-buttons">
                                 <button className="host-button"
