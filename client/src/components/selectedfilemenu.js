@@ -11,6 +11,7 @@ import { ReactComponent as Close } from '../icons/close.svg';
 import { ReactComponent as Download } from '../icons/download.svg';
 import { ReactComponent as Host } from '../icons/harddrive.svg'
 import { ReactComponent as Share } from '../icons/link.svg';
+import { ReactComponent as SharingOriginal } from '../icons/sharing_original.svg';
 import { ReactComponent as Delete } from '../icons/delete.svg';
 import { ReactComponent as Info } from '../icons/info.svg';
 
@@ -134,15 +135,15 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
     setGatewayLink(gatewayLink);
     setPopupOpen(true);
     console.log("Generated Link: ", link);
-    if (link) {
-      navigator.clipboard.writeText(link)
-        .then(() => {
-          alert('Saved to clipboard');
-        })
-        .catch(err => {
-          console.error('Failed to copy: ', err);
-        });
-    }
+    // if (link) {
+    //   navigator.clipboard.writeText(link)
+    //     .then(() => {
+    //       alert('Saved to clipboard');
+    //     })
+    //     .catch(err => {
+    //       console.error('Failed to copy: ', err);
+    //     });
+    // }
   }
 
   const deleteOnClick = () => removeFiles(selectedFiles);
@@ -166,22 +167,23 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
                      basicTrigger={true} 
                      fileInfo={confirmationInfo[0]}/>}
       {(selectedFiles.length > 1 || currSection === "hosting" || currSection === "sharing" || currSection === "storing") && <Download className="grayedout" />}
-      {selectedFiles.length === 1 && (currSection === "storing") &&
+      {selectedFiles.length === 1 && (currSection === "storing" || currSection === "sharing") &&
       <ConfirmationPopup trigger={<Host className="icon" />}
         action={hostOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to host " + endingWords}
         actionMessage={"Host"}
         addFile={addFile} />}
-      {(currSection !== "storing" || selectedFiles.length > 1) && <Host className="grayedout" />}
+      {((currSection !== "sharing" && currSection !== "storing") || selectedFiles.length > 1) && <Host className="grayedout" />}
 
       {currSection === "sharing" && selectedFiles.length === 1 && <SharePopup trigger={<Share className="icon" />} hash={confirmationInfo[0].hash} password={confirmationInfo[0].password}/>}
-      {(currSection === "hosting" && selectedFiles.length === 1) && <ConfirmationPopup trigger={<Share className="icon" />}
+      {currSection === "sharing" && selectedFiles.length > 1 && <Share className="grayedout"/>}
+      {((currSection === "hosting" || currSection === "storing") && selectedFiles.length === 1) && <ConfirmationPopup trigger={<SharingOriginal className="icon" />}
         action={shareOnClick}
         fileInfo={confirmationInfo}
         message={"Are you sure you want to share " + endingWords}
         actionMessage={"Share"} />}
-      {(currSection !== "hosting" || selectedFiles.length > 1) && (currSection !== "sharing" || selectedFiles.length > 1) && <Share className="grayedout"/>}
+      {currSection !== "sharing" && ((currSection !== "hosting" || selectedFiles.length > 1) && (currSection !== "sharing" || selectedFiles.length > 1) && (currSection !== "storing" || selectedFiles.length > 1)) && <SharingOriginal className="grayedout"/>}
 
       {(currSection === "storing" || currSection === "hosting" || currSection === "sharing") &&
       <ConfirmationPopup trigger={<Delete className="icon" />}
@@ -194,7 +196,7 @@ function FileActions({ currSection, selectedFiles, addFile, removeFiles }) {
       {(currSection !== "storing" && currSection !== "hosting" && currSection !== "sharing") && 
         <Delete className="grayedout" />}
       {selectedFiles.length === 1 && (<InfoPopup trigger={<Info className="icon" />}
-        fileInfo={[selectedFiles[0]]} />)}
+        fileInfo={[confirmationInfo[0]]} />)}
       {selectedFiles.length > 1 && (<Info className="grayedout" />)}
     </div>
   );

@@ -5,6 +5,8 @@ export default function Receipt({ balance, files, headerMessage="Transaction Inf
   const totalCost = files.reduce((acc, file) => file.price + acc, 0);
   const newBalance = balance - totalCost;
 
+  console.log("Balance in receipt: ", balance);
+  
   return (
     <div className="rece">
       <h2 className="rece-header">{headerMessage}</h2>
