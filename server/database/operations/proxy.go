@@ -45,6 +45,27 @@ func AddProxyLogs(db *sql.DB, ip string, bytes, time int64) error {
 	return nil
 }
 
+func GetProxyLogs(db *sql.DB) ([]models.ProxyLogs, error) {
+	query := `SELECT id, ip, node, bytes, time FROM ProxyLogs`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("error querying Storing table: %v", err)
+	}
+	defer rows.Close()
+
+	proxyLogsRecords := []models.ProxyLogs{}
+	for rows.Next() {
+		var record models.ProxyLogs
+		err := rows.Scan(&record.Id, &record.IP, &record.Node, &record.Bytes, &record.Bytes, &record.Time)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning Storing record: %v", err)
+		}
+		proxyLogsRecords = append(proxyLogsRecords, record)
+	}
+
+	return proxyLogsRecords, nil
+}
+
 func AddIPtoNode(db *sql.DB, ip, node string) error {
 	query := `INSERT INTO IPtoNode (ip, node) VALUES (?, ?)`
 	_, err := db.Exec(query, ip, node)

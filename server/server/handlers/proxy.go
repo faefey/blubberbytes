@@ -73,3 +73,14 @@ func ConnectToProxyHandler(w http.ResponseWriter, r *http.Request, node host.Hos
 		return
 	}
 }
+
+func ProxyLogsHandler(w http.ResponseWriter, _ *http.Request, db *sql.DB) {
+	proxyLogsRecords, err := operations.GetProxyLogs(db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(proxyLogsRecords)
+}
