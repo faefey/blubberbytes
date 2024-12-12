@@ -1,181 +1,149 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { LineChart, BarChart } from './Graphs.js';
-import { addDays, format } from 'date-fns';
+import { format } from 'date-fns';
 
 import './../stylesheets/UserAccount.css';
 import dropDown from '../icons/drop_down.svg';
-import transactions from '../data/transactions.json';
 
 const rootStyles = getComputedStyle(document.documentElement);
-const colorGraphA = rootStyles.getPropertyValue('--color-graphA').trim();
-const colorGraphB = rootStyles.getPropertyValue('--color-graphB').trim();
-const colorGraphC = rootStyles.getPropertyValue('--color-graphC').trim();
-
-const processData = (transactions, rangeFilter) => {
-  const sortedTransactions = [...transactions].sort((a, b) => new Date(a['Date']) - new Date(b['Date']));
-
-  let startDate = new Date(sortedTransactions[0].Date);
-  const endDate = new Date();
-
-  switch (rangeFilter) {
-    case '7days':
-      startDate = new Date(endDate);
-      startDate.setDate(startDate.getDate() - 7);
-      break;
-    case '30days':
-      startDate = new Date(endDate);
-      startDate.setDate(startDate.getDate() - 30);
-      break;
-    case 'ytd':
-      startDate = new Date(endDate.getFullYear(), 0, 1);
-      break;
-    default:
-      break;
-  }
-
-  const balanceData = {
-    labels: [],
-    datasets: [{
-      label: 'Balance',
-      data: [],
-      borderColor: colorGraphA,
-      fill: false,
-    },
-    ],
-  };
-
-  const earningsData = {
-    labels: [],
-    datasets: [
-      {
-        label: 'Monthly Earnings',
-        data: [],
-        backgroundColor: colorGraphB,
-      },
-    ],
-  };
-
-  const transactionCountData = {
-    labels: [],
-    datasets: [
-      {
-        label: 'Transactions',
-        data: [],
-        borderColor: colorGraphC,
-        fill: false,
-      },
-    ],
-  };
-
-  let currentBalance = sortedTransactions[0]['Running Balance'];
-  let currentDate = startDate;
-
-  const monthlyEarnings = {};
-
-  while (currentDate <= endDate) {
-    const formattedDate = format(currentDate, 'yyyy-MM-dd');
-
-    const dailyTransactions = sortedTransactions.filter(
-      (t) => format(new Date(t.Date), 'yyyy-MM-dd') === formattedDate
-    );
-
-    if (dailyTransactions.length > 0) {
-      currentBalance = dailyTransactions[dailyTransactions.length - 1]['Running Balance'];
-    }
-    balanceData.labels.push(formattedDate);
-    balanceData.datasets[0].data.push(currentBalance);
-
-    transactionCountData.labels.push(formattedDate);
-    transactionCountData.datasets[0].data.push(dailyTransactions.length);
-
-    if (dailyTransactions.length > 0) {
-      const monthYear = format(currentDate, 'yyyy-MM');
-      dailyTransactions.forEach((t) => {
-        if (t.Amount > 0) {
-          if (!monthlyEarnings[monthYear]) {
-            monthlyEarnings[monthYear] = 0;
-          }
-          monthlyEarnings[monthYear] += t.Amount;
-        }
-      });
-    }
-
-    currentDate = addDays(currentDate, 1);
-  }
-
-  const earningsMonths = Object.keys(monthlyEarnings).sort();
-  earningsMonths.slice(-12).forEach((month) => {
-    earningsData.labels.push(month);
-    earningsData.datasets[0].data.push(monthlyEarnings[month]);
-  });
-
-  return { balanceData, transactionCountData, earningsData };
-};
-
-const chartOptions = (yAxisLabel) => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    x: { type: 'time', time: { unit: 'day' } },
-    y: { title: { display: true, text: yAxisLabel } }
-  },
-});
-
-const Dropdown = ({ onSelect }) => (
-  <ul className="dropdown-menu">
-    <li onClick={() => onSelect('balance', 'Balance over Time')}>Balance over Time</li>
-    <li onClick={() => onSelect('earnings', 'Monthly Earnings')}>Monthly Earnings</li>
-    <li onClick={() => onSelect('transactions', 'Transactions over Time')}>Transactions over Time</li>
-  </ul>
-);
-
-const TimeFilterDropdown = ({ onSelect }) => (
-  <ul className="dropdown-menu">
-    <li onClick={() => onSelect('7days')}>Last 7 Days</li>
-    <li onClick={() => onSelect('30days')}>Last 30 Days</li>
-    <li onClick={() => onSelect('ytd')}>Year to Date</li>
-    <li onClick={() => onSelect('all')}>All Time</li>
-  </ul>
-);
-
-const ChartContainer = ({ chartType, chartData, chartTitle }) => {
-  switch (chartType) {
-    case 'balance':
-      return <LineChart data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
-    case 'earnings':
-      return <BarChart data={chartData.earningsData} options={chartOptions('Monthly Earnings')} className="chart" />;
-    case 'transactions':
-      return <LineChart data={chartData.transactionCountData} options={chartOptions('Number of Transactions')} className="chart" />;
-    default:
-      return <LineChart data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
-  }
-};
-
-const colorMapping = {
-  balance: 'var(--color-graphA)',
-  earnings: 'var(--color-graphB)',
-  transactions: 'var(--color-graphC)',
-};
+const graphColorA = rootStyles.getPropertyValue('--color-graphA').trim();
+const graphColorB = rootStyles.getPropertyValue('--color-graphB').trim();
+const graphColorC = rootStyles.getPropertyValue('--color-graphC').trim();
 
 const Wallet = () => {
-  const [selectedRange, setSelectedRange] = useState('all');
-  const [showChartDropdown, setShowChartDropdown] = useState(false);
-  const [showTimeFilterDropdown, setShowTimeFilterDropdown] = useState(false);
-  const { balanceData, earningsData, transactionCountData } = processData(transactions, selectedRange);
-
+  const [walletData, setWalletData] = useState({ address: '', currentBalance: 0, pendingBalance: 0 });
+  const [transactions, setTransactions] = useState([]);
   const [chartType, setChartType] = useState('balance');
   const [chartTitle, setChartTitle] = useState('Balance over Time');
+  const [showChartDropdown, setShowChartDropdown] = useState(false);
+
+  useEffect(() => {
+    fetchWalletData();
+    fetchTransactions();
+  }, []);
+
+  const fetchWalletData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/wallet');
+      setWalletData(response.data);
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/transactions');
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    }
+  };
+
+  const processData = () => {
+    const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const balanceData = {
+      labels: [],
+      datasets: [{
+        label: 'Balance',
+        data: [],
+        borderColor: graphColorA,
+        fill: false,
+      }],
+    };
+
+    const earningsData = {
+      labels: [],
+      datasets: [
+        {
+          label: 'Monthly Earnings',
+          data: [],
+          backgroundColor: graphColorB,
+        },
+      ],
+    };
+
+    const transactionCountData = {
+      labels: [],
+      datasets: [
+        {
+          label: 'Transactions',
+          data: [],
+          borderColor: graphColorC,
+          fill: false,
+        },
+      ],
+    };
+
+    const monthlyEarnings = {};
+
+    sortedTransactions.forEach((transaction) => {
+      const date = format(new Date(transaction.date), 'yyyy-MM-dd');
+      const monthYear = format(new Date(transaction.date), 'yyyy-MM');
+
+      if (!balanceData.labels.includes(date)) {
+        balanceData.labels.push(date);
+        transactionCountData.labels.push(date);
+        balanceData.datasets[0].data.push(transaction.amount);
+        transactionCountData.datasets[0].data.push(1);
+      } else {
+        const index = balanceData.labels.indexOf(date);
+        balanceData.datasets[0].data[index] += transaction.amount;
+        transactionCountData.datasets[0].data[index] += 1;
+      }
+
+      if (transaction.amount > 0) {
+        monthlyEarnings[monthYear] = (monthlyEarnings[monthYear] || 0) + transaction.amount;
+      }
+    });
+
+    Object.keys(monthlyEarnings).sort().slice(-12).forEach((month) => {
+      earningsData.labels.push(month);
+      earningsData.datasets[0].data.push(monthlyEarnings[month]);
+    });
+
+    return { balanceData, earningsData, transactionCountData };
+  };
+
+  const chartOptions = (yAxisLabel) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { type: 'time', time: { unit: 'day' } },
+      y: { title: { display: true, text: yAxisLabel } },
+    },
+  });
+
+  const Dropdown = ({ onSelect }) => (
+    <ul className="dropdown-menu">
+      <li onClick={() => onSelect('balance', 'Balance over Time')}>Balance over Time</li>
+      <li onClick={() => onSelect('earnings', 'Monthly Earnings')}>Monthly Earnings</li>
+      <li onClick={() => onSelect('transactions', 'Transactions over Time')}>Transactions over Time</li>
+    </ul>
+  );
+
+  const ChartContainer = ({ chartType, chartData }) => {
+    switch (chartType) {
+      case 'balance':
+        return <LineChart data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
+      case 'earnings':
+        return <BarChart data={chartData.earningsData} options={chartOptions('Monthly Earnings')} className="chart" />;
+      case 'transactions':
+        return <LineChart data={chartData.transactionCountData} options={chartOptions('Number of Transactions')} className="chart" />;
+      default:
+        return <LineChart data={chartData.balanceData} options={chartOptions('Balance (in OrcaCoins)')} className="chart" />;
+    }
+  };
+
+  const { balanceData, earningsData, transactionCountData } = processData();
 
   const handleChartSelection = (type, title) => {
     setChartType(type);
     setChartTitle(title);
     setShowChartDropdown(false);
-  };
-
-  const handleTimeFilterSelection = (range) => {
-    setSelectedRange(range);
-    setShowTimeFilterDropdown(false);
   };
 
   return (
@@ -184,11 +152,15 @@ const Wallet = () => {
       <div className="two-column">
         <div className="label-value-pair">
           <label>Wallet ID:</label>
-          <span>YourPublicWalletID</span>
+          <span>{walletData.address}</span>
         </div>
         <div className="label-value-pair">
-          <label>Balance:</label>
-          <span>{transactions[0]?.['Running Balance'] || 0} ORCA</span>
+          <label>Current Balance:</label>
+          <span>{walletData.currentBalance} ORCA</span>
+        </div>
+        <div className="label-value-pair">
+          <label>Pending Balance:</label>
+          <span>{walletData.pendingBalance} ORCA</span>
         </div>
       </div>
       <div className="chart">
@@ -198,17 +170,13 @@ const Wallet = () => {
             <img src={dropDown} alt="Chart Dropdown Icon" onClick={() => setShowChartDropdown(!showChartDropdown)} />
             {showChartDropdown && <Dropdown onSelect={handleChartSelection} />}
           </div>
-          <div className="time-filter-container">
-            <img
-              src={dropDown}
-              alt="Time Filter Icon"
-              onClick={() => setShowTimeFilterDropdown(!showTimeFilterDropdown)}
-              style={{ filter: `drop-shadow(0 0 2px ${colorMapping[chartType]})` }}
-            />
-            {showTimeFilterDropdown && <TimeFilterDropdown onSelect={handleTimeFilterSelection} />}
-          </div>
         </div>
-        <ChartContainer chartType={chartType} chartData={{ balanceData, earningsData, transactionCountData }} chartTitle={chartTitle} />
+        <div className="chart-graph" style={{ height: 'calc(100vh - 375px)' }}>
+          <ChartContainer
+            chartType={chartType}
+            chartData={{ balanceData, earningsData, transactionCountData }}
+          />
+        </div>
       </div>
     </div>
   );
