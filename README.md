@@ -1,6 +1,6 @@
 # BlubberBytes
 
-**BlubberBytes** is a distributed file-sharing and HTTP proxy tool that allows users to share files by hash, set up a public gateway, and more.
+**BlubberBytes** is a distributed file-sharing and HTTP proxy tool that allows users to share files by hash, share files by link, be and use a proxy, and more. It uses btcd and btcwallet for transactions that act as monetary incentives.
 
 ## Prerequisites
 
@@ -9,6 +9,7 @@ Make sure you have the following installed on your system:
 - **Node.js** (v14 or newer): Download from [nodejs.org](https://nodejs.org/).
 - **npm** (Node Package Manager): Comes with Node.js.
 - **Electron**: You do **not** need to install Electron globally; it will be installed automatically as part of the project dependencies.
+- **Go**: Download from [go.dev/dl/](https://go.dev/dl/)
 
 ## Getting Started
 
@@ -22,42 +23,57 @@ First, clone the repository to your local machine:
 git clone https://github.com/faefey/blubberbytes.git
 ```
 
-### Step 2: Set Up the Client
+### Step 2: Build Btcd and Btcwallet
 
-Navigate to the `client` directory:
+Navigate to the `btcd` and `btcwallet` directories and run the following commands:
+
+```bash
+cd blubberbytes/server/btcd
+go mod tidy
+go clean
+go build
+```
+
+```bash
+cd blubberbytes/server/btcwallet
+go mod tidy
+go clean
+go build
+```
+
+### Step 3: Run the Server
+
+Navigate to the `server` directory and run the server:
+
+```bash
+cd blubberbytes/server
+go run .
+```
+
+If btcd or btcwallet fails to start, make sure that the btcd and btcwallet processes are not already running and kill them if they are running. Make sure that the server itself is not already running as well.
+
+You can change the `net` variable in `blubberbytes/server/main.go` to connect to a specific network. It is set to the testnet by default.
+
+### Step 4: Set Up the Client
+
+Navigate to the `client` directory and install the required dependencies:
 
 ```bash
 cd blubberbytes/client
-```
-
-### Step 3: Install Dependencies
-
-Install the required dependencies by running:
-
-```bash
 npm install
 ```
 
-> **Note**: This step will also install Electron as defined in the `package.json` file, so no separate installation is needed.
+### Step 5: Build and Run the Client
 
-### Step 4: Build the Project
-
-Once the dependencies are installed, build the project with:
+Once the dependencies are installed, build and run the client with:
 
 ```bash
 npm run build
-```
-
-### Step 5: Run Electron
-
-After building, you can run the Electron app:
-
-```bash
 npm run electron
 ```
 
-This command will start the Electron desktop application.
-
 ## Running the Application
 
-After completing the steps above, the GUI should open up automatically. 
+After completing the steps above, the GUI should open up automatically.
+
+If the server is running, you can go to http://localhost:3001/generate to generate/mine a block to gain coins. It will take some time before the server responds with the generated block.
