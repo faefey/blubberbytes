@@ -82,21 +82,18 @@ func DownloadFileHandler(w http.ResponseWriter, r *http.Request, node host.Host,
 
 	name, data, ext, address, err := p2p.SimplyDownload(node, request.Peer, request.Hash)
 	if err != nil {
-		fmt.Println("SimplyDownload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	btcutilAddress, err := btcutil.DecodeAddress(address, netParams)
 	if err != nil {
-		fmt.Println("DecodeAddress")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	_, err = btcwallet.SendToAddress(btcutilAddress, btcutil.Amount(request.Price*1e8))
+	_, err = btcwallet.SendFrom("default", btcutilAddress, btcutil.Amount(request.Price*1e8))
 	if err != nil {
-		fmt.Printf("SendFrom Error:  %s", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -104,7 +101,6 @@ func DownloadFileHandler(w http.ResponseWriter, r *http.Request, node host.Host,
 	date := time.Now().Local().Format("01/02/2006")
 	err = operations.AddDownloads(db, date, request.Hash, name, ext, int64(len(data)), request.Price)
 	if err != nil {
-		fmt.Println("AddDownloads")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
